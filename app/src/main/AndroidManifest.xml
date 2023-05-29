@@ -31,11 +31,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="YOUR_API_KEY" />
-
         <activity
-            android:name=".MapsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_maps" />
+            android:name=".Statistics"
+            android:exported="false" />
         <activity
             android:name=".Location"
             android:exported="false" />
