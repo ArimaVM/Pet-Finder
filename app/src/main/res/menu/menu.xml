@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/ic_dashboard"
+            android:title="@string/strDashboard"/>
+        <item
+            android:id="@+id/nav_trash"
+            android:icon="@drawable/ic_trash"
+            android:title="@string/strTrash"/>
+
+    </group>
+
+    <item android:title="@string/strOther">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_feeder"
+                    android:icon="@drawable/ic_feeder"
+                    android:title="@string/strFeeder"/>
+                <item
+                    android:id="@+id/nav_settings"
+                    android:icon="@drawable/ic_settings"
+                    android:title="@string/strSetting"/>
+            </group>
+        </menu>
+    </item>
+
+</menu>

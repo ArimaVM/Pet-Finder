@@ -1,0 +1,90 @@
+<resources>
+    //MainActivity
+    <string name="app_name">Pet Finder</string>
+    <string name="feed_and_find"><b>Feed and Find:</b>\nA pet monitoring system on\nembedded collar technology.</string>
+    <string name="todo">todo</string>
+
+    //DashBoard items
+    <string name="name_assigned">Name Goes Here</string>
+    <string name="pet_breed">Pet Breed Goes Here</string>
+
+    //About
+    <string name="about">ABOUT</string>
+    <string name="about_info">The pet tracker developed by team Koinu is a cutting-edge mobile application that offers a comprehensive suite of features to help pet owners monitor the whereabouts, activity, and health of their beloved furry friends. Developed as part of The Feed and Find Initiative, this innovative app harnesses the power of embedded collar technology to provide real-time tracking of pets.\n\nWith this pet tracker, pet owners can stay up-to-date on the behavior and activity levels of their pets, enabling them to better understand and respond to the needs of their pets. In addition, the app offers access to a pet social network, allowing pet owners to connect with other pet lovers and share experiences and advice.</string>
+
+    //Credits
+    <string name="credits">CREDITS</string>
+    <string name="credits_info"><b>The Feed and Find Initiative Team</b>\nCheryl Marie Chomis Alimba\nHyrum Roi Sapurco Bravo\nJasper Daile Tuibeo Corpuz\nJohn Homer Sayno Dar\nAr-jay De La Fuente\nKirby Ann Aycardo De Los Reyes\nAngelo Millares Echano\nArriana Mae Vargas Malubay\nIvan Meir Pablo Morada\nRenze Meinard Mortiga\nWendee Davillo Postre\nChristine Magana Toral\nKai Lapak Yaneza\n\n<b>Team Koinu</b>\nCheryl Marie Chomis Alimba\nAngelo Millares Echano\nArriana Mae Vargas Malubay\nIvan Meir Pablo Morada\nRenze Meinard Mortiga\nChristine Magana Toral\nKai Lapak Yaneza\n\n<b>Lead Wiring Team</b>\nAngelo Millares Echano\nKai Lapak Yaneza\n\n<b>Mobile Application Developers</b>\nCheryl Marie Chomis Alimba\nArriana Mae Vargas Malubay\nIvan Meir Morada\n\n<b>Lead Researchers</b>\nRenze Meinard Mortiga\nChristine Magana Toral\n\n<b>Special Thanks To:</b>\nTeam Lumos\nThe Institute of Computer Studies\nCamarines Norte State College\n3A Glass and Aluminum Works and Services\nand\nProfessor Marc Lester Acunin</string>
+    <string name="logo">logo</string>
+    <string name="app">Feed and Find:</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+
+    //Navigation
+    <string name="strDashboard">Dashboard</string>
+    <string name="strCredits">Credits</string>
+    <string name="strAbout">About</string>
+    <string name="strStatistics">Statistics</string>
+    <string name="strOther">Other</string>
+    <string name="strFeeder">Feeder</string>
+    <string name="strSetting">Settings</string>
+    <string name="strLogout">Log out</string>
+    <string name="navigation_header">navigation header</string>
+    <string name="my_app">My App</string>
+    <string name="addbtn_descrip">Add Pet</string>
+
+    //Info
+    <string name="profile_information">Profile Information:</string>
+    <string name="name">Name:</string>
+    <string name="breed">Breed:</string>
+    <string name="age">Age:</string>
+    <string name="sex">Sex:</string>
+    <string name="birthdate">Birthdate:</string>
+    <string name="weight">Weight:</string>
+    <string name="health_information">Health Information:</string>
+    <string name="allergies">Allergies:</string>
+    <string name="treats">Treats:</string>
+    <string name="restrictions">Restrictions:</string>
+    <string name="medications">Medications:</string>
+    <string name="vet_name">Vet Name:</string>
+    <string name="contact_information">Contact Information:</string>
+    <string name="physical_address">Physical Address:</string>
+    <string name="contact_number">Contact Number:</string>
+    <string name="email_address">Email Address:</string>
+
+    <string name="password">Password</string>
+    <string name="add_pet">Add Pet</string>
+    <string name="address">Address:</string>
+    <string name="birthday_label">Birthday:</string>
+    <string name="personal_information">Personal Information</string>
+    <string name="pet_name">Pet Name</string>
+    <string name="pet_type_and_breed">Pet Type and Breed</string>
+    <string name="birthday">Birthday</string>
+    <string name="sex_input">Sex</string>
+    <string name="birthday_input">Birthday</string>
+    <string name="pet_name_label">Pet Name:</string>
+    <string name="pet_type_and_breed_label">Pet Type and Breed:</string>
+    <string name="birthday_text">Birthday:</string>
+    <string name="pet_informationLabel">Pet Information</string>
+    <string name="contact_informationLabel">Contact Information</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="health_informationLabel">Health Information</string>
+    <string name="vet_contact">Vet Contact:</string>
+    <string name="cancelBtn">CANCEL</string>
+    <string name="submitBtn">SUBMIT</string>
+    <string name="deviceNum">Device ID: 0001</string>
+    <string name="updateBtn">UPDATE</string>
+    <string name="strTrash">Trash</string>
+    <string name="strLocation">Location</string>
+    <string name="strPet_profile">Pet Profile</string>
+    <string name="show_location">Show Location</string>
+    <string name="location">Location</string>
+    <string name="radar">Radar</string>
+    <string name="username">Username</string>
+    <string name="date_format">MM/DD/YYYY</string>
+    <string name="strSearch">Search</string>
+    <string name="strDelete_all">Delete Al</string>
+    <string name="strSort">Sort</string>
+    <string name="StrDelete_all_records">Delete All Records</string>
+</resources>
