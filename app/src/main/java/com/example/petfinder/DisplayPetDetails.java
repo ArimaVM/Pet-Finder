@@ -1,5 +1,6 @@
 package com.example.petfinder;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -17,6 +18,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.blogspot.atifsoftwares.circularimageview.CircularImageView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -25,6 +28,7 @@ public class DisplayPetDetails extends AppCompatActivity {
 
     private CircularImageView petProfile;
     private TextView petName, petBreed, petSex, date, petWeight;
+    private BottomNavigationView bottomNav;
     private String recordID;
     private DatabaseHelper dbhelper;
 
@@ -39,6 +43,24 @@ public class DisplayPetDetails extends AppCompatActivity {
         petSex = findViewById(R.id.petSexDisplay);
         date = findViewById(R.id.petBdateDisplay);
         petWeight = findViewById(R.id.petWeightDisplay);
+
+        bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.nav_petProfile:
+                        break;
+                    case R.id.nav_location:
+                        startActivity(new Intent(DisplayPetDetails.this, Location.class));
+                        break;
+                    case R.id.nav_statistics:
+                        startActivity(new Intent(DisplayPetDetails.this, Statistics.class));
+                        break;
+                }
+                return true;
+            }
+        });
 
         Intent intent = getIntent();
         recordID = intent.getStringExtra("RECORD_ID");
