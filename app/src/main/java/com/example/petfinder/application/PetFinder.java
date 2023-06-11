@@ -20,6 +20,4 @@ public class PetFinder extends Application {
         super.onTerminate();
         Log.d(TAG, "Application terminated");
     }
-
-
 }

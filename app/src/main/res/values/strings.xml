@@ -87,5 +87,7 @@
     <string name="strDelete_all">Delete Al</string>
     <string name="strSort">Sort</string>
     <string name="StrDelete_all_records">Delete All Records</string>
-    <string name="hello_world">Hello World</string>
+
+    //Location
+    <string name="mapAPIKey">AIzaSyCQ7cZSLgPwcQwAQGkfe7jKnRRWVSzuVHA</string>
 </resources>
