@@ -31,6 +31,7 @@ public class DisplayPetDetails extends AppCompatActivity {
     private BottomNavigationView bottomNav;
     private String recordID;
     private DatabaseHelper dbhelper;
+    String pet_id, name, breed, sex, age, weight, image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +94,16 @@ public class DisplayPetDetails extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.editPet) {
-            startActivity(new Intent(DisplayPetDetails.this, EditPet.class));
+            Intent intent = new Intent(DisplayPetDetails.this, EditPet.class);
+            intent.putExtra("isEditMode", true);
+            intent.putExtra("ID", pet_id);
+            intent.putExtra("NAME", name);
+            intent.putExtra("BREED", breed);
+            intent.putExtra("SEX", sex);
+            intent.putExtra("BDATE", age);
+            intent.putExtra("WEIGHT", weight);
+            intent.putExtra("IMAGE", image);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -106,13 +116,13 @@ public class DisplayPetDetails extends AppCompatActivity {
 
         if (cursor.moveToFirst()) {
             do {
-                String id = ""+cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_ID));
-                String name = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PETNAME));
-                String breed ="" +cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BREED));
-                String sex = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_SEX));
-                String age = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_AGE));
-                String weight = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_WEIGHT));
-                String image = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE));
+                pet_id = ""+cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_ID));
+                name = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PETNAME));
+                breed ="" +cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BREED));
+                sex = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_SEX));
+                age = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_AGE));
+                weight = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_WEIGHT));
+                image = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE));
 
                 petName.setText(name);
                 petBreed.setText(breed);

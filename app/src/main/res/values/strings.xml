@@ -35,12 +35,12 @@
 
     //Info
     <string name="profile_information">Profile Information:</string>
-    <string name="name">Name:</string>
-    <string name="breed">Breed:</string>
-    <string name="age">Age:</string>
-    <string name="sex">Sex:</string>
+    <string name="name">Name</string>
+    <string name="breed">Breed</string>
+    <string name="age">Age</string>
+    <string name="sex">Sex</string>
     <string name="birthdate">Birthdate:</string>
-    <string name="weight">Weight:</string>
+    <string name="weight">Weight</string>
     <string name="health_information">Health Information:</string>
     <string name="allergies">Allergies:</string>
     <string name="treats">Treats:</string>
@@ -90,4 +90,6 @@
 
     //Location
     <string name="mapAPIKey">AIzaSyCQ7cZSLgPwcQwAQGkfe7jKnRRWVSzuVHA</string>
+    <string name="birth_date">Birth Date</string>
+    <string name="age_edittext">Age</string>
 </resources>

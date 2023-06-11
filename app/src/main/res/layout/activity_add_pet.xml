@@ -16,10 +16,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:menu="@menu/add_menu"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:title="Add Pet"
-        app:titleTextColor="@color/white"
-        app:menu="@menu/add_menu"/>
+        app:titleTextColor="@color/white" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -30,42 +30,43 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="5dp"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp">
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical">
 
             <com.blogspot.atifsoftwares.circularimageview.CircularImageView
                 android:id="@+id/petPic"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_marginTop="20dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="20dp"
                 android:src="@drawable/ic_add_image"
                 app:c_border="true"
-                app:c_border_width="1dp"
-                app:c_border_color="@color/black" />
+                app:c_border_color="@color/black"
+                app:c_border_width="1dp" />
 
             <TextView
                 android:id="@+id/personal_Info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
                 android:text="@string/pet_informationLabel"
                 android:textColor="@color/black"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_gravity="center"/>
+                android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxBackgroundColor="@color/white">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/petName"
                     android:layout_width="match_parent"
@@ -75,13 +76,14 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxBackgroundColor="@color/white">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/breed"
                     android:layout_width="match_parent"
@@ -91,13 +93,13 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:layout_marginTop="6dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxBackgroundColor="@color/white"/>
+                android:layout_marginEnd="16dp"
+                app:boxBackgroundColor="@color/white" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -107,56 +109,90 @@
                 android:layout_marginBottom="16dp"
                 android:text="@string/sex"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <RadioGroup
                 android:id="@+id/sexRB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="-50dp"
                 android:layout_marginStart="90dp"
-                android:layout_marginBottom="5dp">
+                android:layout_marginTop="-50dp"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
                 <RadioButton
                     android:id="@+id/femaleRB"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/female"
-                    android:textSize="15sp"
                     android:layout_marginStart="30dp"
-                    android:layout_marginEnd="30dp"/>
+                    android:layout_marginEnd="30dp"
+                    android:text="@string/female"
+                    android:textSize="15sp" />
+
                 <RadioButton
                     android:id="@+id/maleRB"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/male"
-                    android:textSize="15sp"/>
+                    android:textSize="15sp" />
             </RadioGroup>
 
-            <com.google.android.material.textfield.TextInputLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:boxBackgroundColor="@color/white">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/bdate"
-                    android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:weightSum="10">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_weight="7"
+                    app:boxBackgroundColor="@color/white">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/bdate"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:hint="@string/birth_date"
+                        android:inputType="none" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="@string/date_format"
-                    android:inputType="" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_weight="3"
+                    app:boxBackgroundColor="@color/white">
 
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/age"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:hint="@string/age_edittext"
+                        android:inputType="none" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxBackgroundColor="@color/white">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/weight"
                     android:layout_width="match_parent"
@@ -167,7 +203,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="50dp"/>
+                android:layout_height="50dp" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

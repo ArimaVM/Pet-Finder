@@ -49,7 +49,7 @@ public class EditPet extends AppCompatActivity {
     private String[] cameraPermissions;
     private String[] storagePermissions;
     private Uri imageUri;
-    private  String id, pname, breed, sex, age, weight, addedTime, updatedTime;
+    private  String pet_id, pname, breed, sex, age, weight, addedTime, updatedTime;
     private boolean isEditMode;
 
     @Override
@@ -75,15 +75,13 @@ public class EditPet extends AppCompatActivity {
         Intent intent = getIntent();
         isEditMode = intent.getBooleanExtra("isEditMode", false);
         if (isEditMode){
-            id = intent.getStringExtra("ID");
+            pet_id = intent.getStringExtra("ID");
             pname = intent.getStringExtra("NAME");
             breed = intent.getStringExtra("BREED");
             sex = intent.getStringExtra("SEX");
             age = intent.getStringExtra("BDATE");
             weight = intent.getStringExtra("WEIGHT");
             imageUri = Uri.parse(intent.getStringExtra("IMAGE"));
-            addedTime = intent.getStringExtra("ADDED_TIME");
-            updatedTime = intent.getStringExtra("UPDATED_TIME");
             petName.setText(pname);
             petBreed.setText(breed);
             // Set the selected radio button based on the sex
@@ -146,7 +144,9 @@ public class EditPet extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.updatePet) {
             storeData();
-            startActivity(new Intent(EditPet.this, DisplayPetDetails.class));
+            Intent intent = new Intent(EditPet.this, DisplayPetDetails.class);
+            intent.putExtra("RECORD_ID", pet_id);
+            startActivity(intent);
             return true;
         }
         else if (id ==R.id.deletePet){
@@ -320,7 +320,7 @@ public class EditPet extends AppCompatActivity {
         if (isEditMode) {
             String timestamp = ""+System.currentTimeMillis();
             databaseHelper.updateData(
-                    ""+id,
+                    ""+ pet_id,
                     ""+pname,
                     ""+breed,
                     ""+sex,
@@ -329,8 +329,7 @@ public class EditPet extends AppCompatActivity {
                     ""+imageUri,
                     ""+addedTime,
                     ""+timestamp);
-        }
-        else {
+        } else {
             String timestamp = ""+System.currentTimeMillis();
             long id = databaseHelper.storeData(
                     ""+petName,

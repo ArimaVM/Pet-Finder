@@ -34,7 +34,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.util.Calendar;
 
 public class AddPet extends AppCompatActivity {
-    TextInputEditText pname, pbreed, pweight, bdate;
+    TextInputEditText pname, pbreed, pweight, bdate, age_edittext;
     RadioGroup psex;
     RadioButton radioButton;
     CircularImageView picture;
@@ -54,13 +54,13 @@ public class AddPet extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_pet);
-
         pname = findViewById(R.id.petName);
         pbreed = findViewById(R.id.breed);
         psex = findViewById(R.id.sexRB);
         pweight = findViewById(R.id.weight);
         bdate = findViewById(R.id.bdate);
         picture = findViewById(R.id.petPic);
+        age_edittext = findViewById(R.id.age);
         databaseHelper = new DatabaseHelper(this);
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -79,12 +79,10 @@ public class AddPet extends AppCompatActivity {
             }
         });
 
-        bdate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        bdate.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showDatePickerDialog();
-                }
+            public void onClick(View view) {
+                showDatePickerDialog();
             }
         });
 
@@ -127,11 +125,30 @@ public class AddPet extends AppCompatActivity {
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         // Update the text of the EditText with the selected date
                         bdate.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
+
+                        // Calculate age
+                        Calendar currentDate = Calendar.getInstance();
+                        int currentYear = currentDate.get(Calendar.YEAR);
+                        int currentMonth = currentDate.get(Calendar.MONTH) + 1; // Months are zero-based
+                        int currentDayOfMonth = currentDate.get(Calendar.DAY_OF_MONTH);
+
+                        int selectedYear = year;
+                        int selectedMonth = month + 1; // Months are zero-based
+                        int selectedDayOfMonth = dayOfMonth;
+
+                        int age = currentYear - selectedYear;
+                        if (currentMonth < selectedMonth || (currentMonth == selectedMonth && currentDayOfMonth < selectedDayOfMonth)) {
+                            age--; // Not yet reached the birthdate in the current year
+                        }
+
+                        // Display age
+                        age_edittext.setText(String.valueOf(age));
                     }
                 }, year, month, dayOfMonth);
 
         // Show the dialog
         datePickerDialog.show();
+
     }
 
     private  boolean checkStoragePermission(){
