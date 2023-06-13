@@ -1,4 +1,4 @@
-package com.example.petfinder.application.container;
+package com.example.petfinder.container;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -14,8 +14,8 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.petfinder.R;
-import com.example.petfinder.application.components.Dashboard;
-import com.example.petfinder.application.components.Settings;
+import com.example.petfinder.components.Dashboard;
+import com.example.petfinder.components.Settings;
 import com.google.android.material.navigation.NavigationView;
 
 public class DrawerNav extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{

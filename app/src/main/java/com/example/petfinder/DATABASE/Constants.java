@@ -1,4 +1,4 @@
-package com.example.petfinder.application.DATABASE;
+package com.example.petfinder.DATABASE;
 
 public class Constants {
 

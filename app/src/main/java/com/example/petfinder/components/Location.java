@@ -1,4 +1,4 @@
-package com.example.petfinder.application.components;
+package com.example.petfinder.components;
 
 
 import android.content.pm.PackageManager;

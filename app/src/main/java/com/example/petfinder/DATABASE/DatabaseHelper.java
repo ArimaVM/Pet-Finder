@@ -1,4 +1,4 @@
-package com.example.petfinder.application.DATABASE;
+package com.example.petfinder.DATABASE;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -7,7 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.petfinder.application.container.RecordModel;
+import com.example.petfinder.container.RecordModel;
 
 import org.jetbrains.annotations.Nullable;
 

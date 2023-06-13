@@ -1,4 +1,4 @@
-package com.example.petfinder.application.pages.user;
+package com.example.petfinder.pages.user;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;

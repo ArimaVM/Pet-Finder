@@ -1,13 +1,13 @@
-package com.example.petfinder.application.components;
+package com.example.petfinder.components;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.example.petfinder.application.container.DrawerNav;
+import com.example.petfinder.container.DrawerNav;
 import com.example.petfinder.R;
-import com.example.petfinder.application.pages.user.UserInfo;
+import com.example.petfinder.pages.user.UserInfo;
 import com.example.petfinder.databinding.ActivitySettingsBinding;
 
 public class Settings extends DrawerNav {

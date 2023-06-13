@@ -1,4 +1,4 @@
-package com.example.petfinder.application.container;
+package com.example.petfinder.container;
 
 public class RecordModel {
     String id, name, breed, sex, age, weight, image, addedtime, updatedtime;

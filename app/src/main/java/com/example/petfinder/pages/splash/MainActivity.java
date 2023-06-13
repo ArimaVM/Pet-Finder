@@ -1,4 +1,4 @@
-package com.example.petfinder.application.pages.splash;
+package com.example.petfinder.pages.splash;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 
-import com.example.petfinder.application.components.Dashboard;
+import com.example.petfinder.components.Dashboard;
 import com.example.petfinder.R;
 
 import java.util.Timer;

@@ -27,40 +27,40 @@
             android:value="@string/mapAPIKey" />
 
         <activity
-            android:name=".application.components.Statistics"
+            android:name=".components.Statistics"
             android:exported="false" />
         <activity
-            android:name=".application.components.Location"
+            android:name=".components.Location"
             android:exported="false" />
         <activity
-            android:name=".application.pages.pet.DisplayPetDetails"
+            android:name=".pages.pet.DisplayPetDetails"
             android:exported="false" />
         <activity
-            android:name=".application.pages.user.UserInfo"
+            android:name=".pages.user.UserInfo"
             android:exported="false" />
         <activity
-            android:name=".application.pages.pet.EditPet"
+            android:name=".pages.pet.EditPet"
             android:exported="false" />
         <activity
-            android:name=".application.components.Credits"
+            android:name=".components.Credits"
             android:exported="false" />
         <activity
-            android:name=".application.components.About"
+            android:name=".components.About"
             android:exported="false" />
         <activity
-            android:name=".application.pages.pet.AddPet"
+            android:name=".pages.pet.AddPet"
             android:exported="false" />
         <activity
-            android:name=".application.components.Settings"
+            android:name=".components.Settings"
             android:exported="false" />
         <activity
-            android:name=".application.container.DrawerNav"
+            android:name=".container.DrawerNav"
             android:exported="false" />
         <activity
-            android:name=".application.components.Dashboard"
+            android:name=".components.Dashboard"
             android:exported="false" />
         <activity
-            android:name=".application.pages.splash.MainActivity"
+            android:name=".pages.splash.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

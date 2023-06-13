@@ -1,4 +1,4 @@
-package com.example.petfinder.application.components;
+package com.example.petfinder.components;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -8,14 +8,14 @@ import android.view.View;
 
 import com.example.petfinder.R;
 
-public class Credits extends AppCompatActivity {
+public class About extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_credits);
+        setContentView(R.layout.activity_about);
 
-        Toolbar myToolbar = findViewById(R.id.credit_toolbar);
+        Toolbar myToolbar = findViewById(R.id.about_toolbar);
         setSupportActionBar(myToolbar);
 
         // Set the custom back arrow as the navigation icon

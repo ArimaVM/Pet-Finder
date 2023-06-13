@@ -1,4 +1,4 @@
-package com.example.petfinder.application.container;
+package com.example.petfinder.container;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +15,8 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petfinder.R;
-import com.example.petfinder.application.DATABASE.DatabaseHelper;
-import com.example.petfinder.application.pages.pet.DisplayPetDetails;
+import com.example.petfinder.DATABASE.DatabaseHelper;
+import com.example.petfinder.pages.pet.DisplayPetDetails;
 
 import java.util.ArrayList;
 

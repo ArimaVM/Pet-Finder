@@ -1,4 +1,4 @@
-package com.example.petfinder.application.pages.pet;
+package com.example.petfinder.pages.pet;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,11 +16,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.blogspot.atifsoftwares.circularimageview.CircularImageView;
-import com.example.petfinder.application.DATABASE.Constants;
-import com.example.petfinder.application.DATABASE.DatabaseHelper;
-import com.example.petfinder.application.components.Location;
+import com.example.petfinder.DATABASE.Constants;
+import com.example.petfinder.DATABASE.DatabaseHelper;
+import com.example.petfinder.components.Location;
 import com.example.petfinder.R;
-import com.example.petfinder.application.components.Statistics;
+import com.example.petfinder.components.Statistics;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
