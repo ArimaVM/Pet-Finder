@@ -27,40 +27,40 @@
             android:value="@string/mapAPIKey" />
 
         <activity
-            android:name=".Statistics"
+            android:name=".application.components.Statistics"
             android:exported="false" />
         <activity
-            android:name=".Location"
+            android:name=".application.components.Location"
             android:exported="false" />
         <activity
-            android:name=".DisplayPetDetails"
+            android:name=".application.pages.pet.DisplayPetDetails"
             android:exported="false" />
         <activity
-            android:name=".UserInfo"
+            android:name=".application.pages.user.UserInfo"
             android:exported="false" />
         <activity
-            android:name=".EditPet"
+            android:name=".application.pages.pet.EditPet"
             android:exported="false" />
         <activity
-            android:name=".Credits"
+            android:name=".application.components.Credits"
             android:exported="false" />
         <activity
-            android:name=".About"
+            android:name=".application.components.About"
             android:exported="false" />
         <activity
-            android:name=".AddPet"
+            android:name=".application.pages.pet.AddPet"
             android:exported="false" />
         <activity
-            android:name=".Settings"
+            android:name=".application.components.Settings"
             android:exported="false" />
         <activity
-            android:name=".DrawerNav"
+            android:name=".application.container.DrawerNav"
             android:exported="false" />
         <activity
-            android:name=".Dashboard"
+            android:name=".application.components.Dashboard"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".application.pages.splash.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

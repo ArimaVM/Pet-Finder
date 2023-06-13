@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/purple_background"
     android:fitsSystemWindows="true"
-    tools:context=".DrawerNav"
+    tools:context=".application.container.DrawerNav"
     tools:openDrawer="start">
 
     <include layout="@layout/content_layout"

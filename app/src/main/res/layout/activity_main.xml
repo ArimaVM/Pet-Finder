@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/purple_background"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".application.pages.splash.MainActivity">
 
     <ProgressBar
         android:id="@+id/pb"
