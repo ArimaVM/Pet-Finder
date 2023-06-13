@@ -1,8 +1,12 @@
 package com.example.petfinder.application.components;
 
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -10,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.petfinder.R;
+import com.example.petfinder.application.pages.pet.DisplayPetDetails;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,14 +26,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 
 public class Location extends AppCompatActivity implements OnMapReadyCallback {
 
+    private BottomNavigationView bottomNav;
     private final int FINE_PERMISSION_CODE = 1;
     private GoogleMap myMap;
     android.location.Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
+    private GoogleMap googleMap;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +66,8 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback {
             }
         });
     }
+
+
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
