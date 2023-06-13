@@ -7,18 +7,18 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import androidx.appcompat.widget.SearchView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petfinder.DATABASE.Constants;
 import com.example.petfinder.DATABASE.DatabaseHelper;
-import com.example.petfinder.container.DrawerNav;
 import com.example.petfinder.R;
+import com.example.petfinder.container.DrawerNav;
 import com.example.petfinder.container.RecordAdapter;
-import com.example.petfinder.pages.pet.AddPet;
 import com.example.petfinder.databinding.ActivityDashboardBinding;
+import com.example.petfinder.pages.pet.AddPet;
 
 public class Dashboard extends DrawerNav {
 

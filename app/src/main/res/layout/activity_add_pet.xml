@@ -159,7 +159,7 @@
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:focusable="false"
-                        android:hint="@string/birth_date"
+                        android:hint="@string/birthdate"
                         android:inputType="none" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -179,7 +179,7 @@
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:focusable="false"
-                        android:hint="@string/age_edittext"
+                        android:hint="@string/age"
                         android:inputType="none" />
 
                 </com.google.android.material.textfield.TextInputLayout>
