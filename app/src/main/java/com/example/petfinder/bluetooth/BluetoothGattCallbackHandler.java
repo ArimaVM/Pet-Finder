@@ -3,24 +3,22 @@ package com.example.petfinder.bluetooth;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.petfinder.pages.splash.MainActivity;
-
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
 
-    private static final String TAG = BluetoothGattCallbackHandler.class.getSimpleName();
-
-    private static final UUID SERVICE_UUID = UUID.fromString("0000180f-0000-1000-8000-00805f9b34fb");
-    private static final UUID CHARACTERISTIC_UUID = UUID.fromString("00002a19-0000-1000-8000-00805f9b34fb");
-
     private BluetoothGattCharacteristic characteristic;
+    private ConnectionStateCallback connectionStateCallback;
+    private ServiceDiscoveredCallback serviceDiscoveredCallback;
+    private CharacteristicChangedCallback characteristicChangedCallback;
 
     private Context context; // Context reference for displaying Toast
     private Handler handler;
@@ -30,19 +28,51 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
         this.handler = handler;
     }
 
+    public interface ConnectionStateCallback {
+        void onConnectionStateChanged(boolean isConnected);
+    }
+
+    public void setConnectionStateCallback(ConnectionStateCallback callback) {
+        this.connectionStateCallback = callback;
+    }
+
+    public interface CharacteristicChangedCallback {
+        void onCharacteristicChanged(String value);
+    }
+
+    public void setCharacteristicChangedCallback(CharacteristicChangedCallback callback) {
+        this.characteristicChangedCallback = callback;
+    }
+
+    public interface ServiceDiscoveredCallback {
+        void onServiceDiscoveredCallback(BluetoothGattCharacteristic characteristic);
+    }
+
+    public void setServiceDiscoveredCallback(ServiceDiscoveredCallback callback) {
+        this.serviceDiscoveredCallback = callback;
+    }
+
+
     @Override
     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
         super.onConnectionStateChange(gatt, status, newState);
 
         if (newState == BluetoothGatt.STATE_CONNECTED) {
-            // Connected to GATT server
-            displayToast("Connected to device.");
-
+            // Device connected
+            makeToast("Connected to device");
+            //Return true
+            if (connectionStateCallback != null) {
+                connectionStateCallback.onConnectionStateChanged(true);
+            }
             // Discover services
             gatt.discoverServices();
         } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
-            // Disconnected from GATT server
-            displayToast("Disconnected to device.");
+            // Device disconnected
+            makeToast("Disconnected from device");
+            //Return false
+            if (connectionStateCallback != null) {
+                connectionStateCallback.onConnectionStateChanged(false);
+            }
         }
     }
 
@@ -51,17 +81,30 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
         super.onServicesDiscovered(gatt, status);
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            // Find the service and characteristic of interest
-            BluetoothGattService service = gatt.getService(SERVICE_UUID);
-            characteristic = service.getCharacteristic(CHARACTERISTIC_UUID);
+            // Find the characteristic you want to receive data from
+            BluetoothGattService service = gatt.getService(UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB"));
+            characteristic = service.getCharacteristic(UUID.fromString("0000FFE1-0000-1000-8000-00805F9B34FB"));
 
-            // Perform operations on the characteristic
-            // For example, read or write data
+            if (serviceDiscoveredCallback != null) {
+                serviceDiscoveredCallback.onServiceDiscoveredCallback(characteristic);
+            }
+            // Enable notifications for the characteristic
+            boolean isNotificationEnabled = gatt.setCharacteristicNotification(characteristic, true);
 
-            // Read the characteristic value
-            gatt.readCharacteristic(characteristic);
-        } else {
-            displayToast("Service discovery failed");
+            if (isNotificationEnabled) {
+                for (BluetoothGattDescriptor descriptor : characteristic.getDescriptors()) {
+                    descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                    gatt.writeDescriptor(descriptor);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+        // Check if the descriptor write operation was successful
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+            // Ready to receive data from the characteristic
         }
     }
 
@@ -69,12 +112,8 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
     public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
         super.onCharacteristicRead(gatt, characteristic, status);
 
-        if (status == BluetoothGatt.GATT_SUCCESS) {
-            // Characteristic read successfully
-            final String value = characteristic.getStringValue(0);
-            displayToast("Characteristic value: " + value);
-        } else {
-            displayToast("Characteristic read failed");
+        if (status != BluetoothGatt.GATT_SUCCESS) {
+            makeToast("Characteristic read failed.");
         }
     }
 
@@ -82,17 +121,16 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
         super.onCharacteristicChanged(gatt, characteristic);
 
-        // Characteristic value changed
-        Log.d(TAG, "Characteristic value changed");
-
-        // Parse and process the updated characteristic value if needed
-        byte[] value = characteristic.getValue();
-        if (value != null && value.length > 0) {
-            // Process the updated value
+        byte[] data = characteristic.getValue();
+        String receivedData = new String(data, StandardCharsets.UTF_8);
+        Log.d("Bluetooth", "Received data: " + receivedData);
+        //Return receivedData
+        if (characteristicChangedCallback != null) {
+            characteristicChangedCallback.onCharacteristicChanged(receivedData);
         }
     }
 
-    private void displayToast(final String message) {
+    private void makeToast(String message){
         handler.post(new Runnable() {
             @Override
             public void run() {
