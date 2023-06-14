@@ -11,7 +11,7 @@
         <item
             android:id="@+id/nav_trash"
             android:icon="@drawable/ic_trash"
-            android:title="@string/strTrash"/>
+            android:title="@string/strDevice"/>
 
     </group>
 

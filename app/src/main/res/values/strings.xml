@@ -89,5 +89,10 @@
     <string name="StrDelete_all_records">Delete All Records</string>
     <string name="hello_world">Hello World</string>
 
+    <string name="show_list">Show List</string>
+    <string name="hide_list">Hide List</string>
+
+    //Location
     <string name="mapAPIKey">AIzaSyCQ7cZSLgPwcQwAQGkfe7jKnRRWVSzuVHA</string>
+    <string name="strDevice">Configure Device</string>
 </resources>
