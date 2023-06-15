@@ -4,6 +4,9 @@ package com.example.petfinder.components;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -44,6 +47,17 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback {
         getLastLocation();
 
         isConnected = getIntent().getBooleanExtra("isConnected", false);
+
+        ImageView emptyImageView = findViewById(R.id.empty);
+        TextView disconnectedTextView = findViewById(R.id.disconnected);
+
+        if (isConnected) {
+            emptyImageView.setVisibility(View.GONE);
+            disconnectedTextView.setVisibility(View.GONE);
+        } else {
+            emptyImageView.setVisibility(View.VISIBLE);
+            disconnectedTextView.setVisibility(View.VISIBLE);
+        }
 
         bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setOnItemSelectedListener(item -> {
