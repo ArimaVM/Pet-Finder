@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/purple_background"
-    tools:context=".application.components.Settings">
+    tools:context=".components.Settings">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -64,7 +64,7 @@
                     android:layout_height="40dp"
                     android:padding="12dp"
                     android:src="@drawable/ic_user"
-                    android:background="@drawable/round_blue_bg"/>
+                    android:background="@drawable/round_pink_bg"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -106,7 +106,8 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:minWidth="50dp"
-                    android:theme="@style/nightModeSwitch"/>
+                    android:theme="@style/nightModeSwitch"
+                    android:checked="true"/>
 
             </RelativeLayout>
             <RelativeLayout
@@ -159,7 +160,7 @@
                     android:layout_toEndOf="@+id/creditsIcon"/>
 
             </RelativeLayout>
-            <RelativeLayout
+            <!--<RelativeLayout
                 android:id="@+id/logout"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
@@ -183,7 +184,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_toEndOf="@+id/logoutIcon"/>
 
-            </RelativeLayout>
+            </RelativeLayout>-->
 
         </LinearLayout>
     </LinearLayout>

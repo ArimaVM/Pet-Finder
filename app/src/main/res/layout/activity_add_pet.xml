@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/purple_background"
-    tools:context=".application.pages.pet.AddPet">
+    tools:context=".pages.pet.AddPet">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/my_toolbar"
@@ -52,10 +52,31 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
                 android:text="@string/pet_informationLabel"
                 android:textColor="@color/black"
                 android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mac_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="MAC Adress"
+                android:textColor="#707070"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mac_address_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:gravity="center"
+                android:text="address"
+                android:textColor="#5E5E5E"
                 android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -159,7 +180,7 @@
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:focusable="false"
-                        android:hint="@string/birth_date"
+                        android:hint="@string/birthdate"
                         android:inputType="none" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -179,7 +200,7 @@
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:focusable="false"
-                        android:hint="@string/age_edittext"
+                        android:hint="@string/age"
                         android:inputType="none" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -200,6 +221,75 @@
                     android:hint="@string/weight"
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/pairedBT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="5dp"
+                android:text="Select Available Device"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/bt_bg">
+
+                <ImageView
+                    android:id="@+id/notificationIcon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_bluetooth"
+                    android:layout_centerVertical="true"/>
+
+                <TextView
+                    android:id="@+id/switchText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="@string/hide_list"
+                    android:textColor="@color/gray"
+                    android:textStyle="bold"
+                    android:layout_marginStart="20dp"
+                    android:layout_toEndOf="@+id/notificationIcon"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/btnSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="10dp"
+                    android:minWidth="50dp"
+                    android:checked="false"
+                    android:theme="@style/nightModeSwitch" />
+
+            </RelativeLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:layout_marginTop="12dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/deviceList"
+                    android:divider="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </androidx.cardview.widget.CardView>
 
             <View
                 android:layout_width="match_parent"

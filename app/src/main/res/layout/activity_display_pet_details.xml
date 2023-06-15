@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/purple_background"
-    tools:context=".application.pages.pet.DisplayPetDetails">
+    tools:context=".pages.pet.DisplayPetDetails">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/pet_toolbar"
@@ -49,6 +49,34 @@
 
                 android:layout_marginStart="15dp"
                 android:stretchColumns="2">
+                <TableRow>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_span="3"
+                        android:layout_weight="1"
+                        android:gravity="top"
+                        android:padding="10dp"
+                        android:text="MACaddress"
+                        android:textColor="@color/gray"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textAlignment="center"/>
+                </TableRow>
+                <TableRow>
+                    <TextView
+                        android:id="@+id/deviceConnected"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_span="3"
+                        android:layout_weight="1"
+                        android:gravity="top"
+                        android:text="Address"
+                        android:textColor="@color/gray"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textAlignment="center"/>
+                </TableRow>
                 <TableRow>
                     <TextView
                         android:id="@+id/petInfo"

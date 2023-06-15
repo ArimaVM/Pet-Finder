@@ -14,7 +14,7 @@
 
     //Credits
     <string name="credits">CREDITS</string>
-    <string name="credits_info"><b>The Feed and Find Initiative Team</b>\nCheryl Marie Chomis Alimba\nHyrum Roi Sapurco Bravo\nJasper Daile Tuibeo Corpuz\nJohn Homer Sayno Dar\nAr-jay De La Fuente\nKirby Ann Aycardo De Los Reyes\nAngelo Millares Echano\nArriana Mae Vargas Malubay\nIvan Meir Pablo Morada\nRenze Meinard Mortiga\nWendee Davillo Postre\nChristine Magana Toral\nKai Lapak Yaneza\n\n<b>Team Koinu</b>\nCheryl Marie Chomis Alimba\nAngelo Millares Echano\nArriana Mae Vargas Malubay\nIvan Meir Pablo Morada\nRenze Meinard Mortiga\nChristine Magana Toral\nKai Lapak Yaneza\n\n<b>Lead Wiring Team</b>\nAngelo Millares Echano\nKai Lapak Yaneza\n\n<b>Mobile Application Developers</b>\nCheryl Marie Chomis Alimba\nArriana Mae Vargas Malubay\nIvan Meir Morada\n\n<b>Lead Researchers</b>\nRenze Meinard Mortiga\nChristine Magana Toral\n\n<b>Special Thanks To:</b>\nTeam Lumos\nThe Institute of Computer Studies\nCamarines Norte State College\n3A Glass and Aluminum Works and Services\nand\nProfessor Marc Lester Acunin</string>
+    <string name="credits_info"><b>The Feed and Find Initiative Team</b>\nCheryl Marie Chomis Alimba\nHyrum Roi Sapurco Bravo\nJasper Daile Tuibeo Corpuz\nJohn Homer Sayno Dar\nAr-jay De La Fuente\nKirby Ann Aycardo De Los Reyes\nAngelo Millares Echano\nArriana Mae Vargas Malubay\nIvan Meir Pablo Morada\nRenze Meinard Mortiga\nWendee Davillo Postre\nChristine Magana Toral\nKai Lapak Yaneza\n\n<b>Team Koinu</b>\nCheryl Marie Chomis Alimba\nAngelo Millares Echano\nArriana Mae Vargas Malubay\nIvan Meir Pablo Morada\nRenze Meinard Mortiga\nChristine Magana Toral\nKai Lapak Yaneza\n\n<b>Circuit Designers</b>\nAngelo Millares Echano\nKai Lapak Yaneza\n\n<b>Mobile Developers</b>\nCheryl Marie Chomis Alimba\nArriana Mae Vargas Malubay\nIvan Meir Morada\n\nAngelo Millares Echano\n\nKai Lapak Yaneza\n\n<b>Researchers</b>\nRenze Meinard Mortiga\nChristine Magana Toral\n\n<b>Special Thanks To:</b>\nTeam Lumos\nThe Institute of Computer Studies\nCamarines Norte State College\n3A Glass and Aluminum Works and Services\nand\nProfessor Marc Lester Acunin</string>
     <string name="logo">logo</string>
     <string name="app">Feed and Find:</string>
     <string name="open">open</string>
@@ -35,22 +35,22 @@
 
     //Info
     <string name="profile_information">Profile Information:</string>
-    <string name="name">Name:</string>
-    <string name="breed">Breed:</string>
-    <string name="age">Age:</string>
-    <string name="sex">Sex:</string>
-    <string name="birthdate">Birthdate:</string>
-    <string name="weight">Weight:</string>
-    <string name="health_information">Health Information:</string>
-    <string name="allergies">Allergies:</string>
-    <string name="treats">Treats:</string>
-    <string name="restrictions">Restrictions:</string>
-    <string name="medications">Medications:</string>
-    <string name="vet_name">Vet Name:</string>
-    <string name="contact_information">Contact Information:</string>
-    <string name="physical_address">Physical Address:</string>
-    <string name="contact_number">Contact Number:</string>
-    <string name="email_address">Email Address:</string>
+    <string name="name">Name</string>
+    <string name="breed">Breed</string>
+    <string name="age">Age</string>
+    <string name="sex">Sex</string>
+    <string name="birthdate">Birthdate</string>
+    <string name="weight">Weight</string>
+    <string name="health_information">Health Information</string>
+    <string name="allergies">Allergies</string>
+    <string name="treats">Treats</string>
+    <string name="restrictions">Restrictions</string>
+    <string name="medications">Medications</string>
+    <string name="vet_name">Vet Name</string>
+    <string name="contact_information">Contact Information</string>
+    <string name="physical_address">Physical Address</string>
+    <string name="contact_number">Contact Number</string>
+    <string name="email_address">Email Address</string>
 
     <string name="password">Password</string>
     <string name="add_pet">Add Pet</string>
@@ -88,4 +88,18 @@
     <string name="strSort">Sort</string>
     <string name="StrDelete_all_records">Delete All Records</string>
     <string name="hello_world">Hello World</string>
+
+    <string name="show_list">Show List</string>
+    <string name="hide_list">Hide List</string>
+
+    //Location
+    <string name="mapAPIKey">AIzaSyCQ7cZSLgPwcQwAQGkfe7jKnRRWVSzuVHA</string>
+
+    //Device
+    <string name="strDevice">Configure Device</string>
+    <string name="add_device">Add_device</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="set_perimeter">Set Perimeter</string>
+    <string name="set_device">Select Bluetooth</string>
 </resources>
