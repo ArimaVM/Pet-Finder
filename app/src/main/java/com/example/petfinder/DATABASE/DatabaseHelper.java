@@ -25,6 +25,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(Constants.query);
         db.execSQL(Constants.query2);
+        db.execSQL(Constants.query3);
+        db.execSQL(Constants.query4);
 
     }
 
@@ -32,6 +34,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME2);
+        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME3);
+        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME4);
         onCreate(db);
     }
     public long storeData(String address, String petName, String breed, String sex, String age,
@@ -69,6 +73,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    public long storePedometerData(String numSteps, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_NUMSTEPS, numSteps);
+        values.put(Constants.COLUMN_DATE, date);
+
+        long id = db.insert(Constants.TABLE_NAME3, null, values);  // Corrected table name usage
+        db.close();
+        return id;
+    }
+
     public void updateData(String id, String petName, String breed, String sex, String age,
                           String weight, String petPic, String addedtime, String updatedtime) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -84,6 +100,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Constants.COLUMN_UPDATED_TIMESTAMP, updatedtime);
 
         db.update(Constants.TABLE_NAME, values, Constants.COLUMN_ID +" = ?", new String[] {id});
+        db.close();
+    }
+
+    public void updatePedometerData(String id, String numstep, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_NUMSTEPS, numstep);
+        values.put(Constants.COLUMN_DATE, date);
+
+
+        db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_ID +" = ?", new String[] {id});
         db.close();
     }
 

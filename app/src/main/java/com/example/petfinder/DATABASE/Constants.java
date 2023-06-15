@@ -52,8 +52,23 @@ public class Constants {
     public static final String COLUMN_DATE = "date";
 
     public static String query3 = "CREATE TABLE " + TABLE_NAME3 + "("
-            + COLUMN_ID3 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_ID3 + " INTEGER AUTOINCREMENT, "
             + COLUMN_NUMSTEPS + " TEXT, "
-            + COLUMN_DATE + " TEXT);";
+            + COLUMN_DATE + " TEXT PRIMARY KEY);";
 
+    //TABLE4
+    public static final String TABLE_NAME4 = "GPS";
+    public static final String COLUMN_ID4 = "_id4";
+    public static final String COLUMN_LONG = "long";
+    public static final String COLUMN_LAT = "lat";
+    public static final String COLUMN_TIME = "time";
+    public static final String COLUMN_DATE2 = "date";
+
+
+    public static String query4 = "CREATE TABLE " + TABLE_NAME4 + "("
+            + COLUMN_ID4 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_LONG + " TEXT, "
+            + COLUMN_LAT + " TEXT, "
+            + COLUMN_TIME + " TEXT, "
+            + COLUMN_DATE2 + " TEXT);";
 }

@@ -1,6 +1,7 @@
 package com.example.petfinder.components;
 
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.petfinder.R;
+import com.example.petfinder.pages.pet.DisplayPetDetails;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,6 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class Location extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -29,6 +32,8 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback {
     private boolean isConnected = false;
     android.location.Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
+
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,26 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback {
         getLastLocation();
 
         isConnected = getIntent().getBooleanExtra("isConnected", false);
+
+        bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setOnItemSelectedListener(item -> {
+            Intent intent;
+            switch (item.getItemId()){
+                case R.id.nav_petProfile:
+                    intent = new Intent(Location.this, DisplayPetDetails.class);
+                    intent.putExtra("isConnected", isConnected);
+                    startActivity(intent);
+                    break;
+                case R.id.nav_location:
+                    break;
+                case R.id.nav_statistics:
+                    intent = new Intent(Location.this, Statistics.class);
+                    intent.putExtra("isConnected", isConnected);
+                    startActivity(intent);
+                    break;
+            }
+            return true;
+        });
 
     }
 
