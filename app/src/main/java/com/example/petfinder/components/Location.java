@@ -26,6 +26,7 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback {
 
     private final int FINE_PERMISSION_CODE = 1;
     private GoogleMap myMap;
+    private boolean isConnected = false;
     android.location.Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
 
@@ -36,6 +37,8 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback {
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         getLastLocation();
+
+        isConnected = getIntent().getBooleanExtra("isConnected", false);
 
     }
 

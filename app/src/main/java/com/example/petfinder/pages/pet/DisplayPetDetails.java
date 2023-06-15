@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,27 +22,31 @@ import android.widget.TextView;
 import com.blogspot.atifsoftwares.circularimageview.CircularImageView;
 import com.example.petfinder.DATABASE.Constants;
 import com.example.petfinder.DATABASE.DatabaseHelper;
+import com.example.petfinder.application.PetFinder;
+import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 import com.example.petfinder.components.Location;
 import com.example.petfinder.R;
 import com.example.petfinder.components.Statistics;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
-public class DisplayPetDetails extends AppCompatActivity {
+public class DisplayPetDetails extends AppCompatActivity implements PetFinder.DataObserver {
 
     private CircularImageView petProfile;
-    private TextView BTaddress, petName, petBreed, petSex, date, petWeight;
+    private TextView petName, petBreed, petSex, date, petWeight;
     private BottomNavigationView bottomNav;
     private String recordID;
     private DatabaseHelper dbhelper;
     String pet_id, name, breed, sex, age, weight, image;
+    private boolean isConnected = false;
+    private BluetoothGatt bluetoothGatt;
+    private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_pet_details);
 
-        BTaddress = findViewById(R.id.deviceConnected);
         petProfile = findViewById(R.id.petImage);
         petName = findViewById(R.id.petNameDisplay);
         petBreed = findViewById(R.id.petBreedDisplay);
@@ -48,21 +55,23 @@ public class DisplayPetDetails extends AppCompatActivity {
         petWeight = findViewById(R.id.petWeightDisplay);
 
         bottomNav = findViewById(R.id.bottomNav);
-        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.nav_petProfile:
-                        break;
-                    case R.id.nav_location:
-                        startActivity(new Intent(DisplayPetDetails.this, Location.class));
-                        break;
-                    case R.id.nav_statistics:
-                        startActivity(new Intent(DisplayPetDetails.this, Statistics.class));
-                        break;
-                }
-                return true;
+        bottomNav.setOnItemSelectedListener(item -> {
+            Intent intent;
+            switch (item.getItemId()){
+                case R.id.nav_petProfile:
+                    break;
+                case R.id.nav_location:
+                    intent = new Intent(DisplayPetDetails.this, Location.class);
+                    intent.putExtra("isConnected", isConnected);
+                    startActivity(intent);
+                    break;
+                case R.id.nav_statistics:
+                    intent = new Intent(DisplayPetDetails.this, Statistics.class);
+                    intent.putExtra("isConnected", isConnected);
+                    startActivity(intent);
+                    break;
             }
+            return true;
         });
 
         Intent intent = getIntent();
@@ -72,6 +81,18 @@ public class DisplayPetDetails extends AppCompatActivity {
 
         Toolbar myToolbar = findViewById(R.id.pet_toolbar);
         setSupportActionBar(myToolbar);
+
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (bluetoothAdapter.isEnabled()) {
+            isConnected = true;
+            BluetoothDevice device = bluetoothAdapter.getRemoteDevice(recordID);
+            bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
+        } else isConnected = false;
+
+        PetFinder myApp = PetFinder.getInstance();
+        myApp.registerObserver(this);
+        myApp.setIsConnected(isConnected);
 
         // Set the custom back arrow as the navigation icon
         myToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
@@ -105,6 +126,7 @@ public class DisplayPetDetails extends AppCompatActivity {
             intent.putExtra("BDATE", age);
             intent.putExtra("WEIGHT", weight);
             intent.putExtra("IMAGE", image);
+            intent.putExtra("isConnected", isConnected);
             startActivity(intent);
             return true;
         }
@@ -127,7 +149,6 @@ public class DisplayPetDetails extends AppCompatActivity {
                 weight = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_WEIGHT));
                 image = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE));
 
-                BTaddress.setText(pet_id);
                 petName.setText(name);
                 petBreed.setText(breed);
                 petSex.setText(sex);
@@ -136,13 +157,23 @@ public class DisplayPetDetails extends AppCompatActivity {
 
                 if (image.equals("null")){
                     petProfile.setImageResource(R.drawable.profile);
-                }
-                else {
+                } else {
                     petProfile.setImageURI(Uri.parse(image));
                 }
 
             } while (cursor.moveToNext());
         }
         db.close();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PetFinder myApp = PetFinder.getInstance();
+        myApp.unregisterObserver(this);
+    }
+
+    @Override
+    public void onDataUpdated(boolean newData) {
     }
 }
