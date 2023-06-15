@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,7 +34,7 @@ import com.google.android.material.navigation.NavigationBarView;
 public class DisplayPetDetails extends AppCompatActivity implements PetFinder.DataObserver {
 
     private CircularImageView petProfile;
-    private TextView petName, petBreed, petSex, date, petWeight;
+    private TextView petName, petBreed, petSex, date, petWeight, MACAddress;
     private BottomNavigationView bottomNav;
     private String recordID;
     private DatabaseHelper dbhelper;
@@ -41,6 +42,7 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
     private boolean isConnected = false;
     private BluetoothGatt bluetoothGatt;
     private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,7 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
         petSex = findViewById(R.id.petSexDisplay);
         date = findViewById(R.id.petBdateDisplay);
         petWeight = findViewById(R.id.petWeightDisplay);
+        MACAddress = findViewById(R.id.deviceConnected);
 
         bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setOnItemSelectedListener(item -> {
@@ -75,14 +78,17 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
         });
 
         Intent intent = getIntent();
-        recordID = intent.getStringExtra("RECORD_ID");
+        recordID = intent.getStringExtra("ID");
 
         dbhelper = new DatabaseHelper(this);
 
         Toolbar myToolbar = findViewById(R.id.pet_toolbar);
         setSupportActionBar(myToolbar);
 
+        handler = new Handler();
+
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        bluetoothGattCallbackHandler = new BluetoothGattCallbackHandler(this, handler);
 
         if (bluetoothAdapter.isEnabled()) {
             isConnected = true;
@@ -154,6 +160,7 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
                 petSex.setText(sex);
                 date.setText(age);
                 petWeight.setText(weight);
+                MACAddress.setText(pet_id);
 
                 if (image.equals("null")){
                     petProfile.setImageResource(R.drawable.profile);

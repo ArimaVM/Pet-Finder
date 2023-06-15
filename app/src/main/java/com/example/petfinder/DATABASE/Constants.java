@@ -56,6 +56,4 @@ public class Constants {
             + COLUMN_NUMSTEPS + " TEXT, "
             + COLUMN_DATE + " TEXT);";
 
-    //Table4
-
 }

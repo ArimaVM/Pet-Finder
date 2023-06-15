@@ -34,12 +34,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME2);
         onCreate(db);
     }
-    public long storeData(String bt, String petName, String breed, String sex, String age,
+    public long storeData(String address, String petName, String breed, String sex, String age,
                           String weight, String petPic, String addedtime, String updatedtime) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(Constants.COLUMN_ID, bt);
+        values.put(Constants.COLUMN_ID, address);
         values.put(Constants.COLUMN_PETNAME, petName);
         values.put(Constants.COLUMN_BREED, breed);
         values.put(Constants.COLUMN_SEX, sex);
@@ -96,7 +96,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 @SuppressLint("Range") RecordModel recordModel = new RecordModel(
-                        ""+cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_ID)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PETNAME)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BREED)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_SEX)),

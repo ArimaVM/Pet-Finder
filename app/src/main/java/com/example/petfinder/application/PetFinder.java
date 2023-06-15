@@ -35,6 +35,7 @@ public class PetFinder extends Application
         super.onCreate();
         instance = this;
         Log.d(TAG, "Application started");
+
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     }
 

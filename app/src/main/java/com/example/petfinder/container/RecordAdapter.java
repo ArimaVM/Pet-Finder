@@ -74,7 +74,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, DisplayPetDetails.class);
-                intent.putExtra("RECORD_ID", id);
+                intent.putExtra("ID", id);
                 context.startActivity(intent);
             }
         });
