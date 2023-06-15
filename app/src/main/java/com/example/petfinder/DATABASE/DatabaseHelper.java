@@ -10,6 +10,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.example.petfinder.container.DeviceModel;
 import com.example.petfinder.container.GPSModel;
 import com.example.petfinder.container.RecordModel;
+import com.example.petfinder.container.dataModel.GPS;
+import com.example.petfinder.container.dataModel.PedometerData;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -89,7 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public long storePedometerData(String numSteps, String date) {
+    public long storePedometerData(int numSteps, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -119,7 +121,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void updatePedometerData(String id, String numstep, String date) {
+    public void updatePedometerData(int numstep, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -127,7 +129,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Constants.COLUMN_DATE, date);
 
 
-        db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_ID +" = ?", new String[] {id});
+        db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_DATE +" = ?", new String[] {date});
         db.close();
     }
 
@@ -158,16 +160,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public GPSModel getLatestGPS(String orderby) {
+    public PedometerData getLatestPedometer() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
-                Constants.TABLE_NAME4,
+                Constants.TABLE_NAME3,
                 null,
                 null,
                 null,
                 null,
                 null,
-                orderby + " DESC",
+                Constants.COLUMN_DATE+" DESC",
                 "1"
         );
 

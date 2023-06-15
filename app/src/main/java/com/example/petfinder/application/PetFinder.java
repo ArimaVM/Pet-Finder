@@ -1,20 +1,16 @@
 package com.example.petfinder.application;
 
 import android.app.Application;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
-import com.example.petfinder.pages.pet.ScanBluetooth;
+import com.example.petfinder.container.dataModel;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,15 +25,29 @@ public class PetFinder extends Application
     private static PetFinder instance;
     private boolean isConnected;
     private List<DataObserver> observers = new ArrayList<>();
+    private dataModel.GPS currentGPS;
+    private dataModel.PedometerData pedometerData;
+    private DatabaseHelper databaseHelper = new DatabaseHelper();
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
         Log.d(TAG, "Application started");
-
+        currentGPS = new dataModel.GPS();
+        pedometerData = new dataModel.PedometerData();
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     }
+
+    public dataModel.GPS getCurrentGPS() {
+        return currentGPS;
+    }
+
+    public void setCurrentGPS(dataModel.GPS currentGPS) {
+        this.currentGPS = currentGPS;
+    }
+
 
     public interface DataObserver {
         void onDataUpdated(boolean newData);
@@ -100,5 +110,46 @@ public class PetFinder extends Application
     @Override
     public void onCharacteristicChanged(String value) {
         //save to MAC_ADDRESS
+        //gpslon;[dateStr];[timeStr];[latStr]
+        //gpslat;[dateStr];[timeStr];[lonStr]
+        //ped;[dateStr];[timeStr];[stepsCount]
+
+        String[] dataArray = value.split(";");
+
+        String dataType = dataArray[0];
+        String dateStr = dataArray[1];
+        String timeStr = dataArray[2];
+        String dataValue = dataArray[3].trim();
+
+        if (dataType.equals("ped")){
+            //pedometer data
+            pedometerData = databaseHelper.getLatestPedometer();
+            if (pedometerData.getDate().equals(dateStr)) {
+                int steps = pedometerData.getPedometer() + 1;
+                pedometerData.setPedometer(steps);
+                databaseHelper.updatePedometerData(steps, dateStr);
+            } else {
+                databaseHelper.storePedometerData( 1, dateStr);
+            }
+        } else {
+            //gps data
+            if (currentGPS.isComplete()){
+                //insert to sql
+                databaseHelper.storeGPSData(currentGPS.getMac_address(),
+                                            currentGPS.getLatitude(),
+                                            currentGPS.getLongitude(),
+                                            currentGPS.getTime(),
+                                            currentGPS.getDate());
+                currentGPS = new dataModel.GPS();
+            }
+            if (dataType.equals("gpslon")){
+                currentGPS.setLongitude(dataValue);
+                currentGPS.setDate(dateStr);
+                currentGPS.setTime(timeStr);
+                currentGPS.setMac_address(MAC_ADDRESS);
+            } else {
+                currentGPS.setLatitude(dataValue);
+            }
+        }
     }
 }
