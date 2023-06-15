@@ -137,62 +137,6 @@ public class ScanBluetooth extends AppCompatActivity
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // Disconnect and close the BluetoothGatt instance
-        if (bluetoothGatt != null) {
-            bluetoothGatt.disconnect();
-            bluetoothGatt.close();
-        }
-    }
-
-//    private void saveGeofencePerimeter() {
-//        if (!isBluetoothConnected) {
-//            Toast.makeText(this, "Bluetooth is not connected", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        if (!latitudeText.isEmpty() && !longitudeText.isEmpty()) {
-//            try {
-//                geofenceLatitude = Double.parseDouble(latitudeText);
-//                geofenceLongitude = Double.parseDouble(longitudeText);
-//
-//                Toast.makeText(this, "Geofence perimeter saved", Toast.LENGTH_SHORT).show();
-//                sendData(geofenceLatitude, geofenceLongitude);
-//            } catch (NumberFormatException e) {
-//                Toast.makeText(this, "Invalid latitude or longitude", Toast.LENGTH_SHORT).show();
-//            }
-//        } else {
-//            Toast.makeText(this, "Latitude or longitude cannot be empty", Toast.LENGTH_SHORT).show();
-//        }
-//    }
-//
-//    private void sendData(Double geolat, Double geolon) {
-//
-//        String data = geolat + ";" + geolon;
-//
-//        if (!isBluetoothConnected) {
-//            Toast.makeText(this, "Bluetooth is not connected", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        if (bluetoothGatt != null && characteristic != null) {
-//            // Characteristic available, proceed with sending data
-//            characteristic.setValue(data);
-//
-//            boolean success = bluetoothGatt.writeCharacteristic(characteristic);
-//            if (success) {
-//                Toast.makeText(this, "Data sent successfully", Toast.LENGTH_SHORT).show();
-//            } else {
-//                Toast.makeText(this, "Failed to send data", Toast.LENGTH_SHORT).show();
-//            }
-//        } else {
-//            Toast.makeText(this, "Bluetooth connection or characteristic not available", Toast.LENGTH_SHORT).show();
-//        }
-//    }
-
     private void startScan() {
         // Clear the previous scan results
         scanResults.clear();
