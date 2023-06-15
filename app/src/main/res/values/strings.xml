@@ -89,6 +89,17 @@
     <string name="StrDelete_all_records">Delete All Records</string>
     <string name="hello_world">Hello World</string>
 
+    <string name="show_list">Show List</string>
+    <string name="hide_list">Hide List</string>
+
+    //Location
     <string name="mapAPIKey">AIzaSyCQ7cZSLgPwcQwAQGkfe7jKnRRWVSzuVHA</string>
-    <string name="start_scan">Start Scan</string>
+
+    //Device
+    <string name="strDevice">Configure Device</string>
+    <string name="add_device">Add_device</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="set_perimeter">Set Perimeter</string>
+    <string name="set_device">Select Bluetooth</string>
 </resources>
