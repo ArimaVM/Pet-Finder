@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -27,7 +28,7 @@ import com.google.android.material.navigation.NavigationBarView;
 public class DisplayPetDetails extends AppCompatActivity {
 
     private CircularImageView petProfile;
-    private TextView petName, petBreed, petSex, date, petWeight;
+    private TextView BTaddress, petName, petBreed, petSex, date, petWeight;
     private BottomNavigationView bottomNav;
     private String recordID;
     private DatabaseHelper dbhelper;
@@ -38,6 +39,7 @@ public class DisplayPetDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_pet_details);
 
+        BTaddress = findViewById(R.id.deviceConnected);
         petProfile = findViewById(R.id.petImage);
         petName = findViewById(R.id.petNameDisplay);
         petBreed = findViewById(R.id.petBreedDisplay);
@@ -109,6 +111,7 @@ public class DisplayPetDetails extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("Range")
     private void showRecordDetails() {
         String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME + " WHERE " + Constants.COLUMN_ID + "=\"" + recordID + "\"";
         SQLiteDatabase db = dbhelper.getWritableDatabase();
@@ -124,6 +127,7 @@ public class DisplayPetDetails extends AppCompatActivity {
                 weight = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_WEIGHT));
                 image = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE));
 
+                BTaddress.setText(pet_id);
                 petName.setText(name);
                 petBreed.setText(breed);
                 petSex.setText(sex);

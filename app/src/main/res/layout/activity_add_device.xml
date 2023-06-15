@@ -110,11 +110,28 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <ListView
-                android:id="@+id/deviceList"
+            <Button
+                android:id="@+id/scanButton"
                 android:layout_width="match_parent"
-                android:layout_height="392dp"
-                android:layout_marginTop="16dp" />
+                android:layout_height="wrap_content"
+                android:text="Scan Bluetooth"
+                android:layout_marginBottom="20dp"/>
+
+            <TextView
+                android:id="@+id/receivedDataTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Received Data: "
+                android:textSize="16sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <View
                 android:layout_width="match_parent"

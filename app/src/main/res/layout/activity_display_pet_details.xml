@@ -51,16 +51,29 @@
                 android:stretchColumns="2">
                 <TableRow>
                     <TextView
-                        android:id="@+id/deviceConnected"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_span="3"
                         android:layout_weight="1"
                         android:gravity="top"
                         android:padding="10dp"
-                        android:text="Connected to: Collar1"
+                        android:text="MACaddress"
                         android:textColor="@color/gray"
-                        android:textSize="18sp"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textAlignment="center"/>
+                </TableRow>
+                <TableRow>
+                    <TextView
+                        android:id="@+id/deviceConnected"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_span="3"
+                        android:layout_weight="1"
+                        android:gravity="top"
+                        android:text="Address"
+                        android:textColor="@color/gray"
+                        android:textSize="15sp"
                         android:textStyle="bold"
                         android:textAlignment="center"/>
                 </TableRow>

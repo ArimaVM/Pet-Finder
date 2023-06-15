@@ -18,7 +18,7 @@ public class Constants {
     public static final String COLUMN_UPDATED_TIMESTAMP = "updated_timestamp";
 
     public static String query = "CREATE TABLE " + TABLE_NAME + "("
-            + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_ID + " TEXT, "
             + COLUMN_PETNAME + " TEXT, "
             + COLUMN_BREED + " TEXT, "
             + COLUMN_SEX + " TEXT, "
@@ -44,4 +44,18 @@ public class Constants {
             + COLUMN_LONGITUDE + " TEXT, "
             + COLUMN_BTNAME + " TEXT, "
             + COLUMN_BTADDRESS + " TEXT);";
+
+    //Table3
+    public static final String TABLE_NAME3 = "Pedometer";
+    public static final String COLUMN_ID3 = "_id3";
+    public static final String COLUMN_NUMSTEPS = "numSteps";
+    public static final String COLUMN_DATE = "date";
+
+    public static String query3 = "CREATE TABLE " + TABLE_NAME3 + "("
+            + COLUMN_ID3 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_NUMSTEPS + " TEXT, "
+            + COLUMN_DATE + " TEXT);";
+
+    //Table4
+
 }

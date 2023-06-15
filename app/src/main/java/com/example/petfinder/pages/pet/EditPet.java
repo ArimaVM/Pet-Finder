@@ -51,7 +51,7 @@ public class EditPet extends AppCompatActivity {
     private String[] cameraPermissions;
     private String[] storagePermissions;
     private Uri imageUri;
-    private  String pet_id, pname, breed, sex, age, weight, addedTime, updatedTime;
+    private  String pet_id, pname, breed, sex, age, weight, btAddress, addedTime, updatedTime;
     private boolean isEditMode;
 
     @Override
@@ -334,6 +334,7 @@ public class EditPet extends AppCompatActivity {
         } else {
             String timestamp = ""+System.currentTimeMillis();
             long id = databaseHelper.storeData(
+                    ""+btAddress,
                     ""+petName,
                     ""+breed,
                     ""+sex,

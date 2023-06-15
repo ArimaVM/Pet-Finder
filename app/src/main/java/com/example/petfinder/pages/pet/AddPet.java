@@ -54,7 +54,7 @@ public class AddPet extends AppCompatActivity {
     private String[] storagePermissions;
     private String bluetoothAddress;
 
-    private  String petName, breed, sex, age, weight;
+    private  String petName, breed, sex, age, weight, btAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -298,9 +298,11 @@ public class AddPet extends AppCompatActivity {
         sex = ""+radioButton.getText().toString().trim();
         age = ""+bdate.getText().toString().trim();
         weight = ""+pweight.getText().toString().trim();
+        btAddress = mMacData.getText().toString().trim();
 
         Intent intent = new Intent(AddPet.this, EditPet.class);
         intent.putExtra("isEditMode", false); // Set the edit mode to false, as it's a new pet
+        intent.putExtra("ID", btAddress);
         intent.putExtra("NAME", petName);
         intent.putExtra("BREED", breed);
         intent.putExtra("SEX", sex);
@@ -309,6 +311,7 @@ public class AddPet extends AppCompatActivity {
 
         String timestamp = ""+System.currentTimeMillis();
         long id = databaseHelper.storeData(
+                ""+btAddress,
                 ""+petName,
                 ""+breed,
                 ""+sex,
