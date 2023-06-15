@@ -57,7 +57,6 @@ public class ScanBluetooth extends AppCompatActivity
     private boolean isScanning = false;
 
     private BluetoothGatt bluetoothGatt;
-
     private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
 
     private Handler timeoutHandler = new Handler();
@@ -87,11 +86,6 @@ public class ScanBluetooth extends AppCompatActivity
         bluetoothGattCallbackHandler.setCharacteristicReadCallback(this);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-
-//        // Connect to the Bluetooth device
-//        BluetoothDevice device = bluetoothAdapter.getRemoteDevice("F4:B8:5E:94:7A:85");
-//        bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
 
         // Check if the device supports BLE
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {

@@ -108,8 +108,6 @@ public class Dashboard extends DrawerNav {
         }
 
         return super.onOptionsItemSelected(item);
-
-
     }
 
     private void sortOptionDialog() {
