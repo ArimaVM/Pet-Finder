@@ -83,17 +83,12 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
         setSupportActionBar(myToolbar);
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-            // Device does not support Bluetooth
-        } else {
-            if (bluetoothAdapter.isEnabled()) {
-                isConnected = true;
-                BluetoothDevice device = bluetoothAdapter.getRemoteDevice(recordID);
-                bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
-            } else {
-                isConnected = false;
-            }
-        }
+
+        if (bluetoothAdapter.isEnabled()) {
+            isConnected = true;
+            BluetoothDevice device = bluetoothAdapter.getRemoteDevice(recordID);
+            bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
+        } else isConnected = false;
 
         PetFinder myApp = PetFinder.getInstance();
         myApp.registerObserver(this);
