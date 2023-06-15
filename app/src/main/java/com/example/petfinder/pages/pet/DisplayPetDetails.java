@@ -99,6 +99,7 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
         PetFinder myApp = PetFinder.getInstance();
         myApp.registerObserver(this);
         myApp.setIsConnected(isConnected);
+        myApp.setMAC_ADDRESS(recordID);
         myApp.setBluetoothGatt(bluetoothGatt);
 
         // Set the custom back arrow as the navigation icon

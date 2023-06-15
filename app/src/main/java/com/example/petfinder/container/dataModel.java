@@ -57,6 +57,12 @@ public class dataModel {
         int pedometer;
         String date;
 
+        public PedometerData(String MAC_Address, int pedometer, String date) {
+            this.MAC_Address = MAC_Address;
+            this.pedometer = pedometer;
+            this.date = date;
+        }
+
         public String getMAC_Address() {
             return MAC_Address;
         }

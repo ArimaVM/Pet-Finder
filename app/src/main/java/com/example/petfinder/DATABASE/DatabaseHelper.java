@@ -175,19 +175,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "1"
         );
 
-        GPSModel latestGPS = null;
+        PedometerData latestPedometer = null;
         if (cursor.moveToFirst()) {
-            latestGPS = new GPSModel(
-                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID4)),
-                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONG)),
-                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LAT)),
-                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TIME)),
-                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DATE2))
+            latestPedometer = new PedometerData(
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID3)),
+                    cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_NUMSTEPS)),
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DATE))
             );
         }
         cursor.close();
         db.close();
-        return latestGPS;
+        return latestPedometer;
     }
 
     public ArrayList<DeviceModel> getAllDeviceRecords (String orderBy){
