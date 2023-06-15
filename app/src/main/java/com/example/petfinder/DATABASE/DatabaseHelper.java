@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.petfinder.container.DeviceModel;
+import com.example.petfinder.container.GPSModel;
 import com.example.petfinder.container.RecordModel;
 
 import org.jetbrains.annotations.Nullable;
@@ -154,6 +155,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         db.close();
         return recordsList;
+    }
+
+    @SuppressLint("Range")
+    public GPSModel getLatestGPS(String orderby) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(
+                Constants.TABLE_NAME4,
+                null,
+                null,
+                null,
+                null,
+                null,
+                orderby + " DESC",
+                "1"
+        );
+
+        GPSModel latestGPS = null;
+        if (cursor.moveToFirst()) {
+            latestGPS = new GPSModel(
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID4)),
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONG)),
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LAT)),
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TIME)),
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DATE2))
+            );
+        }
+        cursor.close();
+        db.close();
+        return latestGPS;
     }
 
     public ArrayList<DeviceModel> getAllDeviceRecords (String orderBy){
