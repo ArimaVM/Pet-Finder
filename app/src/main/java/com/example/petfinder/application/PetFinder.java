@@ -123,13 +123,13 @@ public class PetFinder extends Application
 
         if (dataType.equals("ped")){
             //pedometer data
-            pedometerData = databaseHelper.getLatestPedometer();
+            pedometerData = databaseHelper.getLatestPedometer(MAC_ADDRESS);
             if (pedometerData.getDate().equals(dateStr)) {
                 int steps = pedometerData.getPedometer() + 1;
                 pedometerData.setPedometer(steps);
-                databaseHelper.updatePedometerData(steps, dateStr);
+                databaseHelper.updatePedometerData(MAC_ADDRESS, steps, dateStr);
             } else {
-                databaseHelper.storePedometerData( 1, dateStr);
+                databaseHelper.storePedometerData( MAC_ADDRESS,1, dateStr);
             }
         } else {
             //gps data

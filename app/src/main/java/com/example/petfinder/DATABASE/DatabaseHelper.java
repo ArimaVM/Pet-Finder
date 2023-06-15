@@ -91,10 +91,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public long storePedometerData(int numSteps, String date) {
+    public long storePedometerData(String MAC_ADDRESS, int numSteps, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID3, MAC_ADDRESS);
         values.put(Constants.COLUMN_NUMSTEPS, numSteps);
         values.put(Constants.COLUMN_DATE, date);
 
@@ -121,15 +122,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void updatePedometerData(int numstep, String date) {
+    public void updatePedometerData(String id, int numstep, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID3, id);
         values.put(Constants.COLUMN_NUMSTEPS, numstep);
         values.put(Constants.COLUMN_DATE, date);
 
 
-        db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_DATE +" = ?", new String[] {date});
+        db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_DATE +" = ? AND "+ Constants.COLUMN_ID3 +"= ?", new String[] {date, id});
         db.close();
     }
 
@@ -160,13 +162,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public PedometerData getLatestPedometer() {
+    public PedometerData getLatestPedometer(String MAC_ADDRESS) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
                 Constants.TABLE_NAME3,
                 null,
-                null,
-                null,
+                Constants.COLUMN_ID3 + "= ?",
+                new String[]{MAC_ADDRESS},
                 null,
                 null,
                 Constants.COLUMN_DATE+" DESC",
