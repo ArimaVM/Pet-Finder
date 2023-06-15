@@ -26,6 +26,13 @@
         android:padding="16dp"
         android:layout_marginTop="70dp">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Outdated data, Please connect to Bluetooth!"
+            android:id="@+id/bluetoothWarning" />
+
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/lineChart"
             android:layout_width="match_parent"

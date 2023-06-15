@@ -103,7 +103,7 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback {
     public void onMapReady(@NonNull GoogleMap googleMap) {
         myMap = googleMap;
         LatLng location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        myMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+        myMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
         MarkerOptions options = new MarkerOptions().position(location).title("Current Location");
         options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
         myMap.addMarker(options);

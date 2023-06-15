@@ -73,6 +73,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    public long storeGPSData(String address, String lat, String longi, String time, String date){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID4, address);
+        values.put(Constants.COLUMN_LONG, longi);
+        values.put(Constants.COLUMN_LAT, lat);
+        values.put(Constants.COLUMN_TIME, time);
+        values.put(Constants.COLUMN_DATE2, date);
+
+        long id = db.insert(Constants.TABLE_NAME4, null, values);  // Corrected table name usage
+        db.close();
+        return id;
+    }
+
     public long storePedometerData(String numSteps, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
 
