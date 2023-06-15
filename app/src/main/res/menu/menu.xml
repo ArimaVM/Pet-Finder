@@ -9,8 +9,8 @@
             android:icon="@drawable/ic_dashboard"
             android:title="@string/strDashboard"/>
         <item
-            android:id="@+id/nav_trash"
-            android:icon="@drawable/ic_trash"
+            android:id="@+id/nav_device"
+            android:icon="@drawable/ic_collar"
             android:title="@string/strDevice"/>
 
     </group>

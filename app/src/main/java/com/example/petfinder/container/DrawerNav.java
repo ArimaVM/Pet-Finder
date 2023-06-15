@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.petfinder.R;
 import com.example.petfinder.components.Dashboard;
+import com.example.petfinder.components.Perimeter;
 import com.example.petfinder.components.Settings;
 import com.google.android.material.navigation.NavigationView;
 
@@ -48,6 +49,10 @@ public class DrawerNav extends AppCompatActivity implements NavigationView.OnNav
 
             case R.id.nav_dashboard:
                 startActivity(new Intent(DrawerNav.this, Dashboard.class));
+                break;
+
+            case R.id.nav_device:
+                startActivity(new Intent(DrawerNav.this, Perimeter.class));
                 break;
 
             case R.id.nav_settings:

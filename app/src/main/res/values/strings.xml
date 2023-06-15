@@ -94,5 +94,12 @@
 
     //Location
     <string name="mapAPIKey">AIzaSyCQ7cZSLgPwcQwAQGkfe7jKnRRWVSzuVHA</string>
+
+    //Device
     <string name="strDevice">Configure Device</string>
+    <string name="add_device">Add_device</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="set_perimeter">Set Perimeter</string>
+    <string name="set_device">Select Bluetooth</string>
 </resources>
