@@ -58,6 +58,10 @@ public class PetFinder extends Application
         new UpdateDataTask().execute(isConnected);
     }
 
+    public void setBluetoothGatt(BluetoothGatt bluetoothGatt){
+        this.bluetoothGatt = bluetoothGatt;
+    }
+
     public void registerObserver(DataObserver observer) {
         observers.add(observer);
     }

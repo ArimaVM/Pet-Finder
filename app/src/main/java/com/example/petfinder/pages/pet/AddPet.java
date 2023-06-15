@@ -118,6 +118,7 @@ public class AddPet extends AppCompatActivity {
         if (id == R.id.save) {
             storeData();
             startActivity(new Intent(AddPet.this, Dashboard.class));
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
