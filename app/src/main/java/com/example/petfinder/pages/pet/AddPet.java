@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogspot.atifsoftwares.circularimageview.CircularImageView;
@@ -38,6 +39,7 @@ import java.util.Calendar;
 
 public class AddPet extends AppCompatActivity {
     TextInputEditText pname, pbreed, pweight, bdate, age_edittext;
+    TextView mMacData;
     RadioGroup psex;
     RadioButton radioButton;
     CircularImageView picture;
@@ -50,6 +52,7 @@ public class AddPet extends AppCompatActivity {
     private static final int IMAGE_PICK_GALLERY_CODE = 103;
     private String[] cameraPermissions;
     private String[] storagePermissions;
+    private String bluetoothAddress;
 
     private  String petName, breed, sex, age, weight;
 
@@ -64,9 +67,13 @@ public class AddPet extends AppCompatActivity {
         bdate = findViewById(R.id.bdate);
         picture = findViewById(R.id.petPic);
         age_edittext = findViewById(R.id.age);
+        mMacData = findViewById(R.id.mac_address_data);
         databaseHelper = new DatabaseHelper(this);
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+        bluetoothAddress = getIntent().getStringExtra("MAC_ADDRESS");
+        mMacData.setText(bluetoothAddress);
 
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);

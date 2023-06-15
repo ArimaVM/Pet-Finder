@@ -19,6 +19,7 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
     private ConnectionStateCallback connectionStateCallback;
     private ServiceDiscoveredCallback serviceDiscoveredCallback;
     private CharacteristicChangedCallback characteristicChangedCallback;
+    private CharacteristicReadCallback characteristicReadCallback;
 
     private Context context; // Context reference for displaying Toast
     private Handler handler;
@@ -34,6 +35,14 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
 
     public void setConnectionStateCallback(ConnectionStateCallback callback) {
         this.connectionStateCallback = callback;
+    }
+
+    public interface CharacteristicReadCallback {
+        void onCharacteristicReadCallback(String value);
+    }
+
+    public void setCharacteristicReadCallback(CharacteristicReadCallback callback) {
+        this.characteristicReadCallback = callback;
     }
 
     public interface CharacteristicChangedCallback {
@@ -114,6 +123,10 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
 
         if (status != BluetoothGatt.GATT_SUCCESS) {
             makeToast("Characteristic read failed.");
+        } else {
+            byte[] data = characteristic.getValue();
+            String receivedData = new String(data, StandardCharsets.UTF_8);
+            characteristicReadCallback.onCharacteristicReadCallback(receivedData.trim());
         }
     }
 
@@ -123,10 +136,9 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
 
         byte[] data = characteristic.getValue();
         String receivedData = new String(data, StandardCharsets.UTF_8);
-        Log.d("Bluetooth", "Received data: " + receivedData);
         //Return receivedData
         if (characteristicChangedCallback != null) {
-            characteristicChangedCallback.onCharacteristicChanged(receivedData);
+            characteristicChangedCallback.onCharacteristicChanged(receivedData.trim());
         }
     }
 

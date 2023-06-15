@@ -1,20 +1,10 @@
 package com.example.petfinder.pages.pet;
 
-import com.example.petfinder.R;
-import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
@@ -27,23 +17,30 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.util.Log;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.petfinder.Adapters.ScanBTListViewAdapter;
+import com.example.petfinder.R;
+import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ScanBluetooth extends AppCompatActivity
                                 implements BluetoothGattCallbackHandler.ConnectionStateCallback
                                          , BluetoothGattCallbackHandler.CharacteristicChangedCallback
-                                         , BluetoothGattCallbackHandler.ServiceDiscoveredCallback {
+                                         , BluetoothGattCallbackHandler.CharacteristicReadCallback
+                                         , ScanBTListViewAdapter.OnItemClickListener {
 
 
     private final int REQUEST_ENABLE_BT = 1;
@@ -52,28 +49,27 @@ public class ScanBluetooth extends AppCompatActivity
     private BluetoothLeScanner bluetoothLeScanner;
     private ScanSettings scanSettings;
     private List<ScanResult> scanResults;
-    private ArrayAdapter<String> deviceListAdapter;
 
-    private ListView deviceListView;
+    private String bluetoothAddress;
     private Button scanButton;
     private boolean isBluetoothConnected = false;
-    private EditText latitudeEditText;
-    private EditText longitudeEditText;
-    private Button saveButton;
-
-    private BluetoothGattCharacteristic characteristic;
-
-    private double geofenceLatitude;
-    private double geofenceLongitude;
 
     private boolean isScanning = false;
 
     private BluetoothGatt bluetoothGatt;
 
-    private static final UUID SERVICE_UUID = UUID.fromString("0000FFE0-0000-1000-8000-00805F9B34FB");
-    private TextView receivedDataTextView;
-
     private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
+
+    private Handler timeoutHandler = new Handler();
+    private Runnable timeoutRunnable = () -> runOnUiThread(() -> {
+        //disconnect
+        disconnectGatt();
+        Toast.makeText(ScanBluetooth.this, "Invalid device. Disconnected.", Toast.LENGTH_SHORT).show();
+    });
+
+    private RecyclerView mRecyclerView;
+    private ScanBTListViewAdapter scanBTListViewAdapter;
+    List<ScannedDevices> DeviceScanList;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -81,23 +77,21 @@ public class ScanBluetooth extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_bluetooth);
 
-        deviceListView = findViewById(R.id.deviceList);
         scanButton = findViewById(R.id.scanButton);
-        receivedDataTextView = findViewById(R.id.receivedDataTextView);
 
         Handler handler = new Handler(Looper.getMainLooper());
 
         bluetoothGattCallbackHandler = new BluetoothGattCallbackHandler(ScanBluetooth.this, handler);
         bluetoothGattCallbackHandler.setConnectionStateCallback(this);
         bluetoothGattCallbackHandler.setCharacteristicChangedCallback(this);
-        bluetoothGattCallbackHandler.setServiceDiscoveredCallback(this);
+        bluetoothGattCallbackHandler.setCharacteristicReadCallback(this);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
 
-        // Connect to the Bluetooth device
-        BluetoothDevice device = bluetoothAdapter.getRemoteDevice("F4:B8:5E:94:7A:85");
-        bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
+//        // Connect to the Bluetooth device
+//        BluetoothDevice device = bluetoothAdapter.getRemoteDevice("F4:B8:5E:94:7A:85");
+//        bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
 
         // Check if the device supports BLE
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -129,40 +123,22 @@ public class ScanBluetooth extends AppCompatActivity
         // Create an empty list for scan results
         scanResults = new ArrayList<>();
 
-        // Create an adapter for the device list view
-        deviceListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1);
-        deviceListView.setAdapter(deviceListAdapter);
-
-        // Set click listener for device list items
-        deviceListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Handle device selection here
-                BluetoothDevice device = scanResults.get(position).getDevice();
-                connectToDevice(device);
-            }
-        });
+        mRecyclerView = findViewById(R.id.recyclerview);
+        // Create a recyclerview for the device
+        DeviceScanList = new ArrayList<>();
+        scanBTListViewAdapter = new ScanBTListViewAdapter(this, DeviceScanList);
+        scanBTListViewAdapter.setOnItemClickListener(this);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mRecyclerView.setAdapter(scanBTListViewAdapter);
+        scanBTListViewAdapter.notifyDataSetChanged();
 
         // Set click listener for scan button
-        scanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isScanning) {
-                    stopScan();
-                } else {
-                    startScan();
-                }
-            }
-        });
-
-        latitudeEditText = findViewById(R.id.latitudeEditText);
-        longitudeEditText = findViewById(R.id.longitudeEditText);
-        saveButton = findViewById(R.id.saveButton);
-
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveGeofencePerimeter();
+        scanButton.setOnClickListener(v -> {
+            if (isScanning) {
+                stopScan();
+            } else {
+                startScan();
             }
         });
     }
@@ -178,58 +154,58 @@ public class ScanBluetooth extends AppCompatActivity
         }
     }
 
-    private void saveGeofencePerimeter() {
-        if (!isBluetoothConnected) {
-            Toast.makeText(this, "Bluetooth is not connected", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String latitudeText = latitudeEditText.getText().toString();
-        String longitudeText = longitudeEditText.getText().toString();
-
-        if (!latitudeText.isEmpty() && !longitudeText.isEmpty()) {
-            try {
-                geofenceLatitude = Double.parseDouble(latitudeText);
-                geofenceLongitude = Double.parseDouble(longitudeText);
-
-                Toast.makeText(this, "Geofence perimeter saved", Toast.LENGTH_SHORT).show();
-                sendData(geofenceLatitude, geofenceLongitude);
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "Invalid latitude or longitude", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            Toast.makeText(this, "Latitude or longitude cannot be empty", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void sendData(Double geolat, Double geolon) {
-
-        String data = geolat + ";" + geolon;
-
-        if (!isBluetoothConnected) {
-            Toast.makeText(this, "Bluetooth is not connected", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (bluetoothGatt != null && characteristic != null) {
-            // Characteristic available, proceed with sending data
-            characteristic.setValue(data);
-
-            boolean success = bluetoothGatt.writeCharacteristic(characteristic);
-            if (success) {
-                Toast.makeText(this, "Data sent successfully", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Failed to send data", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            Toast.makeText(this, "Bluetooth connection or characteristic not available", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    private void saveGeofencePerimeter() {
+//        if (!isBluetoothConnected) {
+//            Toast.makeText(this, "Bluetooth is not connected", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        if (!latitudeText.isEmpty() && !longitudeText.isEmpty()) {
+//            try {
+//                geofenceLatitude = Double.parseDouble(latitudeText);
+//                geofenceLongitude = Double.parseDouble(longitudeText);
+//
+//                Toast.makeText(this, "Geofence perimeter saved", Toast.LENGTH_SHORT).show();
+//                sendData(geofenceLatitude, geofenceLongitude);
+//            } catch (NumberFormatException e) {
+//                Toast.makeText(this, "Invalid latitude or longitude", Toast.LENGTH_SHORT).show();
+//            }
+//        } else {
+//            Toast.makeText(this, "Latitude or longitude cannot be empty", Toast.LENGTH_SHORT).show();
+//        }
+//    }
+//
+//    private void sendData(Double geolat, Double geolon) {
+//
+//        String data = geolat + ";" + geolon;
+//
+//        if (!isBluetoothConnected) {
+//            Toast.makeText(this, "Bluetooth is not connected", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        if (bluetoothGatt != null && characteristic != null) {
+//            // Characteristic available, proceed with sending data
+//            characteristic.setValue(data);
+//
+//            boolean success = bluetoothGatt.writeCharacteristic(characteristic);
+//            if (success) {
+//                Toast.makeText(this, "Data sent successfully", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(this, "Failed to send data", Toast.LENGTH_SHORT).show();
+//            }
+//        } else {
+//            Toast.makeText(this, "Bluetooth connection or characteristic not available", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     private void startScan() {
         // Clear the previous scan results
         scanResults.clear();
-        deviceListAdapter.clear();
+        // Clear recyclerview
+        int itemCount = DeviceScanList.size();
+        DeviceScanList.clear();
+        scanBTListViewAdapter.notifyItemRangeRemoved(0, itemCount);
 
         // Start scanning for BLE devices
         bluetoothLeScanner.startScan(null, scanSettings, scanCallback);
@@ -251,11 +227,11 @@ public class ScanBluetooth extends AppCompatActivity
     private ScanCallback scanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
+
             // Handle scan result here
             BluetoothDevice device = result.getDevice();
             String deviceName = device.getName();
             String deviceAddress = device.getAddress();
-            int rssi = result.getRssi();
 
             // Check if the device is already in the list
             boolean isNewDevice = true;
@@ -269,8 +245,15 @@ public class ScanBluetooth extends AppCompatActivity
             // Add the device to the list if it's not already present
             if (isNewDevice) {
                 scanResults.add(result);
-                deviceListAdapter.add(deviceName + " (" + deviceAddress + ") - RSSI: " + rssi + "dBm");
+                addData(new ScannedDevices(deviceName, deviceAddress));
             }
+        }
+
+        private void addData(ScannedDevices data){
+            runOnUiThread(() -> {
+                DeviceScanList.add(data);
+                scanBTListViewAdapter.notifyDataSetChanged();
+            });
         }
 
 
@@ -316,14 +299,6 @@ public class ScanBluetooth extends AppCompatActivity
         bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
     }
 
-//    private void enableCharacteristicNotification(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-//        gatt.setCharacteristicNotification(characteristic, true);
-//
-//        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(SERVICE_UUID);
-//        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-//        gatt.writeDescriptor(descriptor);
-//    }
-
     private void disconnectGatt() {
         if (bluetoothGatt != null) {
             bluetoothGatt.disconnect();
@@ -335,24 +310,84 @@ public class ScanBluetooth extends AppCompatActivity
     @Override
     public void onConnectionStateChanged(boolean isConnected) {
         isBluetoothConnected = isConnected;
-        if (!isBluetoothConnected){
+        if (isBluetoothConnected) {
+            int timeoutMillis = 5000;
+            timeoutHandler.postDelayed(timeoutRunnable, timeoutMillis);
+        } else {
             // Clean up
             disconnectGatt();
         }
     }
 
+
     @Override
     public void onCharacteristicChanged(String value) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                receivedDataTextView.setText("Received Data: " + value );
+        runOnUiThread(() -> {
+            String VALID_DEVICE = "rDmI4NXH08";
+            if (value.equals(VALID_DEVICE)) {
+                Toast.makeText(ScanBluetooth.this, "Received Data: " + value, Toast.LENGTH_SHORT).show();
+                timeoutHandler.removeCallbacks(timeoutRunnable);
+                Intent intent = new Intent(ScanBluetooth.this, AddPet.class);
+                intent.putExtra("MAC_ADDRESS", bluetoothAddress);
+                intent.putExtra("isEditMode", false);
+                startActivity(intent);
+                finish();
+            } else {
+                //clean up
+                disconnectGatt();
             }
         });
     }
 
     @Override
-    public void onServiceDiscoveredCallback(BluetoothGattCharacteristic characteristic) {
-        this.characteristic = characteristic;
+    public void onItemClick(int position) {
+        BluetoothDevice device = scanResults.get(position).getDevice();
+        bluetoothAddress = device.getAddress();
+        connectToDevice(device);
+    }
+
+    @Override
+    public void onCharacteristicReadCallback(String value) {
+        runOnUiThread(() -> {
+            String VALID_DEVICE = "rDmI4NXH08";
+            if (value.equals(VALID_DEVICE)) {
+                Toast.makeText(ScanBluetooth.this, "Received Data: " + value, Toast.LENGTH_SHORT).show();
+                timeoutHandler.removeCallbacks(timeoutRunnable);
+                Intent intent = new Intent(ScanBluetooth.this, AddPet.class);
+                intent.putExtra("MAC_ADDRESS", bluetoothAddress);
+                intent.putExtra("isEditMode", false);
+                startActivity(intent);
+                finish();
+            } else {
+                //clean up
+                disconnectGatt();
+            }
+        });
+    }
+
+    public class ScannedDevices {
+        private String DeviceName;
+        private String MACAddress;
+
+        public ScannedDevices(String DeviceName, String MACAddress) {
+            this.DeviceName = DeviceName;
+            this.MACAddress = MACAddress;
+        }
+
+        public String getDeviceName() {
+            return DeviceName;
+        }
+
+        public void setDeviceName(String deviceName) {
+            DeviceName = deviceName;
+        }
+
+        public String getMACAddress() {
+            return MACAddress;
+        }
+
+        public void setMACAddress(String MACAddress) {
+            this.MACAddress = MACAddress;
+        }
     }
 }

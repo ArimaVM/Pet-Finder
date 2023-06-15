@@ -19,6 +19,7 @@ import com.example.petfinder.container.DrawerNav;
 import com.example.petfinder.container.RecordAdapter;
 import com.example.petfinder.databinding.ActivityDashboardBinding;
 import com.example.petfinder.pages.pet.AddPet;
+import com.example.petfinder.pages.pet.ScanBluetooth;
 
 public class Dashboard extends DrawerNav {
 
@@ -49,8 +50,7 @@ public class Dashboard extends DrawerNav {
         activityDashboardBinding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Dashboard.this, AddPet.class);
-                intent.putExtra("isEditMode", false);
+                Intent intent = new Intent(Dashboard.this, ScanBluetooth.class);
                 startActivity(intent);
             }
         });
