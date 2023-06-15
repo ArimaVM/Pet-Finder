@@ -9,18 +9,34 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
+import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
 import com.example.petfinder.components.Dashboard;
 import com.example.petfinder.components.Perimeter;
 import com.example.petfinder.pages.pet.AddPet;
+import com.example.petfinder.pages.pet.EditPet;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class AddDevice extends AppCompatActivity {
+
+    TextInputEditText dName, latitude, longitude;
+    DatabaseHelper databaseHelper;
+    Button scanBT;
+    private  String deviceName, lat, longi, btName, btAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_device);
+
+        dName = findViewById(R.id.deviceName);
+        latitude = findViewById(R.id.latitude);
+        longitude = findViewById(R.id.longitude);
+        scanBT = findViewById(R.id.scanButton);
+        databaseHelper = new DatabaseHelper(this);
 
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -55,5 +71,25 @@ public class AddDevice extends AppCompatActivity {
     }
 
     private void storeData() {
+        deviceName = ""+dName.getText().toString().trim();
+        lat = ""+latitude.getText().toString().trim();
+        longi = ""+longitude.getText().toString().trim();
+        btName = "";
+        btAddress = "";
+
+        Intent intent = new Intent(AddDevice.this, EditDevice.class);
+        intent.putExtra("isEditMode", false); // Set the edit mode to false, as it's a new device
+        intent.putExtra("DEVICENAME", deviceName);
+        intent.putExtra("LATITUDE", lat);
+        intent.putExtra("LONGITUDE", longi);
+
+        String timestamp = ""+System.currentTimeMillis();
+        long id = databaseHelper.storeDeviceData(
+                ""+deviceName,
+                ""+lat,
+                ""+longi,
+                ""+btName,
+                ""+btAddress);
+        Toast.makeText(this, "Device Added against Id: "+id, Toast.LENGTH_SHORT).show();
     }
 }

@@ -5,6 +5,7 @@ public class Constants {
     public static final String DATABASE_NAME = "PetDatabase.db";
     public static final int DATABASE_VERSION = 1;
 
+    //TABLE1
     public static final String TABLE_NAME = "PetRecord";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_PETNAME = "petName";
@@ -27,4 +28,20 @@ public class Constants {
             + COLUMN_ADDED_TIMESTAMP + " TEXT, "
             + COLUMN_UPDATED_TIMESTAMP + " TEXT);";
 
+    //TABLE2
+    public static final String TABLE_NAME2 = "DeviceRecord";
+    public static final String COLUMN_ID2 = "_id2";
+    public static final String COLUMN_DEVICENAME = "deviceName";
+    public static final String COLUMN_LATITUDE = "latitude";
+    public static final String COLUMN_LONGITUDE = "longitude";
+    public static final String COLUMN_BTNAME = "BTName";
+    public static final String COLUMN_BTADDRESS = "BTaddress";
+
+    public static String query2 = "CREATE TABLE " + TABLE_NAME2 + "("
+            + COLUMN_ID2 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_DEVICENAME + " TEXT, "
+            + COLUMN_LATITUDE + " TEXT, "
+            + COLUMN_LONGITUDE + " TEXT, "
+            + COLUMN_BTNAME + " TEXT, "
+            + COLUMN_BTADDRESS + " TEXT);";
 }

@@ -30,6 +30,9 @@
         android:theme="@style/Theme.PetFinder"
         tools:targetApi="31">
         <activity
+            android:name=".pages.device.EditDevice"
+            android:exported="false" />
+        <activity
             android:name=".pages.device.DisplayDeviceDetails"
             android:exported="false" />
         <activity

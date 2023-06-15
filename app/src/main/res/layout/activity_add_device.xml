@@ -91,7 +91,7 @@
                 app:boxBackgroundColor="@color/white">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/longtitude"
+                    android:id="@+id/longitude"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/longitude"
@@ -109,20 +109,6 @@
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/scanButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Scan Bluetooth"
-                android:layout_marginBottom="20dp"/>
-
-            <TextView
-                android:id="@+id/receivedDataTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Received Data: "
-                android:textSize="16sp" />
 
             <ListView
                 android:id="@+id/deviceList"

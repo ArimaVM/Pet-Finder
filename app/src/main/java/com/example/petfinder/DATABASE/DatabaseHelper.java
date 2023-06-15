@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.petfinder.container.DeviceModel;
 import com.example.petfinder.container.RecordModel;
 
 import org.jetbrains.annotations.Nullable;
@@ -23,11 +24,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(Constants.query);
+        db.execSQL(Constants.query2);
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME2);
         onCreate(db);
     }
     public long storeData(String petName, String breed, String sex, String age,
@@ -45,6 +49,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Constants.COLUMN_UPDATED_TIMESTAMP, updatedtime);
 
         long id = db.insert(Constants.TABLE_NAME, null, values);  // Corrected table name usage
+        db.close();
+        return id;
+    }
+
+    public long storeDeviceData(String deviceName, String latitude, String longitude, String btName, String btAddress){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_DEVICENAME, deviceName);
+        values.put(Constants.COLUMN_LATITUDE, latitude);
+        values.put(Constants.COLUMN_LONGITUDE, longitude);
+        values.put(Constants.COLUMN_BTNAME, btName);
+        values.put(Constants.COLUMN_BTADDRESS, btAddress);
+
+        long id = db.insert(Constants.TABLE_NAME2, null, values);  // Corrected table name usage
         db.close();
         return id;
     }
@@ -91,6 +110,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         db.close();
         return recordsList;
+    }
+
+    public ArrayList<DeviceModel> getAllDeviceRecords (String orderBy){
+        ArrayList<DeviceModel> deviceList = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME2 + " ORDER BY " + orderBy;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") DeviceModel deviceModel = new DeviceModel(
+                        ""+cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_ID2)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DEVICENAME)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LATITUDE)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONGITUDE)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BTNAME)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BTADDRESS)));
+
+                deviceList.add(deviceModel);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return deviceList;
+    }
+    public ArrayList<DeviceModel> searchDeviceRecords (String query) {
+        ArrayList<DeviceModel> deviceList = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME2 + " WHERE " + Constants.COLUMN_DEVICENAME + " LIKE '%" + query +"%'";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") DeviceModel deviceModel = new DeviceModel(
+                        ""+cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_ID2)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DEVICENAME)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LATITUDE)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONGITUDE)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BTNAME)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BTADDRESS)));
+
+                deviceList.add(deviceModel);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return deviceList;
     }
 
     public ArrayList<RecordModel> searchRecords (String query) {
