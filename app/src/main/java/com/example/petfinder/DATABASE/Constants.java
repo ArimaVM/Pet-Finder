@@ -1,5 +1,7 @@
 package com.example.petfinder.DATABASE;
 
+import android.net.Uri;
+
 public class Constants {
 
     public static final String DATABASE_NAME = "PetDatabase.db";
@@ -16,6 +18,11 @@ public class Constants {
     public static final String COLUMN_IMAGE = "petPic";
     public static final String COLUMN_ADDED_TIMESTAMP = "added_timestamp";
     public static final String COLUMN_UPDATED_TIMESTAMP = "updated_timestamp";
+
+    public static final String AUTHORITY = "com.example.petfinder.provider";
+
+    // Define the content URIs
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
     public static String query = "CREATE TABLE " + TABLE_NAME + "("
             + COLUMN_ID + " TEXT, "
