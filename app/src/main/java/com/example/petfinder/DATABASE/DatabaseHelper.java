@@ -50,7 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private Context getContext() {
         return context;
     }
-    @Override
+
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         // Implement the query operation for the Content Provider
         SQLiteDatabase db = getReadableDatabase();
@@ -93,7 +93,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    @Override
     public Uri insert(Uri uri, ContentValues values) {
         // Implement the insert operation for the Content Provider
         SQLiteDatabase db = getWritableDatabase();
