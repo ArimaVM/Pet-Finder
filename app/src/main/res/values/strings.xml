@@ -102,4 +102,5 @@
     <string name="longitude">Longitude</string>
     <string name="set_perimeter">Set Perimeter</string>
     <string name="set_device">Select Bluetooth</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>

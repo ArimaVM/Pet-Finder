@@ -12,7 +12,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 
 import com.example.petfinder.container.DeviceModel;
+import com.example.petfinder.container.GPSModel;
 import com.example.petfinder.container.RecordModel;
+import com.example.petfinder.container.dataModel.GPS;
+import com.example.petfinder.container.dataModel.PedometerData;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -125,6 +128,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(Constants.query);
         db.execSQL(Constants.query2);
+        db.execSQL(Constants.query3);
+        db.execSQL(Constants.query4);
 
     }
 
@@ -132,6 +137,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME2);
+        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME3);
+        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME4);
         onCreate(db);
     }
     public long storeData(String address, String petName, String breed, String sex, String age,
@@ -170,6 +177,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    public long storeGPSData(String address, String lat, String longi, String time, String date){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID4, address);
+        values.put(Constants.COLUMN_LONG, longi);
+        values.put(Constants.COLUMN_LAT, lat);
+        values.put(Constants.COLUMN_TIME, time);
+        values.put(Constants.COLUMN_DATE2, date);
+
+        long id = db.insert(Constants.TABLE_NAME4, null, values);  // Corrected table name usage
+        db.close();
+        return id;
+    }
+
+    public long storePedometerData(String MAC_ADDRESS, int numSteps, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID3, MAC_ADDRESS);
+        values.put(Constants.COLUMN_NUMSTEPS, numSteps);
+        values.put(Constants.COLUMN_DATE, date);
+
+        long id = db.insert(Constants.TABLE_NAME3, null, values);  // Corrected table name usage
+        db.close();
+        return id;
+    }
+
     public void updateData(String id, String petName, String breed, String sex, String age,
                           String weight, String petPic, String addedtime, String updatedtime) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -185,6 +220,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Constants.COLUMN_UPDATED_TIMESTAMP, updatedtime);
 
         db.update(Constants.TABLE_NAME, values, Constants.COLUMN_ID +" = ?", new String[] {id});
+        db.close();
+    }
+
+    public void updatePedometerData(String id, int numstep, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID3, id);
+        values.put(Constants.COLUMN_NUMSTEPS, numstep);
+        values.put(Constants.COLUMN_DATE, date);
+
+
+        db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_DATE +" = ? AND "+ Constants.COLUMN_ID3 +"= ?", new String[] {date, id});
         db.close();
     }
 
@@ -212,6 +260,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         db.close();
         return recordsList;
+    }
+
+    @SuppressLint("Range")
+    public PedometerData getLatestPedometer(String MAC_ADDRESS) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(
+                Constants.TABLE_NAME3,
+                null,
+                Constants.COLUMN_ID3 + "= ?",
+                new String[]{MAC_ADDRESS},
+                null,
+                null,
+                Constants.COLUMN_DATE+" DESC",
+                "1"
+        );
+
+        PedometerData latestPedometer = null;
+        if (cursor.moveToFirst()) {
+            latestPedometer = new PedometerData(
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID3)),
+                    cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_NUMSTEPS)),
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DATE))
+            );
+        }
+        cursor.close();
+        db.close();
+        return latestPedometer;
     }
 
     public ArrayList<DeviceModel> getAllDeviceRecords (String orderBy){

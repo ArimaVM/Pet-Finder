@@ -99,6 +99,8 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
         PetFinder myApp = PetFinder.getInstance();
         myApp.registerObserver(this);
         myApp.setIsConnected(isConnected);
+        myApp.setMAC_ADDRESS(recordID);
+        myApp.setBluetoothGatt(bluetoothGatt);
 
         // Set the custom back arrow as the navigation icon
         myToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
@@ -147,7 +149,7 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
 
         if (cursor.moveToFirst()) {
             do {
-                pet_id = ""+cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_ID));
+                pet_id = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID));
                 name = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PETNAME));
                 breed ="" +cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BREED));
                 sex = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_SEX));
