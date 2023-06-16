@@ -18,12 +18,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,8 +40,6 @@ import java.util.List;
 
 public class ScanBluetooth extends AppCompatActivity
                                 implements BluetoothGattCallbackHandler.ConnectionStateCallback
-                                         , BluetoothGattCallbackHandler.CharacteristicChangedCallback
-                                         , BluetoothGattCallbackHandler.CharacteristicReadCallback
                                          , ScanBTListViewAdapter.OnItemClickListener {
 
 
@@ -59,13 +59,6 @@ public class ScanBluetooth extends AppCompatActivity
     private BluetoothGatt bluetoothGatt;
     private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
 
-    private Handler timeoutHandler = new Handler();
-    private Runnable timeoutRunnable = () -> runOnUiThread(() -> {
-        //disconnect
-        disconnectGatt();
-        Toast.makeText(ScanBluetooth.this, "Invalid device. Disconnected.", Toast.LENGTH_SHORT).show();
-    });
-
     private RecyclerView mRecyclerView;
     private ScanBTListViewAdapter scanBTListViewAdapter;
     List<ScannedDevices> DeviceScanList;
@@ -76,14 +69,26 @@ public class ScanBluetooth extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_bluetooth);
 
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+
+        // Set the custom back arrow as the navigation icon
+        myToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+
+        // Set a click listener on the navigation icon
+        myToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
         scanButton = findViewById(R.id.scanButton);
 
         Handler handler = new Handler(Looper.getMainLooper());
 
         bluetoothGattCallbackHandler = new BluetoothGattCallbackHandler(ScanBluetooth.this, handler);
         bluetoothGattCallbackHandler.setConnectionStateCallback(this);
-        bluetoothGattCallbackHandler.setCharacteristicChangedCallback(this);
-        bluetoothGattCallbackHandler.setCharacteristicReadCallback(this);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -235,6 +240,11 @@ public class ScanBluetooth extends AppCompatActivity
 
         // Connect to the selected device
         bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
+        Intent intent = new Intent(ScanBluetooth.this, AddPet.class);
+        intent.putExtra("MAC_ADDRESS", bluetoothAddress);
+        intent.putExtra("isEditMode", false);
+        startActivity(intent);
+        finish();
     }
 
     private void disconnectGatt() {
@@ -248,33 +258,6 @@ public class ScanBluetooth extends AppCompatActivity
     @Override
     public void onConnectionStateChanged(boolean isConnected) {
         isBluetoothConnected = isConnected;
-        if (isBluetoothConnected) {
-            int timeoutMillis = 5000;
-            timeoutHandler.postDelayed(timeoutRunnable, timeoutMillis);
-        } else {
-            // Clean up
-            disconnectGatt();
-        }
-    }
-
-
-    @Override
-    public void onCharacteristicChanged(String value) {
-        runOnUiThread(() -> {
-            String VALID_DEVICE = "rDmI4NXH08";
-            if (value.equals(VALID_DEVICE)) {
-                Toast.makeText(ScanBluetooth.this, "Received Data: " + value, Toast.LENGTH_SHORT).show();
-                timeoutHandler.removeCallbacks(timeoutRunnable);
-                Intent intent = new Intent(ScanBluetooth.this, AddPet.class);
-                intent.putExtra("MAC_ADDRESS", bluetoothAddress);
-                intent.putExtra("isEditMode", false);
-                startActivity(intent);
-                finish();
-            } else {
-                //clean up
-                disconnectGatt();
-            }
-        });
     }
 
     @Override
@@ -282,25 +265,6 @@ public class ScanBluetooth extends AppCompatActivity
         BluetoothDevice device = scanResults.get(position).getDevice();
         bluetoothAddress = device.getAddress();
         connectToDevice(device);
-    }
-
-    @Override
-    public void onCharacteristicReadCallback(String value) {
-        runOnUiThread(() -> {
-            String VALID_DEVICE = "rDmI4NXH08";
-            if (value.equals(VALID_DEVICE)) {
-                Toast.makeText(ScanBluetooth.this, "Received Data: " + value, Toast.LENGTH_SHORT).show();
-                timeoutHandler.removeCallbacks(timeoutRunnable);
-                Intent intent = new Intent(ScanBluetooth.this, AddPet.class);
-                intent.putExtra("MAC_ADDRESS", bluetoothAddress);
-                intent.putExtra("isEditMode", false);
-                startActivity(intent);
-                finish();
-            } else {
-                //clean up
-                disconnectGatt();
-            }
-        });
     }
 
     public class ScannedDevices {

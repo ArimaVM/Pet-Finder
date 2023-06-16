@@ -73,8 +73,6 @@ public class Statistics extends AppCompatActivity {
                     intent.putExtra("isConnected", isConnected);
                     startActivity(intent);
                     break;
-                case R.id.nav_statistics:
-                    break;
             }
             return true;
         });

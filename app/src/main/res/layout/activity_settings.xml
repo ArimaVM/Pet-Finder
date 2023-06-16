@@ -53,64 +53,6 @@
             android:background="@drawable/round_white_transbg">
 
             <RelativeLayout
-                android:id="@+id/userInfo"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
-
-                <ImageView
-                    android:id="@+id/profileIcon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_user"
-                    android:background="@drawable/round_pink_bg"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="User Info"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:layout_marginStart="20dp"
-                    android:layout_toEndOf="@+id/profileIcon"/>
-
-            </RelativeLayout>
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
-
-                <ImageView
-                    android:id="@+id/notificationIcon"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_notification"
-                    android:background="@drawable/round_violet_bg"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="Notification"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:layout_marginStart="20dp"
-                    android:layout_toEndOf="@+id/notificationIcon"/>
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:minWidth="50dp"
-                    android:theme="@style/nightModeSwitch"
-                    android:checked="true"/>
-
-            </RelativeLayout>
-            <RelativeLayout
                 android:id="@+id/about"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"

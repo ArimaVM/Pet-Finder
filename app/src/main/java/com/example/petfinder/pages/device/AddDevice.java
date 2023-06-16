@@ -1,5 +1,6 @@
 package com.example.petfinder.pages.device;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,10 +13,18 @@ import android.widget.Toast;
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
 import com.example.petfinder.components.Perimeter;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.textfield.TextInputEditText;
 
-public class AddDevice extends AppCompatActivity {
+public class AddDevice extends AppCompatActivity{
 
+    private GoogleMap myMap;
     TextInputEditText dName, latitude, longitude;
     DatabaseHelper databaseHelper;
     Button scanBT;
