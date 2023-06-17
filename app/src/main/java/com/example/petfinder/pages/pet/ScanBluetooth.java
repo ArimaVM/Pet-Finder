@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import android.bluetooth.BluetoothAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -60,6 +61,7 @@ public class ScanBluetooth extends AppCompatActivity
     private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
 
     private RecyclerView mRecyclerView;
+
     private ScanBTListViewAdapter scanBTListViewAdapter;
     List<ScannedDevices> DeviceScanList;
 
@@ -67,7 +69,16 @@ public class ScanBluetooth extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan_bluetooth);
+        setContentView(R.layout.activity_scan_bluetooth);;
+
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        // Check if Bluetooth is supported on the device
+        if (bluetoothAdapter == null) {
+            // Bluetooth is not supported, show an error message or take appropriate action
+            Toast.makeText(this, "Bluetooth is not supported on this device", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -90,8 +101,6 @@ public class ScanBluetooth extends AppCompatActivity
         bluetoothGattCallbackHandler = new BluetoothGattCallbackHandler(ScanBluetooth.this, handler);
         bluetoothGattCallbackHandler.setConnectionStateCallback(this);
 
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
         // Check if the device supports BLE
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, "BLE not supported", Toast.LENGTH_SHORT).show();
@@ -99,7 +108,6 @@ public class ScanBluetooth extends AppCompatActivity
         }
 
         // Check if Bluetooth is enabled, and if not, request to enable it
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth not supported", Toast.LENGTH_SHORT).show();
             finish();
@@ -143,19 +151,25 @@ public class ScanBluetooth extends AppCompatActivity
     }
 
     private void startScan() {
-        // Clear the previous scan results
-        scanResults.clear();
-        // Clear recyclerview
-        int itemCount = DeviceScanList.size();
-        DeviceScanList.clear();
-        scanBTListViewAdapter.notifyItemRangeRemoved(0, itemCount);
+        // Check if Bluetooth LE scanner is initialized
+        if (bluetoothLeScanner != null) {
+            // Clear the previous scan results
+            scanResults.clear();
+            // Clear recyclerview
+            int itemCount = DeviceScanList.size();
+            DeviceScanList.clear();
+            scanBTListViewAdapter.notifyItemRangeRemoved(0, itemCount);
 
-        // Start scanning for BLE devices
-        bluetoothLeScanner.startScan(null, scanSettings, scanCallback);
+            // Start scanning for BLE devices
+            bluetoothLeScanner.startScan(null, scanSettings, scanCallback);
 
-        // Update UI
-        scanButton.setText("Stop Scan");
-        isScanning = true;
+            // Update UI
+            scanButton.setText("Stop Scan");
+            isScanning = true;
+        } else {
+            // Bluetooth LE scanner is not initialized, show an error message
+            Toast.makeText(this, "Failed to initialize Bluetooth LE scanner", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void stopScan() {
@@ -233,6 +247,21 @@ public class ScanBluetooth extends AppCompatActivity
             }
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode == RESULT_OK) {
+                // Bluetooth is enabled, initialize the Bluetooth LE scanner
+                bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            } else {
+                // Bluetooth enabling was canceled or failed, handle the error
+                Toast.makeText(this, "Failed to enable Bluetooth", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     private void connectToDevice(BluetoothDevice device) {
         // Disconnect any existing connection
