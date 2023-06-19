@@ -16,9 +16,12 @@ public class Constants {
     public static final String COLUMN_IMAGE = "petPic";
     public static final String COLUMN_ADDED_TIMESTAMP = "added_timestamp";
     public static final String COLUMN_UPDATED_TIMESTAMP = "updated_timestamp";
-
+    public static final String COLUMN_ALLERGIES = "allergies";
+    public static final String COLUMN_MEDICATIONS = "medications";
+    public static final String COLUMN_VETNAME = "vetName";
+    public static final String COLUMN_VETCONTACT = "vetContact";
     public static String query = "CREATE TABLE " + TABLE_NAME + "("
-            + COLUMN_ID + " TEXT, "
+            + COLUMN_ID + " TEXT PRIMARY KEY, "
             + COLUMN_PETNAME + " TEXT, "
             + COLUMN_BREED + " TEXT, "
             + COLUMN_SEX + " TEXT, "

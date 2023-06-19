@@ -6,6 +6,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,6 +21,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.petfinder.R;
+import com.example.petfinder.pages.device.AddDevice;
 import com.example.petfinder.pages.pet.DisplayPetDetails;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.GeofencingClient;
@@ -71,6 +75,8 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback, G
             }
         });
 
+
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         getLastLocation();
 
@@ -104,6 +110,26 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback, G
             return true;
         });
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.location_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.geofence:
+                Toast.makeText(this, "Geofence Created", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.clear:
+                Toast.makeText(this, "Geofence Cleared", Toast.LENGTH_SHORT).show();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void getLastLocation() {

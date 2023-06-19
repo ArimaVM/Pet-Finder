@@ -268,48 +268,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="30dp"
                         android:padding="5dp"
-                        android:text="@string/treats"
-                        android:textColor="#151515"
-                        android:textSize="18sp"
-                        android:textStyle="bold"/>
-                    <TextView
-                        android:id="@+id/petTreatsDisplay"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="30dp"
-                        android:padding="5dp"
-                        android:text="Pet Treats Here"
-                        android:textColor="@color/white"
-                        android:textSize="18sp" />
-                </TableRow>
-                <TableRow>
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="30dp"
-                        android:padding="5dp"
-                        android:text="@string/restrictions"
-                        android:textColor="#151515"
-                        android:textSize="18sp"
-                        android:textStyle="bold"/>
-                    <TextView
-                        android:id="@+id/petRestrictionsDisplay"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="30dp"
-                        android:padding="5dp"
-                        android:text="Pet Restrictions Here"
-                        android:textColor="@color/white"
-                        android:textSize="18sp" />
-                </TableRow>
-                <TableRow>
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="30dp"
-                        android:padding="5dp"
                         android:text="@string/medications"
                         android:textColor="#151515"
                         android:textSize="18sp"
@@ -344,6 +302,28 @@
                         android:layout_marginEnd="30dp"
                         android:padding="5dp"
                         android:text="Vet Name Here"
+                        android:textColor="@color/white"
+                        android:textSize="18sp" />
+                </TableRow>
+                <TableRow>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="30dp"
+                        android:padding="5dp"
+                        android:text="@string/vet_contact"
+                        android:textColor="#151515"
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/vetContactDisplay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="30dp"
+                        android:padding="5dp"
+                        android:text="Vet Contact Here"
                         android:textColor="@color/white"
                         android:textSize="18sp" />
                 </TableRow>

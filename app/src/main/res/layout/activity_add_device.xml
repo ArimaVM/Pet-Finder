@@ -105,37 +105,11 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
-                android:text="@string/set_device"
+                android:text="Add Settings to this Pet"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/scanButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Scan Bluetooth"
-                android:layout_marginBottom="20dp"/>
-
-            <TextView
-                android:id="@+id/receivedDataTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Received Data: "
-                android:textSize="16sp" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="100dp" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

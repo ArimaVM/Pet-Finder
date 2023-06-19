@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Button;
+
 import android.widget.Toast;
 
 import com.example.petfinder.DATABASE.DatabaseHelper;
@@ -27,9 +27,7 @@ public class AddDevice extends AppCompatActivity{
     private GoogleMap myMap;
     TextInputEditText dName, latitude, longitude;
     DatabaseHelper databaseHelper;
-    Button scanBT;
     private  String deviceName, lat, longi, btName, btAddress;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +37,8 @@ public class AddDevice extends AppCompatActivity{
         dName = findViewById(R.id.deviceName);
         latitude = findViewById(R.id.latitude);
         longitude = findViewById(R.id.longitude);
-        scanBT = findViewById(R.id.scanButton);
         databaseHelper = new DatabaseHelper(this);
+
     }
 
     @Override
