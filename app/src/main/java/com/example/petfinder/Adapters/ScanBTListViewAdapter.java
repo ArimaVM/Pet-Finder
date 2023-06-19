@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,8 +43,14 @@ public class ScanBTListViewAdapter extends RecyclerView.Adapter<ScanBTListViewAd
 
     @Override
     public void onBindViewHolder(@NonNull ScanBTListViewHolder holder, int position) {
-        holder.BluetoothName.setText(DeviceScanList.get(position).getDeviceName());
+        if (DeviceScanList.get(position).getDeviceName() != null) {
+            holder.BluetoothName.setText(DeviceScanList.get(position).getDeviceName());
+        } else {
+            holder.BluetoothName.setText("Bluetooth Device");
+        }
         holder.MACAddress.setText(DeviceScanList.get(position).getMACAddress());
+        // TODO: CHECK IF DEVICE MAC ADDRESS IS ALREADY IN THE DATABASE.
+        holder.Indicator.setBackgroundColor(context.getResources().getColor(R.color.lightGray));
     }
 
     @Override
@@ -53,11 +60,13 @@ public class ScanBTListViewAdapter extends RecyclerView.Adapter<ScanBTListViewAd
 
     public class ScanBTListViewHolder extends RecyclerView.ViewHolder {
         TextView BluetoothName, MACAddress;
+        ImageView Indicator;
 
         public ScanBTListViewHolder(View itemView) {
             super(itemView);
             BluetoothName = itemView.findViewById(R.id.BluetoothName);
             MACAddress = itemView.findViewById(R.id.MAC_Address);
+            Indicator = itemView.findViewById(R.id.indicator);
 
             itemView.setOnClickListener(view -> {
                 int position = getAdapterPosition();

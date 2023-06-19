@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
@@ -17,11 +19,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import android.bluetooth.BluetoothAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -38,9 +37,12 @@ import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ScanBluetooth extends AppCompatActivity
-                                implements BluetoothGattCallbackHandler.ConnectionStateCallback
+                                implements BluetoothGattCallbackHandler.ConnectionStateChangeCallback
+                                         , BluetoothGattCallbackHandler.DescriptorWriteCallback
+                                         , BluetoothGattCallbackHandler.CharacteristicChangedCallback
                                          , ScanBTListViewAdapter.OnItemClickListener {
 
 
@@ -58,12 +60,23 @@ public class ScanBluetooth extends AppCompatActivity
     private boolean isScanning = false;
 
     private BluetoothGatt bluetoothGatt;
+    private BluetoothGattCharacteristic characteristic;
+    private BluetoothDevice device;
     private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
 
     private RecyclerView mRecyclerView;
 
     private ScanBTListViewAdapter scanBTListViewAdapter;
     List<ScannedDevices> DeviceScanList;
+
+    Handler handler2 = new Handler();
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            //disconnectGatt();
+            Toast.makeText(ScanBluetooth.this, "Invalid Device.", Toast.LENGTH_SHORT).show();
+        }
+    };
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -87,19 +100,16 @@ public class ScanBluetooth extends AppCompatActivity
         myToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
 
         // Set a click listener on the navigation icon
-        myToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        myToolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         scanButton = findViewById(R.id.scanButton);
 
         Handler handler = new Handler(Looper.getMainLooper());
 
         bluetoothGattCallbackHandler = new BluetoothGattCallbackHandler(ScanBluetooth.this, handler);
-        bluetoothGattCallbackHandler.setConnectionStateCallback(this);
+        bluetoothGattCallbackHandler.setConnectionStateChangeCallback(this);
+        bluetoothGattCallbackHandler.setDescriptorWriteCallback(this);
+        bluetoothGattCallbackHandler.setCharacteristicChangedCallback(this);
 
         // Check if the device supports BLE
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -150,6 +160,24 @@ public class ScanBluetooth extends AppCompatActivity
         });
     }
 
+    private void askForVerification() {
+        String data = "SEND_DEVICE_CODE";
+
+        if (!isBluetoothConnected) { return; }
+        if (bluetoothGatt != null && characteristic != null) {
+            // Characteristic available, proceed with sending data
+            characteristic.setValue(data);
+            boolean success = bluetoothGatt.writeCharacteristic(characteristic);
+            if (success) {
+                makeToastOnUI("Verifying...");
+            } else {
+                makeToastOnUI("Verification failed. Please try again later.");
+            }
+        } else {
+            makeToastOnUI("An error occured. Please try again later.");
+        }
+    }
+
     private void startScan() {
         // Check if Bluetooth LE scanner is initialized
         if (bluetoothLeScanner != null) {
@@ -189,6 +217,8 @@ public class ScanBluetooth extends AppCompatActivity
             BluetoothDevice device = result.getDevice();
             String deviceName = device.getName();
             String deviceAddress = device.getAddress();
+
+            if (deviceName == null) return;
 
             // Check if the device is already in the list
             boolean isNewDevice = true;
@@ -262,19 +292,50 @@ public class ScanBluetooth extends AppCompatActivity
         }
     }
 
-
     private void connectToDevice(BluetoothDevice device) {
         // Disconnect any existing connection
         disconnectGatt();
-
-        // Connect to the selected device
         bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
-        Intent intent = new Intent(ScanBluetooth.this, AddPet.class);
-        intent.putExtra("MAC_ADDRESS", bluetoothAddress);
-        intent.putExtra("isEditMode", false);
-        startActivity(intent);
-        finish();
+        bluetoothGattCallbackHandler.setGatt(bluetoothGatt);
     }
+
+    //BluetoothGattCallback start
+    @Override
+    public void onConnectionStateChange(boolean isConnected) {
+        isBluetoothConnected = isConnected;
+        if (!isBluetoothConnected) disconnectGatt();
+    }
+
+    @Override
+    public void onWait() {
+        characteristic = bluetoothGattCallbackHandler.getCharacteristic();
+        askForVerification();
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        device = scanResults.get(position).getDevice();
+        bluetoothAddress = device.getAddress();
+        connectToDevice(device);
+    }
+
+    @Override
+    public void onCharacteristicChanged(String value) {
+        if (value.equals("rDmI4NXH08")){
+            // Connect to the selected device
+            handler2.removeCallbacks(runnable);
+            makeToastOnUI("Device Validation Success!");
+            Intent intent = new Intent(ScanBluetooth.this, AddPet.class);
+            intent.putExtra("MAC_ADDRESS", bluetoothAddress);
+            intent.putExtra("isEditMode", false);
+            startActivity(intent);
+            finish();
+        } else {
+            makeToastOnUI("Invalid Device.");
+        }
+    }
+
+    //BluetoothGattCallback end
 
     private void disconnectGatt() {
         if (bluetoothGatt != null) {
@@ -284,16 +345,10 @@ public class ScanBluetooth extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onConnectionStateChanged(boolean isConnected) {
-        isBluetoothConnected = isConnected;
-    }
-
-    @Override
-    public void onItemClick(int position) {
-        BluetoothDevice device = scanResults.get(position).getDevice();
-        bluetoothAddress = device.getAddress();
-        connectToDevice(device);
+    private void makeToastOnUI(String message){
+        runOnUiThread(() -> {
+            Toast.makeText(ScanBluetooth.this, message, Toast.LENGTH_SHORT).show();
+        });
     }
 
     public class ScannedDevices {

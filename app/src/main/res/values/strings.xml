@@ -103,4 +103,6 @@
     <string name="set_perimeter">Set Perimeter</string>
     <string name="set_device">Select Bluetooth</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="bt_name">BT Name</string>
+    <string name="mac_address">MAC Address</string>
 </resources>

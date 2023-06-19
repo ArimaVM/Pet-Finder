@@ -1,26 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="horizontal"
+    android:weightSum="10">
 
-    <TextView
-        android:id="@+id/BluetoothName"
+    <ImageView
+        android:id="@+id/indicator"
+        android:layout_width="10dp"
+        android:layout_height="fill_parent"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1"
+        android:background="#8F8F8F"
+        app:srcCompat="@drawable/rectangle"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="BT Name"
-        android:textColor="@android:color/black"
-        android:textSize="25sp" />
+        android:orientation="vertical"
+        tools:layout_weight="9">
 
-    <TextView
-        android:id="@+id/MAC_Address"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="MAC Address" />
+        <TextView
+            android:id="@+id/BluetoothName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_name"
+            android:textColor="@android:color/black"
+            android:textSize="25sp" />
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
+        <TextView
+            android:id="@+id/MAC_Address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mac_address" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="10dp"
+            android:background="?android:attr/listDivider"
+            tools:ignore="VisualLintBounds" />
+
+    </LinearLayout>
+
 </LinearLayout>

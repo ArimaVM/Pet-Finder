@@ -1,12 +1,5 @@
 package com.example.petfinder.pages.pet;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -27,10 +20,17 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.blogspot.atifsoftwares.circularimageview.CircularImageView;
-import com.example.petfinder.components.Dashboard;
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
+import com.example.petfinder.components.Dashboard;
 import com.google.android.material.textfield.TextInputEditText;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -82,25 +82,16 @@ public class AddPet extends AppCompatActivity {
         myToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
 
         // Set a click listener on the navigation icon
-        myToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        myToolbar.setNavigationOnClickListener(v -> onBackPressed());
 
-        bdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDatePickerDialog();
-            }
-        });
+        bdate.setOnClickListener(view -> showDatePickerDialog());
 
-        picture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                choseImage();
-            }
+        picture.setOnClickListener(view -> choseImage());
+
+        findViewById(R.id.add_pet).setOnClickListener(view -> {
+            storeData();
+            startActivity(new Intent(AddPet.this, Dashboard.class));
+            finish();
         });
 
     }
