@@ -68,11 +68,7 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
                     intent.putExtra("isConnected", isConnected);
                     startActivity(intent);
                     break;
-                case R.id.nav_statistics:
-                    intent = new Intent(DisplayPetDetails.this, Statistics.class);
-                    intent.putExtra("isConnected", isConnected);
-                    startActivity(intent);
-                    break;
+
             }
             return true;
         });

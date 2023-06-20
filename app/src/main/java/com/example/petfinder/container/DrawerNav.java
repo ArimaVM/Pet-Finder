@@ -51,16 +51,8 @@ public class DrawerNav extends AppCompatActivity implements NavigationView.OnNav
                 startActivity(new Intent(DrawerNav.this, Dashboard.class));
                 break;
 
-            case R.id.nav_device:
-                startActivity(new Intent(DrawerNav.this, Perimeter.class));
-                break;
-
             case R.id.nav_settings:
                 startActivity(new Intent(DrawerNav.this, Settings.class));
-                break;
-
-            case R.id.nav_feeder:
-                Toast.makeText(DrawerNav.this, "Feeder", Toast.LENGTH_SHORT).show();
                 break;
 
             default:

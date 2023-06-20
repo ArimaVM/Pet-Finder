@@ -4,7 +4,6 @@ import android.app.Application;
 import android.bluetooth.BluetoothGatt;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -39,6 +38,14 @@ public class PetFinder extends Application
         currentGPS = new dataModel.GPS();
         pedometerData = new dataModel.PedometerData(null, 0, null);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+    }
+
+    public String getMAC_ADDRESS() {
+        return MAC_ADDRESS;
+    }
+
+    public void setMAC_ADDRESS(String MAC_ADDRESS) {
+        this.MAC_ADDRESS = MAC_ADDRESS;
     }
 
     public dataModel.GPS getCurrentGPS() {
@@ -87,14 +94,6 @@ public class PetFinder extends Application
         }
     }
 
-    public String getMAC_ADDRESS() {
-        return MAC_ADDRESS;
-    }
-
-    public void setMAC_ADDRESS(String MAC_ADDRESS) {
-        this.MAC_ADDRESS = MAC_ADDRESS;
-    }
-
     @Override
     public void onTerminate() {
         super.onTerminate();
@@ -122,8 +121,6 @@ public class PetFinder extends Application
         //gpslon;[dateStr];[timeStr];[latStr]
         //gpslat;[dateStr];[timeStr];[lonStr]
         //ped;[dateStr];[timeStr];[stepsCount]
-
-        Toast.makeText(this, "Received Data: "+value, Toast.LENGTH_SHORT).show();
 
         String[] dataArray = value.split(";");
 

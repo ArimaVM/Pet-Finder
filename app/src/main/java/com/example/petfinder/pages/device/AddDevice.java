@@ -1,26 +1,27 @@
 package com.example.petfinder.pages.device;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Button;
+
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
 import com.example.petfinder.components.Perimeter;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.material.textfield.TextInputEditText;
 
-public class AddDevice extends AppCompatActivity {
+public class AddDevice extends AppCompatActivity{
 
+    private GoogleMap myMap;
     TextInputEditText dName, latitude, longitude;
     DatabaseHelper databaseHelper;
-    Button scanBT;
     private  String deviceName, lat, longi, btName, btAddress;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +31,8 @@ public class AddDevice extends AppCompatActivity {
         dName = findViewById(R.id.deviceName);
         latitude = findViewById(R.id.latitude);
         longitude = findViewById(R.id.longitude);
-        scanBT = findViewById(R.id.scanButton);
         databaseHelper = new DatabaseHelper(this);
+
     }
 
     @Override

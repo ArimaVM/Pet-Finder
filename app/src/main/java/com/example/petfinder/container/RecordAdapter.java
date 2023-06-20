@@ -4,14 +4,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petfinder.R;
@@ -85,8 +89,10 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
         return recordsList.size();
     }
 
-    class RecordHolder extends RecyclerView.ViewHolder{
+    class RecordHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
+        private static final String TAG = "RecordHolder";
+        ImageButton imageButton;
         ImageView petPic;
         TextView petName, petBreed, petSex;
 
@@ -97,6 +103,36 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
             petName = itemView.findViewById(R.id.namePet);
             petBreed = itemView.findViewById(R.id.petbreed);
             petSex = itemView.findViewById(R.id.sexPet);
+            imageButton = itemView.findViewById(R.id.imageButton);
+            imageButton.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            showPopupMenu(v);
+        }
+
+        private void showPopupMenu(View view) {
+            PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
+             popupMenu.inflate(R.menu.popup_menu);
+             popupMenu.setOnMenuItemClickListener(this);
+             popupMenu.show();
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.action_popup_edit:
+                    Log.d(TAG, "onMenuItemClick: action_popup_edit");
+                    return true;
+
+                case R.id.action_popup_delete:
+                    Log.d(TAG, "onMenuItemClick: action_popup_delete");
+                    return true;
+
+                default:
+                    return false;
+            }
         }
     }
 }

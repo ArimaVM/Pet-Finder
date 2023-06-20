@@ -14,8 +14,7 @@ import android.net.Uri;
 import com.example.petfinder.container.DeviceModel;
 import com.example.petfinder.container.GPSModel;
 import com.example.petfinder.container.RecordModel;
-import com.example.petfinder.container.dataModel.GPS;
-import com.example.petfinder.container.dataModel.PedometerData;
+import com.example.petfinder.container.dataModel;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -126,11 +125,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(Constants.query);
+        db.execSQL("ALTER TABLE " + Constants.TABLE_NAME + " ADD COLUMN " + Constants.COLUMN_ALLERGIES + " TEXT");
+        db.execSQL("ALTER TABLE " + Constants.TABLE_NAME + " ADD COLUMN " + Constants.COLUMN_MEDICATIONS + " TEXT");
+        db.execSQL("ALTER TABLE " + Constants.TABLE_NAME + " ADD COLUMN " + Constants.COLUMN_VETNAME + " TEXT");
+        db.execSQL("ALTER TABLE " + Constants.TABLE_NAME + " ADD COLUMN " + Constants.COLUMN_VETCONTACT + " TEXT");
         db.execSQL(Constants.query2);
         db.execSQL(Constants.query3);
         db.execSQL(Constants.query4);
-
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
@@ -140,12 +143,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME4);
         onCreate(db);
     }
-    public long storeData(String address, String petName, String breed, String sex, String age,
+    public long storeData(String btAddress, String petName, String breed, String sex, String age,
                           String weight, String petPic, String addedtime, String updatedtime) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(Constants.COLUMN_ID, address);
+        values.put(Constants.COLUMN_ID, btAddress); // Use Bluetooth address as ID
         values.put(Constants.COLUMN_PETNAME, petName);
         values.put(Constants.COLUMN_BREED, breed);
         values.put(Constants.COLUMN_SEX, sex);
@@ -155,7 +158,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Constants.COLUMN_ADDED_TIMESTAMP, addedtime);
         values.put(Constants.COLUMN_UPDATED_TIMESTAMP, updatedtime);
 
-        long id = db.insert(Constants.TABLE_NAME, null, values);  // Corrected table name usage
+        long id = db.insert(Constants.TABLE_NAME, null, values);
         db.close();
         return id;
     }
@@ -262,7 +265,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public PedometerData getLatestPedometer(String MAC_ADDRESS) {
+    public dataModel.PedometerData getLatestPedometer(String MAC_ADDRESS) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
                 Constants.TABLE_NAME3,
@@ -275,9 +278,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "1"
         );
 
-        PedometerData latestPedometer = null;
+        dataModel.PedometerData latestPedometer = null;
         if (cursor.moveToFirst()) {
-            latestPedometer = new PedometerData(
+            latestPedometer = new dataModel.PedometerData(
                     cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID3)),
                     cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_NUMSTEPS)),
                     cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DATE))
@@ -379,6 +382,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return count;
+    }
+    public ArrayList<String> getAllBTAddresses() {
+        ArrayList<String> btAddresses = new ArrayList<>();
+        String selectQuery = "SELECT " + Constants.COLUMN_ID + " FROM " + Constants.TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") String btAddress = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID));
+                btAddresses.add(btAddress);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return btAddresses;
     }
 
 }

@@ -25,14 +25,6 @@ public class Settings extends DrawerNav {
 
         allocateActivityTitle("Settings");
 
-        userInfo = findViewById(R.id.userInfo);
-        userInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Settings.this, UserInfo.class);
-                startActivity(intent);
-            }
-        });
 
         about = findViewById(R.id.about);
         about.setOnClickListener(new View.OnClickListener() {
