@@ -20,6 +20,7 @@ public class Constants {
     public static final String COLUMN_MEDICATIONS = "medications";
     public static final String COLUMN_VETNAME = "vetName";
     public static final String COLUMN_VETCONTACT = "vetContact";
+    public static final String AUTHORITY = "com.example.petfinder.provider";
     public static String query = "CREATE TABLE " + TABLE_NAME + "("
             + COLUMN_ID + " TEXT PRIMARY KEY, "
             + COLUMN_PETNAME + " TEXT, "
