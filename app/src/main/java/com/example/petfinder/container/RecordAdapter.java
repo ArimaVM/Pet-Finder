@@ -28,6 +28,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
 
     private Context context;
     private ArrayList<RecordModel> recordsList;
+    private int selectedItemPosition = RecyclerView.NO_POSITION;
     DatabaseHelper databaseHelper;
 
     public RecordAdapter(Context context, ArrayList<RecordModel> recordsList) {
@@ -92,7 +93,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
     class RecordHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
         private static final String TAG = "RecordHolder";
-        ImageButton imageButton;
+        ImageView imageButton;
         ImageView petPic;
         TextView petName, petBreed, petSex;
 
@@ -122,16 +123,22 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.action_popup_edit:
-                    Log.d(TAG, "onMenuItemClick: action_popup_edit");
-                    return true;
-
                 case R.id.action_popup_delete:
                     Log.d(TAG, "onMenuItemClick: action_popup_delete");
+                    deleteSelectedItem();
                     return true;
 
                 default:
                     return false;
+            }
+        }
+
+        private void deleteSelectedItem() {
+            int position = getAdapterPosition();
+
+            if (position != RecyclerView.NO_POSITION) {
+                recordsList.remove(position);
+                notifyItemRemoved(position);
             }
         }
     }

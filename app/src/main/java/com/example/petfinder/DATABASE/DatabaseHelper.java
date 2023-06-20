@@ -1,15 +1,12 @@
 package com.example.petfinder.DATABASE;
 
-import com.example.petfinder.DATABASE.Constants;
 import android.annotation.SuppressLint;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
+import android.util.Log;
 
 import com.example.petfinder.container.DeviceModel;
 import com.example.petfinder.container.GPSModel;
@@ -22,104 +19,9 @@ import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int PETS = 1;
-    private static final int PET_ID = 2;
-    private static final int PEDOMETER = 3;
-    private static final int PEDOMETER_ID = 4;
-    private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-
-    public static final String AUTHORITY = "com.example.petfinder.provider";
-    public static final Uri CONTENT_URI = Uri.parse("content://"+AUTHORITY+"/emp");
-
-    static {
-        // Add URIs for pets table
-        URI_MATCHER.addURI(Constants.AUTHORITY, Constants.TABLE_NAME, PETS);
-        URI_MATCHER.addURI(Constants.AUTHORITY, Constants.TABLE_NAME + "/#", PET_ID);
-
-        // Add URIs for devices table
-        URI_MATCHER.addURI(Constants.AUTHORITY, Constants.TABLE_NAME3, PEDOMETER);
-        URI_MATCHER.addURI(Constants.AUTHORITY, Constants.TABLE_NAME2 + "/#", PEDOMETER_ID);
-    }
-
-
     public Context context;
-    public DatabaseHelper(@Nullable Context context) {
+    public DatabaseHelper(Context context) {
         super(context, Constants.DATABASE_NAME, null, Constants.DATABASE_VERSION);
-    }
-    private Context getContext() {
-        return context;
-    }
-
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        // Implement the query operation for the Content Provider
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor;
-
-        int match = URI_MATCHER.match(uri);
-        switch (match) {
-            case PETS:
-                // Query the pets table
-                cursor = db.query(Constants.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
-                break;
-            case PET_ID:
-                // Query a specific pet by ID
-                long petId = ContentUris.parseId(uri);
-                selection = Constants.COLUMN_ID + " = ?";
-                selectionArgs = new String[]{String.valueOf(petId)};
-                cursor = db.query(Constants.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
-                break;
-            case PEDOMETER:
-                // Query the devices table
-                cursor = db.query(Constants.TABLE_NAME2, projection, selection, selectionArgs, null, null, sortOrder);
-                break;
-            case PEDOMETER_ID:
-                // Query a specific device by ID
-                long deviceId = ContentUris.parseId(uri);
-                selection = Constants.COLUMN_ID2 + " = ?";
-                selectionArgs = new String[]{String.valueOf(deviceId)};
-                cursor = db.query(Constants.TABLE_NAME2, projection, selection, selectionArgs, null, null, sortOrder);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown URI: " + uri);
-        }
-
-        // Set the notification URI on the cursor
-        Context context = getContext();
-        if (context != null) {
-            cursor.setNotificationUri(context.getContentResolver(), uri);
-        }
-
-        return cursor;
-    }
-
-    public Uri insert(Uri uri, ContentValues values) {
-        // Implement the insert operation for the Content Provider
-        SQLiteDatabase db = getWritableDatabase();
-
-        long id;
-        int match = URI_MATCHER.match(uri);
-        switch (match) {
-            case PETS:
-                // Insert into pets table
-                id = db.insert(Constants.TABLE_NAME, null, values);
-                break;
-            case PEDOMETER:
-                // Insert into devices table
-                id = db.insert(Constants.TABLE_NAME2, null, values);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown URI: " + uri);
-        }
-
-        // Notify the Content Resolver that the data has changed
-        if (id != -1) {
-            Context context = getContext();
-            if (context != null) {
-                context.getContentResolver().notifyChange(uri, null);
-            }
-        }
-
-        return ContentUris.withAppendedId(uri, id);
     }
 
     @Override
@@ -145,6 +47,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     public long storeData(String btAddress, String petName, String breed, String sex, String age,
                           String weight, String petPic, String addedtime, String updatedtime) {
+
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -229,10 +132,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+
         values.put(Constants.COLUMN_ID3, id);
         values.put(Constants.COLUMN_NUMSTEPS, numstep);
         values.put(Constants.COLUMN_DATE, date);
-
 
         db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_DATE +" = ? AND "+ Constants.COLUMN_ID3 +"= ?", new String[] {date, id});
         db.close();
@@ -383,21 +286,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return count;
     }
-    public ArrayList<String> getAllBTAddresses() {
-        ArrayList<String> btAddresses = new ArrayList<>();
-        String selectQuery = "SELECT " + Constants.COLUMN_ID + " FROM " + Constants.TABLE_NAME;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
 
-        if (cursor.moveToFirst()) {
-            do {
-                @SuppressLint("Range") String btAddress = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID));
-                btAddresses.add(btAddress);
-            } while (cursor.moveToNext());
+        public ArrayList<String> getAllBTAddresses() {
+            ArrayList<String> btAddresses = new ArrayList<>();
+            String selectQuery = "SELECT " + Constants.COLUMN_ID + " FROM " + Constants.TABLE_NAME;
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    @SuppressLint("Range") String btAddress = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID));
+                    btAddresses.add(btAddress);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+            return btAddresses;
         }
-        cursor.close();
-        db.close();
-        return btAddresses;
-    }
 
 }
