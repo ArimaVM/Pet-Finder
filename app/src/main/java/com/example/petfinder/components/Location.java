@@ -1,15 +1,21 @@
 package com.example.petfinder.components;
 
-
+import android.Manifest;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,13 +24,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.example.petfinder.R;
-import com.example.petfinder.pages.device.AddDevice;
 import com.example.petfinder.pages.pet.DisplayPetDetails;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,20 +47,26 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Location extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     private static final String TAG = "Location";
-    private final int FINE_PERMISSION_CODE = 1;
+    private static final int FINE_PERMISSION_CODE = 1;
+    private static final int ERROR_DIALOG_REQUEST = 2;
+
     private GoogleMap myMap;
     private GeofencingClient geofencingClient;
+    private List<Geofence> geofenceList;
+    private PendingIntent geofencePendingIntent;
 
-
-    private float GEOFENCE_RADIUS = 50;
-    private String GEOFENCE_ID = "SOME_FENCE_ID";
+    private float geofenceRadius = 50;
+    private String geofenceId = "SOME_FENCE_ID";
 
     private boolean isConnected = false;
-    android.location.Location currentLocation;
-    FusedLocationProviderClient fusedLocationProviderClient;
+    private android.location.Location currentLocation;
+    private FusedLocationProviderClient fusedLocationProviderClient;
 
     private BottomNavigationView bottomNav;
 
@@ -75,17 +89,17 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback, G
             }
         });
 
-
-
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        geofencingClient = LocationServices.getGeofencingClient(this);
+
+        checkPlayServices();
+
         getLastLocation();
 
         isConnected = getIntent().getBooleanExtra("isConnected", false);
 
         ImageView emptyImageView = findViewById(R.id.empty);
         TextView disconnectedTextView = findViewById(R.id.disconnected);
-
-        geofencingClient = LocationServices.getGeofencingClient(this);
 
         if (isConnected) {
             emptyImageView.setVisibility(View.GONE);
@@ -96,20 +110,43 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback, G
         }
 
         bottomNav = findViewById(R.id.bottomNav);
-        bottomNav.setOnItemSelectedListener(item -> {
-            Intent intent;
-            switch (item.getItemId()) {
-                case R.id.nav_petProfile:
-                    intent = new Intent(Location.this, DisplayPetDetails.class);
-                    intent.putExtra("isConnected", isConnected);
-                    startActivity(intent);
-                    break;
-                case R.id.nav_location:
-                    break;
+        bottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Intent intent;
+                switch (item.getItemId()) {
+                    case R.id.nav_petProfile:
+                        intent = new Intent(Location.this, DisplayPetDetails.class);
+                        intent.putExtra("isConnected", isConnected);
+                        startActivity(intent);
+                        break;
+                    case R.id.nav_location:
+                        break;
+                }
+                return true;
             }
-            return true;
         });
+    }
 
+    private void checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                Dialog errorDialog = apiAvailability.getErrorDialog(this, resultCode, ERROR_DIALOG_REQUEST);
+                errorDialog.setCancelable(false);
+                errorDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        finish();
+                    }
+                });
+                errorDialog.show();
+            } else {
+                Toast.makeText(this, "This device is not supported.", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
     }
 
     @Override
@@ -121,9 +158,9 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback, G
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.geofence:
-                Toast.makeText(this, "Geofence Created", Toast.LENGTH_SHORT).show();
+                showCreateGeofenceDialog();
                 return true;
             case R.id.clear:
                 Toast.makeText(this, "Geofence Cleared", Toast.LENGTH_SHORT).show();
@@ -133,8 +170,8 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback, G
     }
 
     private void getLastLocation() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, FINE_PERMISSION_CODE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_PERMISSION_CODE);
             return;
         }
         Task<android.location.Location> task = fusedLocationProviderClient.getLastLocation();
@@ -164,8 +201,42 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback, G
         myMap.getUiSettings().setZoomControlsEnabled(true);
         myMap.getUiSettings().setCompassEnabled(true);
 
-        //Add Geofence in the location
+        // Add existing geofence if available
+        if (geofenceList != null && geofenceList.size() > 0) {
+            myMap.clear();
+            Geofence geofence = geofenceList.get(0);
+//            double latitude = Double.parseDouble(geofence.getRequestId()); // Replace with latitude value
+//            double longitude = geofence.getTransitionTypes(); // Replace with longitude value
+            float radius = geofence.getRadius(); // Replace with radius value
+//            LatLng geofenceLatLng = new LatLng(latitude, longitude);
+            addGeofenceMarker(location);
+            addGeofenceCircle(location, radius);
+        }
+
+        if (currentLocation != null) {
+            LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+        }
+
+        // Add Geofence on long click
         myMap.setOnMapLongClickListener(this);
+    }
+
+    private void addGeofenceMarker(LatLng location) {
+        LatLng latLng = new LatLng(location.latitude, location.longitude);
+        MarkerOptions options = new MarkerOptions().position(latLng).title("Geofence");
+        myMap.addMarker(options);
+    }
+
+    private void addGeofenceCircle(LatLng location, float perimeter) {
+        LatLng latLng = new LatLng(location.latitude, location.longitude);
+        CircleOptions circleOptions = new CircleOptions()
+                .center(latLng)
+                .radius(perimeter)
+                .fillColor(Color.argb(70, 150, 50, 50))
+                .strokeColor(Color.argb(100, 200, 100, 100))
+                .strokeWidth(2);
+        myMap.addCircle(circleOptions);
     }
 
     @Override
@@ -181,42 +252,104 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback, G
         }
     }
 
-    //For the on-click of GeoFence
+    // Handle long click on the map to create a geofence
     @Override
     public void onMapLongClick(@NonNull LatLng latLng) {
-        myMap.clear();
-        addMarker(latLng);
-        addCircle(latLng, GEOFENCE_RADIUS);
+        showCreateGeofenceDialog();
+    }
 
-        if (Build.VERSION.SDK_INT >= 29) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) ==
-                    PackageManager.PERMISSION_GRANTED) {
-                tryAddingGeofence(latLng);
+    private void showCreateGeofenceDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_create_geofence, null);
+        dialogBuilder.setView(dialogView);
+
+        EditText perimeterEditText = dialogView.findViewById(R.id.perimeterEditText);
+        Button setButton = dialogView.findViewById(R.id.setButton);
+        ImageView closeButton = dialogView.findViewById(R.id.closeButton);
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+
+        setButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String perimeterStr = perimeterEditText.getText().toString().trim();
+                if (!perimeterStr.isEmpty()) {
+                    float perimeter = Float.parseFloat(perimeterStr);
+                    setGeofence(perimeter);
+                    alertDialog.dismiss();
+                } else {
+                    Toast.makeText(Location.this, "Please enter a valid perimeter.", Toast.LENGTH_SHORT).show();
+                }
             }
+        });
 
-        } else {
-            tryAddingGeofence(latLng);
-        }
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
     }
 
-    private void tryAddingGeofence(LatLng latLng) {
+    private void setGeofence(float perimeter) {
         myMap.clear();
-        addMarker(latLng);
-        addCircle(latLng, GEOFENCE_RADIUS);
+        LatLng location = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+        addGeofenceMarker(location);
+        addGeofenceCircle(location, perimeter);
+
+        geofenceRadius = perimeter;
+
+        geofenceList = new ArrayList<>();
+        geofenceList.add(new Geofence.Builder()
+                .setRequestId(geofenceId)
+                .setCircularRegion(
+                        currentLocation.getLatitude(),
+                        currentLocation.getLongitude(),
+                        perimeter
+                )
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                .build());
+
+
+
+        GeofencingRequest geofencingRequest = getGeofencingRequest(geofenceList);
+        geofencingClient.addGeofences(geofencingRequest, getGeofencePendingIntent())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(Location.this, "Geofence created successfully.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(Location.this, "Failed to create geofence.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    private void addMarker(LatLng latLng){
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng);
-        myMap.addMarker(markerOptions);
+    private GeofencingRequest getGeofencingRequest(List<Geofence> geofenceList) {
+        return new GeofencingRequest.Builder()
+                .addGeofences(geofenceList)
+                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                .build();
     }
 
-    private void addCircle(LatLng latLng, float radius){
-        CircleOptions circleOptions = new CircleOptions();
-        circleOptions.center(latLng);
-        circleOptions.radius(radius);
-        circleOptions.strokeColor(Color.argb(255,255,0,0));
-        circleOptions.fillColor(Color.argb(64,255,0,0));
-        myMap.addCircle(circleOptions);
+    private PendingIntent getGeofencePendingIntent() {
+        if (geofencePendingIntent != null) {
+            return geofencePendingIntent;
+        }
+
+        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+        geofencePendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_MUTABLE);
+        return geofencePendingIntent;
     }
+
 
 }
