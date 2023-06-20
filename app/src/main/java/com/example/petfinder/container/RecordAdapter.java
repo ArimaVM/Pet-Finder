@@ -92,7 +92,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
     class RecordHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
         private static final String TAG = "RecordHolder";
-        ImageButton imageButton;
+        ImageView imageButton;
         ImageView petPic;
         TextView petName, petBreed, petSex;
 

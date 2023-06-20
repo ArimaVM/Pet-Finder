@@ -30,7 +30,7 @@
 
         <LinearLayout
             android:id="@+id/layout1"
-            android:layout_width="220dp"
+            android:layout_width="190dp"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/petProfile"
@@ -76,8 +76,8 @@
 
             <ImageView
                 android:id="@+id/imageButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 app:srcCompat="@drawable/ic_more_vert_24" />
         </LinearLayout>
 
