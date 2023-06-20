@@ -383,4 +383,5 @@ public class ScanBluetooth extends AppCompatActivity
             this.MACAddress = MACAddress;
         }
     }
+
 }
