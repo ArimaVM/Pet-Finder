@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.example.petfinder.container.DeviceModel;
 import com.example.petfinder.container.GPSModel;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public Context context;
-    public DatabaseHelper(@Nullable Context context) {
+    public DatabaseHelper(Context context) {
         super(context, Constants.DATABASE_NAME, null, Constants.DATABASE_VERSION);
     }
 
@@ -46,6 +47,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     public long storeData(String btAddress, String petName, String breed, String sex, String age,
                           String weight, String petPic, String addedtime, String updatedtime) {
+
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -130,10 +132,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+
         values.put(Constants.COLUMN_ID3, id);
         values.put(Constants.COLUMN_NUMSTEPS, numstep);
         values.put(Constants.COLUMN_DATE, date);
-
 
         db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_DATE +" = ? AND "+ Constants.COLUMN_ID3 +"= ?", new String[] {date, id});
         db.close();
@@ -284,21 +286,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return count;
     }
-    public ArrayList<String> getAllBTAddresses() {
-        ArrayList<String> btAddresses = new ArrayList<>();
-        String selectQuery = "SELECT " + Constants.COLUMN_ID + " FROM " + Constants.TABLE_NAME;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
 
-        if (cursor.moveToFirst()) {
-            do {
-                @SuppressLint("Range") String btAddress = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID));
-                btAddresses.add(btAddress);
-            } while (cursor.moveToNext());
+        public ArrayList<String> getAllBTAddresses() {
+            ArrayList<String> btAddresses = new ArrayList<>();
+            String selectQuery = "SELECT " + Constants.COLUMN_ID + " FROM " + Constants.TABLE_NAME;
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    @SuppressLint("Range") String btAddress = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID));
+                    btAddresses.add(btAddress);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+            return btAddresses;
         }
-        cursor.close();
-        db.close();
-        return btAddresses;
-    }
 
 }

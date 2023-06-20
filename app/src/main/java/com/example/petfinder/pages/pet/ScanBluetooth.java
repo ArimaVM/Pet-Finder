@@ -313,10 +313,17 @@ public class ScanBluetooth extends AppCompatActivity
     }
 
     @Override
-    public void onItemClick(int position) {
+    public void onItemClick(int position, boolean isUsed) {
+
         device = scanResults.get(position).getDevice();
         bluetoothAddress = device.getAddress();
-        connectToDevice(device);
+
+        if (isUsed) {
+            Intent intent = new Intent(ScanBluetooth.this, DisplayPetDetails.class);
+            intent.putExtra("ID", bluetoothAddress);
+            ScanBluetooth.this.startActivity(intent);
+            finish();
+        } else connectToDevice(device);
     }
 
     @Override

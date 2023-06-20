@@ -10,9 +10,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
 import com.example.petfinder.pages.pet.ScanBluetooth;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ScanBTListViewAdapter extends RecyclerView.Adapter<ScanBTListViewAdapter.ScanBTListViewHolder> {
@@ -20,6 +22,7 @@ public class ScanBTListViewAdapter extends RecyclerView.Adapter<ScanBTListViewAd
     private Context context;
     private List<ScanBluetooth.ScannedDevices> DeviceScanList;
     private OnItemClickListener clickListener;
+    DatabaseHelper databaseHelper;
 
     public ScanBTListViewAdapter(Context context, List<ScanBluetooth.ScannedDevices> DeviceScanList) {
         this.context = context;
@@ -27,7 +30,7 @@ public class ScanBTListViewAdapter extends RecyclerView.Adapter<ScanBTListViewAd
     }
 
     public interface OnItemClickListener {
-        void onItemClick(int position);
+        void onItemClick(int position, boolean isUsed);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -49,30 +52,39 @@ public class ScanBTListViewAdapter extends RecyclerView.Adapter<ScanBTListViewAd
             holder.BluetoothName.setText("Bluetooth Device");
         }
         holder.MACAddress.setText(DeviceScanList.get(position).getMACAddress());
-        // TODO: CHECK IF DEVICE MAC ADDRESS IS ALREADY IN THE DATABASE.
-        holder.Indicator.setBackgroundColor(context.getResources().getColor(R.color.lightGray));
+        if (holder.MacAddressList.contains(DeviceScanList.get(position).getMACAddress())) {
+            holder.Indicator.setBackgroundColor(context.getResources().getColor(R.color.purple_700));
+            holder.isUsed = true;
+        }
+        else holder.Indicator.setBackgroundColor(context.getResources().getColor(R.color.lightGray));
     }
 
     @Override
-    public int getItemCount() {
-        return DeviceScanList.size();
-    }
+    public int getItemCount() { return DeviceScanList.size(); }
 
     public class ScanBTListViewHolder extends RecyclerView.ViewHolder {
         TextView BluetoothName, MACAddress;
         ImageView Indicator;
+        ArrayList<String> MacAddressList;
+        boolean isUsed;
 
         public ScanBTListViewHolder(View itemView) {
             super(itemView);
+
+            databaseHelper = new DatabaseHelper(context);
+
+            MacAddressList = databaseHelper.getAllBTAddresses();
             BluetoothName = itemView.findViewById(R.id.BluetoothName);
             MACAddress = itemView.findViewById(R.id.MAC_Address);
             Indicator = itemView.findViewById(R.id.indicator);
+
+            isUsed = false;
 
             itemView.setOnClickListener(view -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
                     if (clickListener != null) {
-                        clickListener.onItemClick(position);
+                        clickListener.onItemClick(position, isUsed);
                     }
                 }
             });
