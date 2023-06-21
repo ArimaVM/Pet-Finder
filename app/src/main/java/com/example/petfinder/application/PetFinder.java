@@ -2,162 +2,202 @@ package com.example.petfinder.application;
 
 import android.app.Application;
 import android.bluetooth.BluetoothGatt;
-import android.os.AsyncTask;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.content.Context;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
-import com.example.petfinder.container.dataModel;
+import com.example.petfinder.bluetooth.BluetoothObject;
+import com.example.petfinder.container.dataModel.PedometerData;
+import com.example.petfinder.container.dataModel.GPSData;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
+import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class PetFinder extends Application
-                        implements BluetoothGattCallbackHandler.CharacteristicChangedCallback{
+public class PetFinder extends Application{
     private static final String TAG = "PetFinder";
-
-    private BluetoothGatt bluetoothGatt;
-    private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
-
-    private String MAC_ADDRESS;
+    public BluetoothObject bluetoothObject;
     private static PetFinder instance;
-    private boolean isConnected;
-    private List<DataObserver> observers = new ArrayList<>();
-    private dataModel.GPS currentGPS;
-    private dataModel.PedometerData pedometerData;
-    private DatabaseHelper databaseHelper = new DatabaseHelper(this);
-
+    private Pedometer pedometer;
+    private GPS gps;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        bluetoothObject = new BluetoothObject();
+        pedometer = new Pedometer(PetFinder.this, getCurrentDate());
         instance = this;
         Log.d(TAG, "Application started");
-        currentGPS = new dataModel.GPS();
-        pedometerData = new dataModel.PedometerData(null, 0, null);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     }
 
-    public String getMAC_ADDRESS() {
-        return MAC_ADDRESS;
-    }
-
-    public void setMAC_ADDRESS(String MAC_ADDRESS) {
-        this.MAC_ADDRESS = MAC_ADDRESS;
-    }
-
-    public dataModel.GPS getCurrentGPS() {
-        return currentGPS;
-    }
-
-    public void setCurrentGPS(dataModel.GPS currentGPS) {
-        this.currentGPS = currentGPS;
-    }
-
-
-    public interface DataObserver {
-        void onDataUpdated(boolean newData);
-    }
-
-    public static synchronized PetFinder getInstance(){
+    public static PetFinder getInstance(){
         return instance;
     }
 
-    public boolean getIsConnected() {
-        return isConnected;
+    public Pedometer getPedometer() {
+        return pedometer;
     }
 
-    public void setIsConnected(boolean isConnected) {
-        this.isConnected = isConnected;
-        notifyObservers(isConnected);
-
-        new UpdateDataTask().execute(isConnected);
+    public GPS getGps() {
+        return gps;
     }
 
-    public void setBluetoothGatt(BluetoothGatt bluetoothGatt){
-        this.bluetoothGatt = bluetoothGatt;
+    public BluetoothObject getBluetoothObject() {
+        return bluetoothObject;
     }
 
-    public void registerObserver(DataObserver observer) {
-        observers.add(observer);
+    public void setBluetoothObject(BluetoothGatt bluetoothGatt,
+                                   BluetoothGattCharacteristic characteristic,
+                                   BluetoothGattCallbackHandler bluetoothgattCallbackHandler) {
+        this.bluetoothObject.setBluetoothGatt(bluetoothGatt);
+        this.bluetoothObject.setCharacteristic(characteristic);
+        this.bluetoothObject.setHandlerInstance(bluetoothgattCallbackHandler);
+        this.pedometer.setBluetoothObject(this.bluetoothObject);
     }
 
-    public void unregisterObserver(DataObserver observer) {
-        observers.remove(observer);
+    public void deleteBluetoothObject(){
+        this.bluetoothObject.nullify();
+        this.pedometer.saveData();
+        this.pedometer.setBluetoothObject(this.bluetoothObject);
     }
 
-    private void notifyObservers(boolean newData) {
-        for (DataObserver observer : observers) {
-            observer.onDataUpdated(newData);
-        }
+    public String getCurrentDate(){
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        return month + "/" + day + "/" + year;
     }
 
     @Override
     public void onTerminate() {
         super.onTerminate();
-        Log.d(TAG, "Application terminated");
-    }
-
-    private class UpdateDataTask extends AsyncTask<Boolean, Void, Void> {
-        @Override
-        protected Void doInBackground(Boolean... booleans) {
-            Boolean data = booleans[0];
-
-            if (data) {
-                // Bluetooth is on
-                MAC_ADDRESS = bluetoothGatt.getDevice().getAddress();
-            } else {
-                MAC_ADDRESS = null;
-            }
-            return null;
+        if (!bluetoothObject.isNull()) {
+            pedometer.saveData();
         }
     }
 
-    @Override
-    public void onCharacteristicChanged(String value) {
-        //save to MAC_ADDRESS
-        //gpslon;[dateStr];[timeStr];[latStr]
-        //gpslat;[dateStr];[timeStr];[lonStr]
-        //ped;[dateStr];[timeStr];[stepsCount]
+    private static class Pedometer implements BluetoothGattCallbackHandler.CharacteristicChangedCallback{
+        BluetoothObject bluetoothObject;
+        BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
+        BluetoothGatt bluetoothGatt;
+        BluetoothGattCharacteristic characteristic;
+        Integer pedometerCount = 0;
+        DatabaseHelper databaseHelper;
+        String Date;
+        String rawDate;
 
-        String[] dataArray = value.split(";");
+        public Pedometer(Context context, String Date) {
+            databaseHelper = new DatabaseHelper(context);
+            this.Date = Date;
 
-        String dataType = dataArray[0];
-        String dateStr = dataArray[1];
-        String timeStr = dataArray[2];
-        String dataValue = dataArray[3].trim();
+        }
 
-        if (dataType.equals("ped")){
-            //pedometer data
-            pedometerData = databaseHelper.getLatestPedometer(MAC_ADDRESS);
-            if (pedometerData.getDate().equals(dateStr)) {
-                int steps = pedometerData.getPedometer() + 1;
-                pedometerData.setPedometer(steps);
-                databaseHelper.updatePedometerData(MAC_ADDRESS, steps, dateStr);
+        public void setBluetoothObject(BluetoothObject bluetoothObject) {
+            this.bluetoothObject = bluetoothObject;
+            this.bluetoothGattCallbackHandler = bluetoothObject.getHandlerInstance();
+            this.bluetoothGatt = bluetoothObject.getBluetoothGatt();
+            this.characteristic = bluetoothObject.getCharacteristic();
+            if (!bluetoothObject.isNull()) {
+                this.bluetoothGattCallbackHandler.setCharacteristicChangedCallback(this);
+                PedometerData rawData = databaseHelper.getLatestPedometer(bluetoothGatt.getDevice().getAddress());
+                this.rawDate = rawData.getDate();
+                if (Objects.equals(this.rawDate, this.Date)) pedometerCount = rawData.getPedometer();
+            }
+            if (bluetoothGatt != null && characteristic != null) {
+                // Characteristic available, proceed with sending data
+                this.characteristic.setValue("SEND_STEPS_COUNT");
+                this.bluetoothGatt.writeCharacteristic(characteristic);
+            }
+        }
+
+        public Integer getPedometerCount() {
+            return pedometerCount;
+        }
+
+        @Override
+        public void onCharacteristicChanged(String value) {
+            if (value != null) {
+                if (value.equals("+1")) pedometerCount += 1;
+                else pedometerCount += Integer.parseInt(value);
+            }
+            Log.d("PEDOMETER", String.valueOf(pedometerCount));
+        }
+
+        public void saveData() {
+            if (Objects.equals(this.rawDate, this.Date)) {
+                //IF DATE EXISTS (SAME DAY), UPDATE THE DATA
+                databaseHelper.updatePedometerData(
+                        bluetoothGatt.getDevice().getAddress(),
+                        pedometerCount,
+                        this.rawDate
+                );
             } else {
-                databaseHelper.storePedometerData( MAC_ADDRESS,1, dateStr);
+                //IF DATE EXISTS (NEW DAY), STORE THE DATA
+                databaseHelper.storePedometerData(
+                        bluetoothGatt.getDevice().getAddress(),
+                        pedometerCount,
+                        Date
+                );
             }
-        } else {
-            //gps data
-            if (currentGPS.isComplete()){
-                //insert to sql
-                databaseHelper.storeGPSData(currentGPS.getMac_address(),
-                                            currentGPS.getLatitude(),
-                                            currentGPS.getLongitude(),
-                                            currentGPS.getTime(),
-                                            currentGPS.getDate());
-                currentGPS = new dataModel.GPS();
+        }
+    }
+
+    private static class GPS {
+        private ScheduledExecutorService executorService;
+        private Runnable logGPS;
+        private Long delay = 60 * 1000L;
+        Long Longitude;
+        Long Latitude;
+
+        public GPS() {
+            startAsyncLoop();
+            logGPS = new Runnable() {
+                @Override
+                public void run() {
+                    //TODO: GET CURRENT LONGITUDE AND LATITUDE AND LOG IT TO DATABASE.
+
+                }
+            };
+        }
+
+        private void startAsyncLoop() {
+            executorService = Executors.newSingleThreadScheduledExecutor();
+            executorService.scheduleAtFixedRate(logGPS, 0, this.delay, TimeUnit.MILLISECONDS);
+        }
+        public void cleanUp(){
+            stopAsyncLoop();
+        }
+        private void stopAsyncLoop() {
+            if (executorService != null) {
+                executorService.shutdown();
+                try {
+                    if (!executorService.awaitTermination(5000, TimeUnit.MILLISECONDS)) {
+                        executorService.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
             }
-            if (dataType.equals("gpslon")){
-                currentGPS.setLongitude(dataValue);
-                currentGPS.setDate(dateStr);
-                currentGPS.setTime(timeStr);
-                currentGPS.setMac_address(MAC_ADDRESS);
-            } else {
-                currentGPS.setLatitude(dataValue);
-            }
+        }
+
+        public void setOutsideGeofence(boolean outsideGeofence) {
+            if (outsideGeofence) this.delay = 15 * 1000L;
+            else this.delay = 60 * 1000L;
+        }
+        public Long getLongitude() {
+            return Longitude;
+        }
+        public Long getLatitude() {
+            return Latitude;
         }
     }
 }

@@ -1,9 +1,5 @@
 package com.example.petfinder.pages.pet;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -20,18 +16,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.blogspot.atifsoftwares.circularimageview.CircularImageView;
 import com.example.petfinder.DATABASE.Constants;
 import com.example.petfinder.DATABASE.DatabaseHelper;
+import com.example.petfinder.R;
 import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
+import com.example.petfinder.components.Dashboard;
 import com.example.petfinder.components.Location;
-import com.example.petfinder.R;
-import com.example.petfinder.components.Statistics;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 
-public class DisplayPetDetails extends AppCompatActivity implements PetFinder.DataObserver {
+public class DisplayPetDetails extends AppCompatActivity
+                                implements BluetoothGattCallbackHandler.DescriptorWriteCallback{
 
     private CircularImageView petProfile;
     private TextView petName, petBreed, petSex, date, petWeight, MACAddress;
@@ -67,6 +66,7 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
                     intent = new Intent(DisplayPetDetails.this, Location.class);
                     intent.putExtra("isConnected", isConnected);
                     startActivity(intent);
+                    finish();
                     break;
 
             }
@@ -85,18 +85,19 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         bluetoothGattCallbackHandler = new BluetoothGattCallbackHandler(this, handler);
+        bluetoothGattCallbackHandler.setDescriptorWriteCallback(this);
 
         if (bluetoothAdapter.isEnabled()) {
             isConnected = true;
             BluetoothDevice device = bluetoothAdapter.getRemoteDevice(recordID);
             bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
-        } else isConnected = false;
-
-        PetFinder myApp = PetFinder.getInstance();
-        myApp.registerObserver(this);
-        myApp.setIsConnected(isConnected);
-        myApp.setMAC_ADDRESS(recordID);
-        myApp.setBluetoothGatt(bluetoothGatt);
+            bluetoothGattCallbackHandler.setGatt(bluetoothGatt);
+            //also triggers the onWait override below.
+        } else {
+            isConnected = false;
+            PetFinder petFinder = PetFinder.getInstance();
+            petFinder.deleteBluetoothObject();
+        }
 
         // Set the custom back arrow as the navigation icon
         myToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
@@ -110,6 +111,18 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
         });
 
         showRecordDetails();
+    }
+
+    @Override
+    public void onBackPressed() {
+
+
+        PetFinder petFinder = PetFinder.getInstance();
+        if (!petFinder.getBluetoothObject().isNull()) {
+            petFinder.getBluetoothObject().getBluetoothGatt().disconnect();
+            petFinder.deleteBluetoothObject();
+        }
+        startActivity(new Intent(DisplayPetDetails.this, Dashboard.class));
     }
 
     @Override
@@ -174,11 +187,15 @@ public class DisplayPetDetails extends AppCompatActivity implements PetFinder.Da
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        PetFinder myApp = PetFinder.getInstance();
-        myApp.unregisterObserver(this);
     }
 
     @Override
-    public void onDataUpdated(boolean newData) {
+    public void onWait() {
+        PetFinder petFinder = PetFinder.getInstance();
+        if (petFinder.bluetoothObject.isNull()) {
+            petFinder.setBluetoothObject(bluetoothGatt,
+                    bluetoothGattCallbackHandler.getCharacteristic(),
+                    bluetoothGattCallbackHandler);
+        }
     }
 }

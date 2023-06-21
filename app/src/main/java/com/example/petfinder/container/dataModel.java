@@ -1,7 +1,7 @@
 package com.example.petfinder.container;
 
 public class dataModel {
-    public static class GPS {
+    public static class GPSData {
         String mac_address;
         String latitude;
         String longitude;
@@ -66,25 +66,11 @@ public class dataModel {
         public String getMAC_Address() {
             return MAC_Address;
         }
-
-        public void setMAC_Address(String MAC_Address) {
-            this.MAC_Address = MAC_Address;
-        }
-
         public int getPedometer() {
             return pedometer;
         }
-
-        public void setPedometer(int pedometer) {
-            this.pedometer = pedometer;
-        }
-
         public String getDate() {
             return date;
-        }
-
-        public void setDate(String date) {
-            this.date = date;
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.petfinder.Adapters;
+package com.example.petfinder.container;
 
 import android.content.Context;
 import android.view.LayoutInflater;

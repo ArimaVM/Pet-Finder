@@ -57,7 +57,7 @@ public class Constants {
 
     public static String query3 = "CREATE TABLE " + TABLE_NAME3 + "("
             + COLUMN_ID3 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_NUMSTEPS + " INT, "
+            + COLUMN_NUMSTEPS + " INTEGER, "
             + COLUMN_DATE + " TEXT, "
             + COLUMN_ID + " TEXT, "
             + "FOREIGN KEY(" + COLUMN_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + "));";

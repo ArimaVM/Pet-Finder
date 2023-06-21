@@ -17,7 +17,6 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
     private BluetoothGattCharacteristic characteristic;
     private BluetoothGatt bluetoothGatt;
 
-
     private ConnectionStateChangeCallback connectionStateChangeCallback;
     private DescriptorWriteCallback descriptorWriteCallback;
     private CharacteristicReadCallback characteristicReadCallback;
@@ -85,17 +84,18 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
         if (newState == BluetoothGatt.STATE_CONNECTED) {
             // Device connected
             makeToast("Connected to device");
-            connectionStateChangeCallback.onConnectionStateChange(true);
+            if (connectionStateChangeCallback != null) {
+                connectionStateChangeCallback.onConnectionStateChange(true);
+            }
 
             // Discover services
             gatt.discoverServices();
         } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
             // Device disconnected
             makeToast("Disconnected from device");
-            connectionStateChangeCallback.onConnectionStateChange(false);
-
-            // Clean up
-            //disconnectGatt();
+            if (connectionStateChangeCallback != null) {
+                connectionStateChangeCallback.onConnectionStateChange(false);
+            }
         }
     }
 
@@ -124,7 +124,7 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
     @Override
     public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
         // Check if the descriptor write operation was successful
-        if (status == BluetoothGatt.GATT_SUCCESS) {
+        if (status == BluetoothGatt.GATT_SUCCESS && descriptorWriteCallback != null) {
             descriptorWriteCallback.onWait();
         }
     }
@@ -135,7 +135,9 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
         if (status == BluetoothGatt.GATT_SUCCESS) {
             // Characteristic read successfully
             final String value = characteristic.getStringValue(0);
-            characteristicReadCallback.onCharacteristicRead(value.trim());
+            if (characteristicReadCallback != null) {
+                characteristicReadCallback.onCharacteristicRead(value.trim());
+            }
         }
     }
 
@@ -145,7 +147,9 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
 
         byte[] data = characteristic.getValue();
         String receivedData = new String(data, StandardCharsets.UTF_8);
-        characteristicChangedCallback.onCharacteristicChanged(receivedData.trim());
+        if (characteristicChangedCallback != null) {
+            characteristicChangedCallback.onCharacteristicChanged(receivedData.trim());
+        }
     }
 
     private void makeToast(String message){

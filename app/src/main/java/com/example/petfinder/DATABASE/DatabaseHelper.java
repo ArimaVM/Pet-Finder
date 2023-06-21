@@ -1,6 +1,5 @@
 package com.example.petfinder.DATABASE;
 
-import com.example.petfinder.DATABASE.Constants;
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -12,9 +11,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 
 import com.example.petfinder.container.DeviceModel;
-import com.example.petfinder.container.GPSModel;
 import com.example.petfinder.container.RecordModel;
-import com.example.petfinder.container.dataModel;
+import com.example.petfinder.container.dataModel.PedometerData;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -198,7 +196,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(Constants.COLUMN_ID3, MAC_ADDRESS);
+        values.put(Constants.COLUMN_ID, MAC_ADDRESS);
         values.put(Constants.COLUMN_NUMSTEPS, numSteps);
         values.put(Constants.COLUMN_DATE, date);
 
@@ -229,7 +227,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(Constants.COLUMN_ID3, id);
+        values.put(Constants.COLUMN_ID, id);
         values.put(Constants.COLUMN_NUMSTEPS, numstep);
         values.put(Constants.COLUMN_DATE, date);
 
@@ -265,7 +263,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public dataModel.PedometerData getLatestPedometer(String MAC_ADDRESS) {
+    public PedometerData getLatestPedometer(String MAC_ADDRESS) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
                 Constants.TABLE_NAME3,
@@ -278,9 +276,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "1"
         );
 
-        dataModel.PedometerData latestPedometer = null;
+        PedometerData latestPedometer = new PedometerData(null, 0, null);
         if (cursor.moveToFirst()) {
-            latestPedometer = new dataModel.PedometerData(
+            latestPedometer = new PedometerData(
                     cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID3)),
                     cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_NUMSTEPS)),
                     cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DATE))

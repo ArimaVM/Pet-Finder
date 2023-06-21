@@ -26,6 +26,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import com.example.petfinder.R;
+import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.pages.pet.DisplayPetDetails;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -351,5 +352,13 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback, G
         return geofencePendingIntent;
     }
 
-
+    @Override
+    public void onBackPressed() {
+        PetFinder petFinder = PetFinder.getInstance();
+        if (!petFinder.getBluetoothObject().isNull()) {
+            petFinder.getBluetoothObject().getBluetoothGatt().disconnect();
+            petFinder.deleteBluetoothObject();
+        }
+        startActivity(new Intent(Location.this, Dashboard.class));
+    }
 }

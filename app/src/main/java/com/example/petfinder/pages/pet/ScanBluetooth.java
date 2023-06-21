@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
@@ -19,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -31,13 +31,13 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.petfinder.Adapters.ScanBTListViewAdapter;
+import com.example.petfinder.application.PetFinder;
+import com.example.petfinder.container.ScanBTListViewAdapter;
 import com.example.petfinder.R;
 import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ScanBluetooth extends AppCompatActivity
                                 implements BluetoothGattCallbackHandler.ConnectionStateChangeCallback
@@ -73,7 +73,8 @@ public class ScanBluetooth extends AppCompatActivity
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            //disconnectGatt();
+            Log.d("TIMEOUT", "THE TIMEOUT HAS RAN AT: " + System.currentTimeMillis());
+            disconnectGatt();
             Toast.makeText(ScanBluetooth.this, "Invalid Device.", Toast.LENGTH_SHORT).show();
         }
     };
@@ -169,6 +170,8 @@ public class ScanBluetooth extends AppCompatActivity
             characteristic.setValue(data);
             boolean success = bluetoothGatt.writeCharacteristic(characteristic);
             if (success) {
+                handler2.postDelayed(runnable, 2000);
+                Log.d("TIMEOUT", "I SET THE TIMEOUT AT: " + System.currentTimeMillis());
                 makeToastOnUI("Verifying...");
             } else {
                 makeToastOnUI("Verification failed. Please try again later.");
@@ -329,20 +332,33 @@ public class ScanBluetooth extends AppCompatActivity
     @Override
     public void onCharacteristicChanged(String value) {
         if (value.equals("rDmI4NXH08")){
+            Log.d("TIMEOUT", "CODE IS RECEIVED AT: " + System.currentTimeMillis());
             // Connect to the selected device
             handler2.removeCallbacks(runnable);
             makeToastOnUI("Device Validation Success!");
-            Intent intent = new Intent(ScanBluetooth.this, AddPet.class);
-            intent.putExtra("MAC_ADDRESS", bluetoothAddress);
-            intent.putExtra("isEditMode", false);
-            startActivity(intent);
-            finish();
+            onValidationSuccess();
         } else {
             makeToastOnUI("Invalid Device.");
         }
     }
 
     //BluetoothGattCallback end
+
+    private void onValidationSuccess(){
+        /*
+           This creates new bluetoothGatt, characteristic, and bluetoothGattCallbackHandler, which
+           is why it does not need the code snippet:
+               if (petFinder.bluetoothObject.isNull()){...}
+        */
+        PetFinder petFinder = PetFinder.getInstance();
+        petFinder.setBluetoothObject(bluetoothGatt, characteristic, bluetoothGattCallbackHandler);
+
+        Intent intent = new Intent(ScanBluetooth.this, AddPet.class);
+        intent.putExtra("MAC_ADDRESS", bluetoothAddress);
+        intent.putExtra("isEditMode", false);
+        startActivity(intent);
+        finish();
+    }
 
     private void disconnectGatt() {
         if (bluetoothGatt != null) {

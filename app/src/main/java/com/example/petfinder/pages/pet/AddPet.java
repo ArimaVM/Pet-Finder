@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat;
 import com.blogspot.atifsoftwares.circularimageview.CircularImageView;
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
+import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.components.Dashboard;
 import com.google.android.material.textfield.TextInputEditText;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -90,10 +91,18 @@ public class AddPet extends AppCompatActivity {
 
         findViewById(R.id.add_pet).setOnClickListener(view -> {
             storeData();
-            startActivity(new Intent(AddPet.this, Dashboard.class));
+            Intent intent = new Intent(AddPet.this, DisplayPetDetails.class);
+            intent.putExtra("ID", bluetoothAddress);
+            startActivity(intent);
             finish();
         });
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        PetFinder.getInstance().getBluetoothObject().getBluetoothGatt().disconnect();
+        super.onBackPressed();
     }
 
     @Override
@@ -108,7 +117,9 @@ public class AddPet extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.save) {
             storeData();
-            startActivity(new Intent(AddPet.this, Dashboard.class));
+            Intent intent = new Intent(AddPet.this, DisplayPetDetails.class);
+            intent.putExtra("ID", bluetoothAddress);
+            startActivity(intent);
             finish();
             return true;
         }
