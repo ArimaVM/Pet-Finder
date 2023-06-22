@@ -231,8 +231,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Constants.COLUMN_NUMSTEPS, numstep);
         values.put(Constants.COLUMN_DATE, date);
 
-
-        db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_DATE +" = ? AND "+ Constants.COLUMN_ID3 +"= ?", new String[] {date, id});
+        db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_DATE +" = ? AND "+ Constants.COLUMN_ID +"= ?", new String[] {date, id});
         db.close();
     }
 
@@ -268,7 +267,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query(
                 Constants.TABLE_NAME3,
                 null,
-                Constants.COLUMN_ID3 + "= ?",
+                Constants.COLUMN_ID + "= ?",
                 new String[]{MAC_ADDRESS},
                 null,
                 null,
@@ -279,7 +278,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         PedometerData latestPedometer = new PedometerData(null, 0, null);
         if (cursor.moveToFirst()) {
             latestPedometer = new PedometerData(
-                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID3)),
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID)),
                     cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_NUMSTEPS)),
                     cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DATE))
             );
