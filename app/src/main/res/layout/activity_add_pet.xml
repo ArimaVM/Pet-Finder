@@ -175,7 +175,7 @@
                     app:boxBackgroundColor="@color/white">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/bdate"
+                        android:id="@+id/editBdate"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:clickable="true"
@@ -195,7 +195,7 @@
                     app:boxBackgroundColor="@color/white">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/age"
+                        android:id="@+id/EditAge"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:clickable="true"

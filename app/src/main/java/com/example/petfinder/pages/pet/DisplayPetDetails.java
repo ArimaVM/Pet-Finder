@@ -27,17 +27,18 @@ import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 import com.example.petfinder.components.Dashboard;
 import com.example.petfinder.components.Location;
+import com.example.petfinder.container.PetModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class DisplayPetDetails extends AppCompatActivity
                                 implements BluetoothGattCallbackHandler.DescriptorWriteCallback{
 
     private CircularImageView petProfile;
-    private TextView petName, petBreed, petSex, date, petWeight, MACAddress;
+    private TextView petName, petBreed, petSex, date, petWeight, MACAddress, age_textview;
     private BottomNavigationView bottomNav;
-    private String recordID;
+    private String recordID, image;
     private DatabaseHelper dbhelper;
-    String pet_id, name, breed, sex, age, weight, image;
+    private PetModel petModel;
     private boolean isConnected = false;
     private BluetoothGatt bluetoothGatt;
     private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
@@ -55,6 +56,7 @@ public class DisplayPetDetails extends AppCompatActivity
         date = findViewById(R.id.petBdateDisplay);
         petWeight = findViewById(R.id.petWeightDisplay);
         MACAddress = findViewById(R.id.deviceConnected);
+        age_textview = findViewById(R.id.petAgeDisplay);
 
         bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setOnItemSelectedListener(item -> {
@@ -73,9 +75,7 @@ public class DisplayPetDetails extends AppCompatActivity
             return true;
         });
 
-        Intent intent = getIntent();
-        recordID = intent.getStringExtra("ID");
-
+        recordID = PetFinder.getInstance().getCurrentMacAddress();
         dbhelper = new DatabaseHelper(this);
 
         Toolbar myToolbar = findViewById(R.id.pet_toolbar);
@@ -121,6 +121,7 @@ public class DisplayPetDetails extends AppCompatActivity
         if (!petFinder.getBluetoothObject().isNull()) {
             petFinder.getBluetoothObject().getBluetoothGatt().disconnect();
             petFinder.deleteBluetoothObject();
+            petFinder.removeCurrentMacAddress();
         }
         startActivity(new Intent(DisplayPetDetails.this, Dashboard.class));
     }
@@ -134,15 +135,9 @@ public class DisplayPetDetails extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.editPet) {
+            PetFinder.getInstance().setCurrentPetModel(petModel);
             Intent intent = new Intent(DisplayPetDetails.this, EditPet.class);
             intent.putExtra("isEditMode", true);
-            intent.putExtra("ID", pet_id);
-            intent.putExtra("NAME", name);
-            intent.putExtra("BREED", breed);
-            intent.putExtra("SEX", sex);
-            intent.putExtra("BDATE", age);
-            intent.putExtra("WEIGHT", weight);
-            intent.putExtra("IMAGE", image);
             intent.putExtra("isConnected", isConnected);
             startActivity(intent);
             return true;
@@ -152,36 +147,24 @@ public class DisplayPetDetails extends AppCompatActivity
 
     @SuppressLint("Range")
     private void showRecordDetails() {
-        String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME + " WHERE " + Constants.COLUMN_ID + "=\"" + recordID + "\"";
-        SQLiteDatabase db = dbhelper.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        petModel = dbhelper.getRecordDetails(recordID);
 
-        if (cursor.moveToFirst()) {
-            do {
-                pet_id = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID));
-                name = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PETNAME));
-                breed ="" +cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BREED));
-                sex = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_SEX));
-                age = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_AGE));
-                weight = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_WEIGHT));
-                image = ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE));
+        MACAddress.setText(petModel.getMAC_ADDRESS());
+        petName.setText(petModel.getName());
+        petBreed.setText(petModel.getBreed());
+        petSex.setText(petModel.getSex());
+        if (petModel.getAge()>1) age_textview.setText(String.format("%d Years Old", petModel.getAge()));
+        else age_textview.setText(String.format("%d Year Old", petModel.getAge()));
+        date.setText(petModel.getBirthdate());
+        petWeight.setText(String.format("%dkg", petModel.getWeight()));
 
-                petName.setText(name);
-                petBreed.setText(breed);
-                petSex.setText(sex);
-                date.setText(age);
-                petWeight.setText(weight);
-                MACAddress.setText(pet_id);
+        image = petModel.getImage();
 
-                if (image.equals("null")){
-                    petProfile.setImageResource(R.drawable.profile);
-                } else {
-                    petProfile.setImageURI(Uri.parse(image));
-                }
-
-            } while (cursor.moveToNext());
+        if (image.equals("null")){
+            petProfile.setImageResource(R.drawable.profile);
+        } else {
+            petProfile.setImageURI(Uri.parse(image));
         }
-        db.close();
     }
 
     @Override

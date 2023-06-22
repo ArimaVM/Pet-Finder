@@ -358,6 +358,7 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback, G
         if (!petFinder.getBluetoothObject().isNull()) {
             petFinder.getBluetoothObject().getBluetoothGatt().disconnect();
             petFinder.deleteBluetoothObject();
+            petFinder.removeCurrentMacAddress();
         }
         startActivity(new Intent(Location.this, Dashboard.class));
     }

@@ -56,6 +56,7 @@ public class ScanBluetooth extends AppCompatActivity
     private String bluetoothAddress;
     private Button scanButton;
     private boolean isBluetoothConnected = false;
+    PetFinder petFinder;
 
     private boolean isScanning = false;
 
@@ -106,6 +107,8 @@ public class ScanBluetooth extends AppCompatActivity
         scanButton = findViewById(R.id.scanButton);
 
         Handler handler = new Handler(Looper.getMainLooper());
+
+        petFinder = PetFinder.getInstance();
 
         bluetoothGattCallbackHandler = new BluetoothGattCallbackHandler(ScanBluetooth.this, handler);
         bluetoothGattCallbackHandler.setConnectionStateChangeCallback(this);
@@ -322,9 +325,8 @@ public class ScanBluetooth extends AppCompatActivity
         bluetoothAddress = device.getAddress();
 
         if (isUsed) {
-            Intent intent = new Intent(ScanBluetooth.this, DisplayPetDetails.class);
-            intent.putExtra("ID", bluetoothAddress);
-            ScanBluetooth.this.startActivity(intent);
+            petFinder.setCurrentMacAddress(bluetoothAddress);
+            ScanBluetooth.this.startActivity(new Intent(ScanBluetooth.this, DisplayPetDetails.class));
             finish();
         } else connectToDevice(device);
     }
@@ -350,11 +352,10 @@ public class ScanBluetooth extends AppCompatActivity
            is why it does not need the code snippet:
                if (petFinder.bluetoothObject.isNull()){...}
         */
-        PetFinder petFinder = PetFinder.getInstance();
         petFinder.setBluetoothObject(bluetoothGatt, characteristic, bluetoothGattCallbackHandler);
 
+        petFinder.setCurrentMacAddress(bluetoothAddress);
         Intent intent = new Intent(ScanBluetooth.this, AddPet.class);
-        intent.putExtra("MAC_ADDRESS", bluetoothAddress);
         intent.putExtra("isEditMode", false);
         startActivity(intent);
         finish();

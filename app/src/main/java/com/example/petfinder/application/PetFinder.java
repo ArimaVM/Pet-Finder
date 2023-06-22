@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 import com.example.petfinder.bluetooth.BluetoothObject;
+import com.example.petfinder.container.PetModel;
 import com.example.petfinder.container.dataModel.PedometerData;
 import com.example.petfinder.container.dataModel.GPSData;
 
@@ -24,6 +25,8 @@ public class PetFinder extends Application{
     private static final String TAG = "PetFinder";
     public BluetoothObject bluetoothObject;
     private static PetFinder instance;
+    public String currentMacAddress;
+    public PetModel currentPetModel;
     private Pedometer pedometer;
     private GPS gps;
 
@@ -31,6 +34,7 @@ public class PetFinder extends Application{
     public void onCreate() {
         super.onCreate();
         bluetoothObject = new BluetoothObject();
+        currentPetModel = new PetModel();
         pedometer = new Pedometer(PetFinder.this, getCurrentDate());
         instance = this;
         Log.d(TAG, "Application started");
@@ -74,6 +78,27 @@ public class PetFinder extends Application{
         int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         return month + "/" + day + "/" + year;
+    }
+
+    public String getCurrentMacAddress() {
+        return currentMacAddress;
+    }
+
+    public void setCurrentMacAddress(String currentMacAddress) {
+        this.currentMacAddress = currentMacAddress;
+    }
+
+    public void removeCurrentMacAddress(){
+        this.currentMacAddress = null;
+        currentPetModel.nullify();
+    }
+
+    public PetModel getCurrentPetModel() {
+        return currentPetModel;
+    }
+
+    public void setCurrentPetModel(PetModel currentPetModel) {
+        this.currentPetModel = currentPetModel;
     }
 
     @Override

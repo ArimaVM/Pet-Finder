@@ -13,7 +13,6 @@ import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -31,7 +30,6 @@ import com.blogspot.atifsoftwares.circularimageview.CircularImageView;
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
 import com.example.petfinder.application.PetFinder;
-import com.example.petfinder.components.Dashboard;
 import com.google.android.material.textfield.TextInputEditText;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -46,6 +44,7 @@ public class AddPet extends AppCompatActivity {
     CircularImageView picture;
     private Uri imagePath;
     DatabaseHelper databaseHelper;
+    PetFinder petFinder;
 
     private static final int CAMERA_REQUEST_CODE = 100;
     private static final int STORAGE_REQUEST_CODE = 101;
@@ -55,7 +54,8 @@ public class AddPet extends AppCompatActivity {
     private String[] storagePermissions;
     private String bluetoothAddress;
 
-    private  String petName, breed, sex, age, weight, btAddress;
+    private String petName, breed, sex, birthdate, btAddress;
+    private Integer age, weight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,15 +65,16 @@ public class AddPet extends AppCompatActivity {
         pbreed = findViewById(R.id.breed);
         psex = findViewById(R.id.sexRB);
         pweight = findViewById(R.id.weight);
-        bdate = findViewById(R.id.bdate);
+        bdate = findViewById(R.id.editBdate);
         picture = findViewById(R.id.petPic);
-        age_edittext = findViewById(R.id.age);
+        age_edittext = findViewById(R.id.EditAge);
         mMacData = findViewById(R.id.mac_address_data);
         databaseHelper = new DatabaseHelper(this);
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        petFinder = PetFinder.getInstance();
 
-        bluetoothAddress = getIntent().getStringExtra("MAC_ADDRESS");
+        bluetoothAddress = petFinder.getCurrentMacAddress();
         mMacData.setText(bluetoothAddress);
 
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
@@ -101,7 +102,7 @@ public class AddPet extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        PetFinder.getInstance().getBluetoothObject().getBluetoothGatt().disconnect();
+        petFinder.getBluetoothObject().getBluetoothGatt().disconnect();
         super.onBackPressed();
     }
 
@@ -160,6 +161,7 @@ public class AddPet extends AppCompatActivity {
                 }, year, month, dayOfMonth);
 
         // Show the dialog
+        datePickerDialog.getDatePicker().setMaxDate(Calendar.getInstance().getTimeInMillis());
         datePickerDialog.show();
 
     }
@@ -298,28 +300,23 @@ public class AddPet extends AppCompatActivity {
         sex = radioButton.getText().toString().trim();
         petName = ""+pname.getText().toString().trim();
         breed = ""+pbreed.getText().toString().trim();
-        sex = ""+radioButton.getText().toString().trim();
-        age = ""+bdate.getText().toString().trim();
-        weight = ""+pweight.getText().toString().trim();
+        birthdate = ""+bdate.getText().toString().trim();
+        age = Integer.valueOf(age_edittext.getText().toString().trim());
+        weight = Integer.valueOf(pweight.getText().toString().trim());
         btAddress = mMacData.getText().toString().trim();
 
         Intent intent = new Intent(AddPet.this, EditPet.class);
         intent.putExtra("isEditMode", false); // Set the edit mode to false, as it's a new pet
-        intent.putExtra("ID", btAddress);
-        intent.putExtra("NAME", petName);
-        intent.putExtra("BREED", breed);
-        intent.putExtra("SEX", sex);
-        intent.putExtra("BDATE", age);
-        intent.putExtra("WEIGHT", weight);
-
+        petFinder.setCurrentMacAddress(btAddress);
         String timestamp = ""+System.currentTimeMillis();
         long id = databaseHelper.storeData(
                 ""+btAddress,
                 ""+petName,
                 ""+breed,
                 ""+sex,
-                ""+age,
-                ""+weight,
+                ""+birthdate,
+                age,
+                weight,
                 ""+imagePath,
                 ""+timestamp,
                 ""+timestamp);

@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 
 import com.example.petfinder.container.DeviceModel;
+import com.example.petfinder.container.PetModel;
 import com.example.petfinder.container.RecordModel;
 import com.example.petfinder.container.dataModel.PedometerData;
 
@@ -141,8 +142,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME4);
         onCreate(db);
     }
-    public long storeData(String btAddress, String petName, String breed, String sex, String age,
-                          String weight, String petPic, String addedtime, String updatedtime) {
+    public long storeData(String btAddress, String petName, String breed, String sex, String bdate, Integer age,
+                          Integer weight, String petPic, String addedtime, String updatedtime) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -150,6 +151,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Constants.COLUMN_PETNAME, petName);
         values.put(Constants.COLUMN_BREED, breed);
         values.put(Constants.COLUMN_SEX, sex);
+        values.put(Constants.COLUMN_BIRTHDATE, bdate);
         values.put(Constants.COLUMN_AGE, age);
         values.put(Constants.COLUMN_WEIGHT, weight);
         values.put(Constants.COLUMN_IMAGE, petPic);
@@ -205,14 +207,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public void updateData(String id, String petName, String breed, String sex, String age,
-                          String weight, String petPic, String addedtime, String updatedtime) {
+    public void updateData(String id, String petName, String breed, String sex, String bdate, Integer age,
+                           Integer weight, String petPic, String addedtime, String updatedtime) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(Constants.COLUMN_PETNAME, petName);
         values.put(Constants.COLUMN_BREED, breed);
         values.put(Constants.COLUMN_SEX, sex);
+        values.put(Constants.COLUMN_BIRTHDATE, bdate);
         values.put(Constants.COLUMN_AGE, age);
         values.put(Constants.COLUMN_WEIGHT, weight);
         values.put(Constants.COLUMN_IMAGE, petPic);
@@ -397,4 +400,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return btAddresses;
     }
 
+    @SuppressLint("Range")
+    public PetModel getRecordDetails(String recordID) {
+        String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME + " WHERE " + Constants.COLUMN_ID + "=\"" + recordID + "\"";
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        PetModel petModel = new PetModel();
+
+        if (cursor.moveToFirst()) {
+            do {
+                petModel.setMAC_ADDRESS(
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID)));
+                petModel.setName(
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PETNAME)));
+                petModel.setBreed(
+                        "" +cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BREED)));
+                petModel.setSex(
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_SEX)));
+                petModel.setAge(
+                        cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_AGE)));
+                petModel.setWeight(
+                        cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_WEIGHT)));
+                petModel.setBirthdate(
+                        cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BIRTHDATE))
+                );
+                petModel.setImage(
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE)));
+            } while (cursor.moveToNext());
+        }
+        db.close();
+
+        return petModel;
+    }
 }

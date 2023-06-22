@@ -11,6 +11,7 @@ public class Constants {
     public static final String COLUMN_PETNAME = "petName";
     public static final String COLUMN_BREED = "breed";
     public static final String COLUMN_SEX = "sex";
+    public static final String COLUMN_BIRTHDATE = "birthdate";
     public static final String COLUMN_AGE = "age";
     public static final String COLUMN_WEIGHT = "weight";
     public static final String COLUMN_IMAGE = "petPic";
@@ -26,8 +27,9 @@ public class Constants {
             + COLUMN_PETNAME + " TEXT, "
             + COLUMN_BREED + " TEXT, "
             + COLUMN_SEX + " TEXT, "
-            + COLUMN_AGE + " TEXT, "
-            + COLUMN_WEIGHT + " TEXT, "
+            + COLUMN_BIRTHDATE + " TEXT, "
+            + COLUMN_AGE + " INTEGER, "
+            + COLUMN_WEIGHT + " INTEGER, "
             + COLUMN_IMAGE + " TEXT, "
             + COLUMN_ADDED_TIMESTAMP + " TEXT, "
             + COLUMN_UPDATED_TIMESTAMP + " TEXT);";

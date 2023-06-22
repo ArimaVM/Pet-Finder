@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petfinder.R;
 import com.example.petfinder.DATABASE.DatabaseHelper;
+import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.pages.pet.DisplayPetDetails;
 
 import java.util.ArrayList;
@@ -62,9 +63,9 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
         holder.petBreed.setText(breed);
 
         if (sex.equalsIgnoreCase("female")) {
-            holder.petSex.setText("F");
+            holder.petSex.setText("Female");
         } else if (sex.equalsIgnoreCase("male")) {
-            holder.petSex.setText("M");
+            holder.petSex.setText("Male");
         } else {
             holder.petSex.setText(sex);
         }
@@ -78,9 +79,8 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, DisplayPetDetails.class);
-                intent.putExtra("ID", id);
-                context.startActivity(intent);
+                PetFinder.getInstance().setCurrentMacAddress(id);
+                context.startActivity(new Intent(context, DisplayPetDetails.class));
             }
         });
     }
