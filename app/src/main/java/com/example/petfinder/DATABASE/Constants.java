@@ -17,11 +17,8 @@ public class Constants {
     public static final String COLUMN_IMAGE = "petPic";
     public static final String COLUMN_ADDED_TIMESTAMP = "added_timestamp";
     public static final String COLUMN_UPDATED_TIMESTAMP = "updated_timestamp";
-    public static final String COLUMN_ALLERGIES = "allergies";
-    public static final String COLUMN_MEDICATIONS = "medications";
-    public static final String COLUMN_VETNAME = "vetName";
-    public static final String COLUMN_VETCONTACT = "vetContact";
-    public static final String AUTHORITY = "com.example.petfinder.provider";
+    public static final String COLUMN_PET_FEEDER_ID = "petFeederId";
+    public static final String COLUMN_PET_FINDER_ID = "petFinderId";
     public static String query = "CREATE TABLE " + TABLE_NAME + "("
             + COLUMN_ID + " TEXT PRIMARY KEY, "
             + COLUMN_PETNAME + " TEXT, "
@@ -32,7 +29,8 @@ public class Constants {
             + COLUMN_WEIGHT + " INTEGER, "
             + COLUMN_IMAGE + " TEXT, "
             + COLUMN_ADDED_TIMESTAMP + " TEXT, "
-            + COLUMN_UPDATED_TIMESTAMP + " TEXT);";
+            + COLUMN_UPDATED_TIMESTAMP + " TEXT,"
+            + COLUMN_PET_FEEDER_ID + " TEXT);";
 
     //TABLE2
     public static final String TABLE_NAME2 = "DeviceRecord";
@@ -44,7 +42,7 @@ public class Constants {
     public static final String COLUMN_BTADDRESS = "BTaddress";
 
     public static String query2 = "CREATE TABLE " + TABLE_NAME2 + "("
-            + COLUMN_ID2 + " TEXT PRIMARY KEY, "
+            + COLUMN_ID2 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_DEVICENAME + " TEXT, "
             + COLUMN_LATITUDE + " TEXT, "
             + COLUMN_LONGITUDE + " TEXT, "
@@ -58,7 +56,7 @@ public class Constants {
     public static final String COLUMN_DATE = "date";
 
     public static String query3 = "CREATE TABLE " + TABLE_NAME3 + "("
-            + COLUMN_ID3 + " TEXT PRIMARY KEY, "
+            + COLUMN_ID3 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_NUMSTEPS + " INTEGER, "
             + COLUMN_DATE + " TEXT, "
             + COLUMN_ID + " TEXT, "
@@ -82,5 +80,20 @@ public class Constants {
             + COLUMN_ID + " TEXT, "
             + "FOREIGN KEY(" + COLUMN_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + "));";
 
+    //TABLE 5
+    public static final String TABLE_NAME5 = "PetMoreInfo";
+    public static final String COLUMN_ID5 = "_id5";
+    public static final String COLUMN_ALLERGIES = "allergies";
+    public static final String COLUMN_MEDICATIONS = "medications";
+    public static final String COLUMN_VETNAME = "vetName";
+    public static final String COLUMN_VETCONTACT = "vetContact";
 
+    public static String query5 = "CREATE TABLE " + TABLE_NAME5 + "("
+            + COLUMN_ID5 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_ALLERGIES + " TEXT, "
+            + COLUMN_MEDICATIONS + " TEXT, "
+            + COLUMN_VETNAME + " TEXT, "
+            + COLUMN_VETCONTACT + " TEXT, "
+            + COLUMN_ID + " TEXT, "
+            + "FOREIGN KEY(" + COLUMN_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + "));";
 }

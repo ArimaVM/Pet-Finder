@@ -29,13 +29,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(Constants.query);
-        db.execSQL("ALTER TABLE " + Constants.TABLE_NAME + " ADD COLUMN " + Constants.COLUMN_ALLERGIES + " TEXT");
-        db.execSQL("ALTER TABLE " + Constants.TABLE_NAME + " ADD COLUMN " + Constants.COLUMN_MEDICATIONS + " TEXT");
-        db.execSQL("ALTER TABLE " + Constants.TABLE_NAME + " ADD COLUMN " + Constants.COLUMN_VETNAME + " TEXT");
-        db.execSQL("ALTER TABLE " + Constants.TABLE_NAME + " ADD COLUMN " + Constants.COLUMN_VETCONTACT + " TEXT");
         db.execSQL(Constants.query2);
         db.execSQL(Constants.query3);
         db.execSQL(Constants.query4);
+        db.execSQL(Constants.query5);
     }
 
 
@@ -45,6 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME2);
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME3);
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME4);
+        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME5);
         onCreate(db);
     }
     public long storeData(String btAddress, String petName, String breed, String sex, String bdate, Integer age,
@@ -112,8 +110,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public void updateData(String id, String petName, String breed, String sex, String bdate, Integer age,
-                           Integer weight, String petPic, String addedtime, String updatedtime) {
+    public int updateData(String id, String petName, String breed, String sex, String bdate, Integer age,
+                           Integer weight, String petPic, String addedtime, String updatedtime, String petFeederID) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -126,9 +124,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Constants.COLUMN_IMAGE, petPic);
         values.put(Constants.COLUMN_ADDED_TIMESTAMP, addedtime);
         values.put(Constants.COLUMN_UPDATED_TIMESTAMP, updatedtime);
+        values.put(Constants.COLUMN_PET_FEEDER_ID, petFeederID);
 
-        db.update(Constants.TABLE_NAME, values, Constants.COLUMN_ID +" = ?", new String[] {id});
+        int returnValue =
+                db.update(Constants.TABLE_NAME, values, Constants.COLUMN_ID +" = ?", new String[] {id});
         db.close();
+
+        //TODO: ALSO UPDATE IN PET FEEDER IF NECESSARY.
+
+        return returnValue;
     }
 
     public void updatePedometerData(String id, int numstep, String date) {
@@ -169,6 +173,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return recordsList;
     }
 
+    public Cursor getAllPets () {
+        //USED FOR CONTENT PROVIDER.
+        String table1 = Constants.TABLE_NAME;
+        String table2 = Constants.TABLE_NAME5;
+        String ID = Constants.COLUMN_ID;
+
+        String selectQuery = "SELECT * FROM " + table1 + " INNER JOIN " + table2 +
+                " ON " + table1+"."+ID + " = " + table2+"."+ID +
+                " UNION " +
+                "SELECT * FROM " + table2 + " LEFT OUTER JOIN " + table1 +
+                " ON " + table1+"."+ID + " = " + table2+"."+ID;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        db.close();
+        return cursor;
+    }
+
     @SuppressLint("Range")
     public PedometerData getLatestPedometer(String MAC_ADDRESS) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -194,6 +216,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return latestPedometer;
+    }
+
+    public Cursor getAllSteps() {
+        //USED FOR CONTENT PROVIDER.
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(
+                Constants.TABLE_NAME3,
+                null,
+                null,
+                null,
+                null,
+                null,
+                Constants.COLUMN_DATE+" DESC",
+                null
+        );
+        cursor.close();
+        db.close();
+        return cursor;
     }
 
     public ArrayList<DeviceModel> getAllDeviceRecords (String orderBy){
@@ -271,11 +311,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(Constants.TABLE_NAME, Constants.COLUMN_ID + " = ?", new String[]{id});
         db.close();
+
+        //TODO: ALSO DELETE IN PET FEEDER IF NECESSARY.
     }
     public void deleteAllData(){
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DELETE FROM " + Constants.TABLE_NAME);
         db.close();
+        //TODO: ALSO DELETE IN PET FEEDER IF NECESSARY.
+    }
+
+    public int deleteData(String whereClause, String[] whereValues) {
+        //USED FOR CONTENT PROVIDER.
+        SQLiteDatabase db = getWritableDatabase();
+        int feedback = db.delete(Constants.TABLE_NAME, whereClause, whereValues);
+        db.close();
+        return feedback;
     }
 
     public int getRecordsCount() {
@@ -327,14 +378,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 petModel.setWeight(
                         cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_WEIGHT)));
                 petModel.setBirthdate(
-                        cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BIRTHDATE))
-                );
+                        cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BIRTHDATE)));
                 petModel.setImage(
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE)));
+                petModel.setPetFeederID(
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PET_FEEDER_ID)));
             } while (cursor.moveToNext());
         }
         db.close();
 
         return petModel;
+    }
+
+    public Cursor getPetWhere(String whereClause, String[] whereValues){
+        //USED FOR CONTENT RESOLVER.
+        String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME + " WHERE " + whereClause;
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery(selectQuery, whereValues);
     }
 }
