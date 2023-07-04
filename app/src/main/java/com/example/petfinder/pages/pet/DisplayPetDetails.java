@@ -30,6 +30,8 @@ import com.example.petfinder.components.Location;
 import com.example.petfinder.container.PetModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.Objects;
+
 public class DisplayPetDetails extends AppCompatActivity
                                 implements BluetoothGattCallbackHandler.DescriptorWriteCallback{
 
@@ -41,6 +43,7 @@ public class DisplayPetDetails extends AppCompatActivity
     private PetModel petModel;
     private boolean isConnected = false;
     private BluetoothGatt bluetoothGatt;
+    private PetFinder petFinder;
     private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
     private Handler handler;
 
@@ -75,7 +78,10 @@ public class DisplayPetDetails extends AppCompatActivity
             return true;
         });
 
-        recordID = PetFinder.getInstance().getCurrentMacAddress();
+        petFinder = PetFinder.getInstance();
+        petFinder.getGps().setDebuggingText(findViewById(R.id.debug_value));
+
+        recordID = petFinder.getCurrentMacAddress();
         dbhelper = new DatabaseHelper(this);
 
         Toolbar myToolbar = findViewById(R.id.pet_toolbar);
@@ -88,14 +94,23 @@ public class DisplayPetDetails extends AppCompatActivity
         bluetoothGattCallbackHandler.setDescriptorWriteCallback(this);
 
         if (bluetoothAdapter.isEnabled()) {
-            isConnected = true;
-            BluetoothDevice device = bluetoothAdapter.getRemoteDevice(recordID);
-            bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
-            bluetoothGattCallbackHandler.setGatt(bluetoothGatt);
-            //also triggers the onWait override below.
+
+            Runnable connectToBT = () -> {
+                isConnected = true;
+                BluetoothDevice device = bluetoothAdapter.getRemoteDevice(recordID);
+                bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
+                bluetoothGattCallbackHandler.setGatt(bluetoothGatt);
+                //also triggers the onWait override below.
+            };
+
+            if (petFinder.getBluetoothObject().isNull()) {
+                connectToBT.run();
+            } else if (!Objects.equals(petFinder.getBluetoothObject().getBluetoothGatt().getDevice().getAddress(),
+                    recordID)){
+                connectToBT.run();
+            }
         } else {
             isConnected = false;
-            PetFinder petFinder = PetFinder.getInstance();
             petFinder.deleteBluetoothObject();
         }
 
@@ -115,9 +130,6 @@ public class DisplayPetDetails extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-
-
-        PetFinder petFinder = PetFinder.getInstance();
         if (!petFinder.getBluetoothObject().isNull()) {
             petFinder.getBluetoothObject().getBluetoothGatt().disconnect();
             petFinder.deleteBluetoothObject();
@@ -135,7 +147,7 @@ public class DisplayPetDetails extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.editPet) {
-            PetFinder.getInstance().setCurrentPetModel(petModel);
+            petFinder.setCurrentPetModel(petModel);
             Intent intent = new Intent(DisplayPetDetails.this, EditPet.class);
             intent.putExtra("isEditMode", true);
             intent.putExtra("isConnected", isConnected);
@@ -174,7 +186,6 @@ public class DisplayPetDetails extends AppCompatActivity
 
     @Override
     public void onWait() {
-        PetFinder petFinder = PetFinder.getInstance();
         if (petFinder.bluetoothObject.isNull()) {
             petFinder.setBluetoothObject(bluetoothGatt,
                     bluetoothGattCallbackHandler.getCharacteristic(),

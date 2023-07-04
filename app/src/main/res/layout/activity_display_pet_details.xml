@@ -49,6 +49,7 @@
 
                 android:layout_marginStart="15dp"
                 android:stretchColumns="2">
+
                 <TableRow>
                     <TextView
                         android:layout_width="match_parent"
@@ -94,6 +95,7 @@
                 </TableRow>
 
                 <TableRow>
+
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

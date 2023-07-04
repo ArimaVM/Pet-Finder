@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
@@ -35,6 +36,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
 public class EditPet extends AppCompatActivity {
@@ -87,6 +91,8 @@ public class EditPet extends AppCompatActivity {
             breed = petModel.getBreed();
             sex = petModel.getSex();
             birthday = petModel.getBirthdate();
+            age = Period.between(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("d/M/yyyy")),
+                    LocalDate.now()).getYears();
             weight = petModel.getWeight();
             imageUri = Uri.parse(petModel.getImage());
             petName.setText(pname);
@@ -98,6 +104,7 @@ public class EditPet extends AppCompatActivity {
                 psex.check(R.id.femaleRB);
             }
             bdate.setText(birthday);
+            petAge.setText(String.valueOf(age));
             petWeight.setText(String.valueOf(weight));
 
             if (imageUri.equals("null")) {
@@ -335,7 +342,7 @@ public class EditPet extends AppCompatActivity {
         breed = ""+petBreed.getText().toString().trim();
         sex = ""+radioButton.getText().toString().trim();  // Update this line
         birthday = bdate.getText().toString().trim();
-        age = Integer.valueOf(petAge.getText().toString().trim());
+        age = Integer.parseInt(petAge.getText().toString().trim().replaceAll("[^\\d]", ""));
         weight = Integer.valueOf(petWeight.getText().toString().trim());
 
         if (isEditMode) {

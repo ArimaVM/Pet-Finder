@@ -44,7 +44,7 @@ public class Constants {
     public static final String COLUMN_BTADDRESS = "BTaddress";
 
     public static String query2 = "CREATE TABLE " + TABLE_NAME2 + "("
-            + COLUMN_ID2 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_ID2 + " TEXT PRIMARY KEY, "
             + COLUMN_DEVICENAME + " TEXT, "
             + COLUMN_LATITUDE + " TEXT, "
             + COLUMN_LONGITUDE + " TEXT, "
@@ -58,7 +58,7 @@ public class Constants {
     public static final String COLUMN_DATE = "date";
 
     public static String query3 = "CREATE TABLE " + TABLE_NAME3 + "("
-            + COLUMN_ID3 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_ID3 + " TEXT PRIMARY KEY, "
             + COLUMN_NUMSTEPS + " INTEGER, "
             + COLUMN_DATE + " TEXT, "
             + COLUMN_ID + " TEXT, "
@@ -81,5 +81,6 @@ public class Constants {
             + COLUMN_DATE2 + " TEXT, "
             + COLUMN_ID + " TEXT, "
             + "FOREIGN KEY(" + COLUMN_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + "));";
+
 
 }

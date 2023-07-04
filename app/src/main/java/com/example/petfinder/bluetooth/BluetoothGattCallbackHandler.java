@@ -21,7 +21,10 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
     private DescriptorWriteCallback descriptorWriteCallback;
     private CharacteristicReadCallback characteristicReadCallback;
     private CharacteristicChangedCallback characteristicChangedCallback;
+    private CharacteristicWriteCallback characteristicWriteCallback;
 
+    private StringBuilder receivedDataBuffer = new StringBuilder();
+    private String receivedDataBufferTrailer;
 
     private Context context; // Context reference for displaying Toast
     private Handler handler;
@@ -75,6 +78,19 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
         this.characteristicChangedCallback = callback;
     }
 
+    public interface CharacteristicWriteCallback{
+        void onCharacteristicWrite(Boolean writeOperationStatus);
+    }
+    public void setCharacteristicWriteCallback(CharacteristicWriteCallback callback){
+        this.characteristicWriteCallback = callback;
+    }
+
+
+    @Override
+    public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+        super.onCharacteristicWrite(gatt, characteristic, status);
+        characteristicWriteCallback.onCharacteristicWrite(status == BluetoothGatt.GATT_SUCCESS);
+    }
 
     //OVERRIDES
     @Override
@@ -146,10 +162,33 @@ public class BluetoothGattCallbackHandler extends BluetoothGattCallback {
         super.onCharacteristicChanged(gatt, characteristic);
 
         byte[] data = characteristic.getValue();
-        String receivedData = new String(data, StandardCharsets.UTF_8);
-        if (characteristicChangedCallback != null) {
-            characteristicChangedCallback.onCharacteristicChanged(receivedData.trim());
+        String receivedData = new String(data, 0, data.length);
+
+        receivedDataBuffer.append(receivedData);
+
+        if (isCompleteMessageReceived(receivedDataBuffer.toString())) {
+            String completeMessage = checkForTrailingMessage(receivedDataBuffer.toString());
+
+            if (characteristicChangedCallback != null) {
+                characteristicChangedCallback.onCharacteristicChanged(completeMessage);
+            }
+            receivedDataBuffer.setLength(0);
+            receivedDataBuffer.append(receivedDataBufferTrailer);
         }
+    }
+    private boolean isCompleteMessageReceived(String receivedData) {
+        return receivedData.contains("\n");
+    }
+    private String checkForTrailingMessage(String data){
+        String[] splitData = data.trim().split("\r\n", 2);
+        if (splitData.length > 1){
+            receivedDataBufferTrailer = splitData[1].trim();
+            return splitData[0].trim();
+        } else {
+            receivedDataBufferTrailer = "";
+            return splitData[0].trim();
+        }
+
     }
 
     private void makeToast(String message){

@@ -88,7 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(Constants.COLUMN_ID4, address);
+        values.put(Constants.COLUMN_ID, address);
         values.put(Constants.COLUMN_LONG, longi);
         values.put(Constants.COLUMN_LAT, lat);
         values.put(Constants.COLUMN_TIME, time);

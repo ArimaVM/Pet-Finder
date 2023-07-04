@@ -38,6 +38,7 @@ import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ScanBluetooth extends AppCompatActivity
                                 implements BluetoothGattCallbackHandler.ConnectionStateChangeCallback
@@ -64,6 +65,7 @@ public class ScanBluetooth extends AppCompatActivity
     private BluetoothGattCharacteristic characteristic;
     private BluetoothDevice device;
     private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
+    private PetFinder.RepeatSend repeatSend;
 
     private RecyclerView mRecyclerView;
 
@@ -75,6 +77,7 @@ public class ScanBluetooth extends AppCompatActivity
         @Override
         public void run() {
             Log.d("TIMEOUT", "THE TIMEOUT HAS RAN AT: " + System.currentTimeMillis());
+            repeatSend.stopSending();
             disconnectGatt();
             Toast.makeText(ScanBluetooth.this, "Invalid Device.", Toast.LENGTH_SHORT).show();
         }
@@ -114,6 +117,8 @@ public class ScanBluetooth extends AppCompatActivity
         bluetoothGattCallbackHandler.setConnectionStateChangeCallback(this);
         bluetoothGattCallbackHandler.setDescriptorWriteCallback(this);
         bluetoothGattCallbackHandler.setCharacteristicChangedCallback(this);
+
+        repeatSend = petFinder.getRepeatSend();
 
         // Check if the device supports BLE
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -170,14 +175,16 @@ public class ScanBluetooth extends AppCompatActivity
         if (!isBluetoothConnected) { return; }
         if (bluetoothGatt != null && characteristic != null) {
             // Characteristic available, proceed with sending data
-            characteristic.setValue(data);
-            boolean success = bluetoothGatt.writeCharacteristic(characteristic);
-            if (success) {
-                handler2.postDelayed(runnable, 2000);
-                Log.d("TIMEOUT", "I SET THE TIMEOUT AT: " + System.currentTimeMillis());
-                makeToastOnUI("Verifying...");
-            } else {
-                makeToastOnUI("Verification failed. Please try again later.");
+            repeatSend.addString(data).startSending();
+            if (Objects.equals(repeatSend.currentString(), "SEND_DEVICE_CODE")){
+                while (repeatSend.successStatus() == null); // wait until repeatSend actually started the loop.
+                if (repeatSend.successStatus()) {
+                    handler2.postDelayed(runnable, 2000);
+                    Log.d("TIMEOUT", "I SET THE TIMEOUT AT: " + System.currentTimeMillis());
+                    makeToastOnUI("Verifying...");
+                } else {
+                    makeToastOnUI("Verification failed. Please try again later.");
+                }
             }
         } else {
             makeToastOnUI("An error occured. Please try again later.");
@@ -249,7 +256,6 @@ public class ScanBluetooth extends AppCompatActivity
             });
         }
 
-
         @Override
         public void onScanFailed(int errorCode) {
             // Handle scan failure here
@@ -315,6 +321,7 @@ public class ScanBluetooth extends AppCompatActivity
     @Override
     public void onWait() {
         characteristic = bluetoothGattCallbackHandler.getCharacteristic();
+        petFinder.setBluetoothObject(bluetoothGatt, characteristic, bluetoothGattCallbackHandler, false);
         askForVerification();
     }
 
@@ -335,9 +342,10 @@ public class ScanBluetooth extends AppCompatActivity
     public void onCharacteristicChanged(String value) {
         if (value.equals("rDmI4NXH08")){
             Log.d("TIMEOUT", "CODE IS RECEIVED AT: " + System.currentTimeMillis());
-            // Connect to the selected device
+            repeatSend.stopSending();
             handler2.removeCallbacks(runnable);
             makeToastOnUI("Device Validation Success!");
+            // Connect to the selected device
             onValidationSuccess();
         } else {
             makeToastOnUI("Invalid Device.");
