@@ -79,7 +79,6 @@ public class DisplayPetDetails extends AppCompatActivity
         });
 
         petFinder = PetFinder.getInstance();
-        petFinder.getGps().setDebuggingText(findViewById(R.id.debug_value));
 
         recordID = petFinder.getCurrentMacAddress();
         dbhelper = new DatabaseHelper(this);
