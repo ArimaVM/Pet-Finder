@@ -16,6 +16,13 @@
         android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 
+    <queries>
+        <package android:name="com.example.petfinder"/>
+    </queries>
+    <queries>
+        <package android:name="com.example.petfeeder"/>
+    </queries>
+
     <application
         android:name=".application.PetFinder"
         android:allowBackup="true"
@@ -106,6 +113,11 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
+
+        <provider
+            android:authorities="com.example.petfinder"
+            android:name=".DataSharing.PetFinderContentProvider"
+            android:exported="true"/>
     </application>
 
 </manifest>

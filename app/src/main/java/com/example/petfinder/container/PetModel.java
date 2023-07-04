@@ -3,7 +3,7 @@ package com.example.petfinder.container;
 import java.util.List;
 
 public class PetModel {
-    String MAC_ADDRESS, Name, Breed, Sex, Birthdate, VetName, VetContact, Image;
+    String MAC_ADDRESS, Name, Breed, Sex, Birthdate, VetName, VetContact, Image, PetFeederID;
     Integer Age, Weight;
     List<String> Allergies, Medications;
 
@@ -20,12 +20,12 @@ public class PetModel {
         Weight = null;
         Allergies = null;
         Medications = null;
+        PetFeederID = null;
     }
 
     public String getMAC_ADDRESS() {
         return MAC_ADDRESS;
     }
-
     public void setMAC_ADDRESS(String MAC_ADDRESS) {
         this.MAC_ADDRESS = MAC_ADDRESS;
     }
@@ -33,7 +33,6 @@ public class PetModel {
     public String getImage() {
         return Image;
     }
-
     public void setImage(String image) {
         Image = image;
     }
@@ -41,7 +40,6 @@ public class PetModel {
     public String getName() {
         return Name;
     }
-
     public void setName(String name) {
         Name = name;
     }
@@ -49,7 +47,6 @@ public class PetModel {
     public String getBreed() {
         return Breed;
     }
-
     public void setBreed(String breed) {
         Breed = breed;
     }
@@ -57,7 +54,6 @@ public class PetModel {
     public String getSex() {
         return Sex;
     }
-
     public void setSex(String sex) {
         Sex = sex;
     }
@@ -65,7 +61,6 @@ public class PetModel {
     public String getBirthdate() {
         return Birthdate;
     }
-
     public void setBirthdate(String birthdate) {
         Birthdate = birthdate;
     }
@@ -73,7 +68,6 @@ public class PetModel {
     public String getVetName() {
         return VetName;
     }
-
     public void setVetName(String vetName) {
         VetName = vetName;
     }
@@ -81,7 +75,6 @@ public class PetModel {
     public String getVetContact() {
         return VetContact;
     }
-
     public void setVetContact(String vetContact) {
         VetContact = vetContact;
     }
@@ -89,7 +82,6 @@ public class PetModel {
     public Integer getAge() {
         return Age;
     }
-
     public void setAge(Integer age) {
         Age = age;
     }
@@ -97,7 +89,6 @@ public class PetModel {
     public Integer getWeight() {
         return Weight;
     }
-
     public void setWeight(Integer weight) {
         Weight = weight;
     }
@@ -105,7 +96,6 @@ public class PetModel {
     public List<String> getAllergies() {
         return Allergies;
     }
-
     public void setAllergies(List<String> allergies) {
         Allergies = allergies;
     }
@@ -113,8 +103,14 @@ public class PetModel {
     public List<String> getMedications() {
         return Medications;
     }
-
     public void setMedications(List<String> medications) {
         Medications = medications;
+    }
+
+    public String getPetFeederID() {
+        return PetFeederID;
+    }
+    public void setPetFeederID(String petFeederID) {
+        PetFeederID = petFeederID;
     }
 }

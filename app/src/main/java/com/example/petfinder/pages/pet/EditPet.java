@@ -57,7 +57,7 @@ public class EditPet extends AppCompatActivity {
     private String[] cameraPermissions;
     private String[] storagePermissions;
     private Uri imageUri;
-    private  String pet_id, pname, breed, sex, birthday, addedTime, updatedTime;
+    private  String pet_id, pname, breed, sex, birthday, addedTime, updatedTime, PFID;
     private Integer age, weight;
     private boolean isEditMode;
 
@@ -95,6 +95,7 @@ public class EditPet extends AppCompatActivity {
                     LocalDate.now()).getYears();
             weight = petModel.getWeight();
             imageUri = Uri.parse(petModel.getImage());
+            PFID = petModel.getPetFeederID();
             petName.setText(pname);
             petBreed.setText(breed);
             // Set the selected radio button based on the sex
@@ -357,7 +358,8 @@ public class EditPet extends AppCompatActivity {
                     weight,
                     ""+imageUri,
                     ""+addedTime,
-                    ""+timestamp);
+                    ""+timestamp,
+                    ""+PFID);
         } else {
             String timestamp = ""+System.currentTimeMillis();
             databaseHelper.storeData(

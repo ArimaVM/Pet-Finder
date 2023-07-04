@@ -1,19 +1,29 @@
 package com.example.petfinder.application;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Application;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
-import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.example.petfinder.DATABASE.Constants;
 import com.example.petfinder.DATABASE.DatabaseHelper;
+import com.example.petfinder.DataSharing.PetProviderConstants;
 import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 import com.example.petfinder.bluetooth.BluetoothObject;
 import com.example.petfinder.container.PetModel;
+import com.example.petfinder.container.RecordModel;
 import com.example.petfinder.container.dataModel.PedometerData;
 
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +38,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-public class PetFinder extends Application{
+public class PetFinder extends Application implements Application.ActivityLifecycleCallbacks{
     private static final String TAG = "PetFinder";
     public BluetoothObject bluetoothObject;
     private static PetFinder instance;
@@ -38,18 +48,85 @@ public class PetFinder extends Application{
     private GPS gps;
     private RepeatSend repeatSend;
 
+    ContentResolver contentResolver;
+    ContentObserver contentObserver;
+    DatabaseHelper databaseHelper;
+
+    Handler handler;
+
+    Boolean contentProviderExists = false;
+    Boolean previousContentProviderExists = false;
+
+    ArrayList<RecordModel> unlistedPets;
+
     @Override
     public void onCreate() {
         super.onCreate();
+
         instance = this;
+
         bluetoothObject = new BluetoothObject();
         repeatSend = new RepeatSend();
         currentPetModel = new PetModel();
         pedometer = new Pedometer(PetFinder.this, getCurrentDate());
         gps = new GPS(PetFinder.this, getCurrentDate());
-        Log.d(TAG, "Application started");
+        databaseHelper = new DatabaseHelper(this);
+        unlistedPets = new ArrayList<>();
+
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+        isContentUriExists();
+        contentInitialize();
+
+        registerActivityLifecycleCallbacks(this);
     }
+
+    private void isContentUriExists() {
+        Uri uri = PetProviderConstants.CONTENT_URI_PETS;
+        ContentResolver contentResolver = getContentResolver();
+        Cursor cursor = null;
+
+        try {
+            cursor = contentResolver.query(uri, null, null, null, null);
+            contentProviderExists = cursor != null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            contentProviderExists = false;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        //IF CONTENT PROVIDER DOES NOT EXIST PREVIOUSLY, AND NOW EXISTS, INITIALIZE CONTENT
+        if (contentProviderExists != previousContentProviderExists && contentProviderExists)
+            contentInitialize();
+    }
+
+
+    private void contentInitialize(){
+        if (contentProviderExists) {
+
+            previousContentProviderExists = contentProviderExists;
+            //IF PET FEEDER IS INSTALLED
+            handler = new Handler();
+            contentResolver = getContentResolver();
+            contentObserver = new ContentObserver(handler) {
+                //THIS OBSERVER IS FOR DETECTING CHANGES TO PET FEEDER'S DATABASE.
+                @Override
+                public void onChange(boolean selfChange) {
+                    super.onChange(selfChange);
+                    setUnlistedPets();
+                }
+            };
+            //REGISTER THE OBSERVER
+            contentResolver.registerContentObserver(PetProviderConstants.CONTENT_URI_PETS, true, contentObserver);
+
+            //DETECT INITIAL DATA
+            setUnlistedPets();
+        }
+    }
+
 
     public static PetFinder getInstance(){
         return instance;
@@ -60,7 +137,6 @@ public class PetFinder extends Application{
     public Pedometer getPedometer() {
         return pedometer;
     }
-
     public GPS getGps() {
         return gps;
     }
@@ -68,9 +144,6 @@ public class PetFinder extends Application{
     public BluetoothObject getBluetoothObject() {
         return bluetoothObject;
     }
-
-    Boolean stop = false;
-
     public void setBluetoothObject(BluetoothGatt bluetoothGatt,
                                    BluetoothGattCharacteristic characteristic,
                                    BluetoothGattCallbackHandler bluetoothgattCallbackHandler) {
@@ -93,7 +166,6 @@ public class PetFinder extends Application{
             this.gps.setBluetoothObject(this.bluetoothObject);
         }
     }
-
     public void deleteBluetoothObject(){
         if (!bluetoothObject.isNull()) {
             this.bluetoothObject.nullify();
@@ -119,11 +191,9 @@ public class PetFinder extends Application{
     public String getCurrentMacAddress() {
         return currentMacAddress;
     }
-
     public void setCurrentMacAddress(String currentMacAddress) {
         this.currentMacAddress = currentMacAddress;
     }
-
     public void removeCurrentMacAddress(){
         this.currentMacAddress = null;
         currentPetModel.nullify();
@@ -132,9 +202,44 @@ public class PetFinder extends Application{
     public PetModel getCurrentPetModel() {
         return currentPetModel;
     }
-
     public void setCurrentPetModel(PetModel currentPetModel) {
         this.currentPetModel = currentPetModel;
+    }
+
+
+    //DATA SETTERS
+    @SuppressLint("Range")
+    private void setUnlistedPets(){
+        if (!contentProviderExists) return;
+        //GET ALL PETS WITHOUT COLLAR MAC ADDRESS.
+        Cursor cursor = contentResolver.query(PetProviderConstants.CONTENT_URI_PETS,
+                null,
+                Constants.COLUMN_PET_FINDER_ID + " IS NULL",
+                null,
+                null,
+                null);
+        if (cursor!=null && cursor.getCount()>0){
+            while (cursor.moveToNext()){
+                //Reminder: Pets without a collar mac address will not be stored in the database.
+                // Although, it will still be displayed.
+                RecordModel recordModel = new RecordModel(
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PET_FINDER_ID)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PETNAME)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BREED)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_SEX)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_AGE)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_WEIGHT)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ADDED_TIMESTAMP)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_UPDATED_TIMESTAMP)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID)));
+                unlistedPets.add(recordModel);
+            }
+            cursor.close();
+        }
+    }
+    public ArrayList<RecordModel> getUnlistedPets() {
+        return unlistedPets;
     }
 
     @Override
@@ -144,6 +249,34 @@ public class PetFinder extends Application{
         repeatSend.stopSending();
         repeatSend.emptyList();
     }
+    @Override
+    public void onActivityCreated(@NonNull Activity activity, @androidx.annotation.Nullable Bundle bundle) {
+        isContentUriExists();
+
+    }
+
+    @Override
+    public void onActivityStarted(@NonNull Activity activity) {
+        isContentUriExists();
+    }
+
+    @Override
+    public void onActivityResumed(@NonNull Activity activity) {
+        setUnlistedPets();
+        isContentUriExists();
+    }
+
+    @Override
+    public void onActivityPaused(@NonNull Activity activity) {}
+
+    @Override
+    public void onActivityStopped(@NonNull Activity activity) {}
+
+    @Override
+    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle bundle) {}
+
+    @Override
+    public void onActivityDestroyed(@NonNull Activity activity) {}
 
     // INTERNAL CLASSES
     public static class Pedometer implements CharChangedListener.PedometerDataReceived {
