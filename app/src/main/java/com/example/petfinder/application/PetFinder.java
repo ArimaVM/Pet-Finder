@@ -73,6 +73,15 @@ public class PetFinder extends Application implements Application.ActivityLifecy
         databaseHelper = new DatabaseHelper(this);
         unlistedPets = new ArrayList<>();
 
+        //TODO: REMOVE THE FOLLOWING unlistedPets.add() AFTER DEBUGGING. FROM HERE:
+        unlistedPets.add(new RecordModel(null, "Reign", "Shih Tzu", "Male",
+                "8", "32", null, "1234124", "1253156"));
+        unlistedPets.add(new RecordModel(null, "Ariana", "Shih Tzu", "Female",
+                "9", "29", null, "1232124", "1253536"));
+        unlistedPets.add(new RecordModel(null, "Gorou", "Watatsumi General", "Male",
+                "18", "46", null, "1232124", "1253536"));
+        //TO HERE.
+
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         isContentUriExists();
