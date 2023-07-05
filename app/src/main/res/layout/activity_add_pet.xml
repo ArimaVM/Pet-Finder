@@ -238,7 +238,6 @@
                     android:gravity="center"
                     android:text="Add Pet" />
             </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

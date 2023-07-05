@@ -164,9 +164,17 @@ public class ScanBluetooth extends AppCompatActivity
             if (isScanning) {
                 stopScan();
             } else {
-                startScan();
+                // Check if location permission is granted
+                if (ContextCompat.checkSelfPermission(ScanBluetooth.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    // Location permission is granted, start scanning
+                    startScan();
+                } else {
+                    // Location permission is not granted, request the permission
+                    ActivityCompat.requestPermissions(ScanBluetooth.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+                }
             }
         });
+
     }
 
     private void askForVerification() {
@@ -289,6 +297,7 @@ public class ScanBluetooth extends AppCompatActivity
             }
         }
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
