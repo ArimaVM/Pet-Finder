@@ -80,7 +80,12 @@ public class PetFinder extends Application implements Application.ActivityLifecy
                 "9", "29", null, "1232124", "1253536"));
         unlistedPets.add(new RecordModel(null, "Gorou", "Watatsumi General", "Male",
                 "18", "46", null, "1232124", "1253536"));
+        databaseHelper.storeData("D9-F0-66-01-6B-E2", "Razor", "Wolf",
+                "Male", "06/07/2022", 1, 23, null, "1234124",
+                "1253536");
         //TO HERE.
+
+
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 

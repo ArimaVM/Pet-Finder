@@ -61,7 +61,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Constants.COLUMN_ADDED_TIMESTAMP, addedtime);
         values.put(Constants.COLUMN_UPDATED_TIMESTAMP, updatedtime);
 
-        long id = db.insert(Constants.TABLE_NAME, null, values);
+        long id = db.insertWithOnConflict(Constants.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
         db.close();
         return id;
     }
