@@ -9,6 +9,8 @@ import android.widget.Toast;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
+import java.util.List;
+
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = "GeofenceBroadcastReceiver";
@@ -21,15 +23,20 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
+        List<Geofence> geofenceList = geofencingEvent.getTriggeringGeofences();
+        for(Geofence geofence: geofenceList){
+            Log.d(TAG, "onReceive: "+ geofence.getRequestId());
+        }
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
 
         // Handle geofence transition
-        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
-            Toast.makeText(context, "Entered geofence", Toast.LENGTH_SHORT).show();
-            // Perform necessary actions when entering the geofence
-        } else if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
-            Toast.makeText(context, "Exited geofence", Toast.LENGTH_SHORT).show();
-            // Perform necessary actions when exiting the geofence
+        switch (geofenceTransition){
+            case Geofence.GEOFENCE_TRANSITION_DWELL:
+                Toast.makeText(context, "Pet is inside the geofence", Toast.LENGTH_SHORT).show();
+                break;
+            case Geofence.GEOFENCE_TRANSITION_EXIT:
+                Toast.makeText(context, "Pet exits the geofence", Toast.LENGTH_SHORT).show();
+                break;
         }
     }
 }
