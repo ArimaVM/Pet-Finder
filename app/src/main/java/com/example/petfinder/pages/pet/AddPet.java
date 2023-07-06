@@ -320,6 +320,6 @@ public class AddPet extends AppCompatActivity {
                 ""+imagePath,
                 ""+timestamp,
                 ""+timestamp);
-        Toast.makeText(this, "Record Added against Id: "+id, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Pet information saved successfully. Pet ID: "+id, Toast.LENGTH_SHORT).show();
     }
 }

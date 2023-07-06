@@ -247,7 +247,7 @@ public class Location extends AppCompatActivity implements OnMapReadyCallback, G
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getLastLocation();
             } else {
-                Toast.makeText(this, "Permission Denied, Please Allow Access!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permission denied. Please allow access.", Toast.LENGTH_SHORT).show();
             }
         }
     }
