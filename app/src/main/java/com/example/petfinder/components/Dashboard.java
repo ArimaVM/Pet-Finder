@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.petfinder.DATABASE.Constants;
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
+import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.container.DrawerNav;
 import com.example.petfinder.container.RecordAdapter;
 import com.example.petfinder.databinding.ActivityDashboardBinding;
@@ -24,7 +25,7 @@ import com.example.petfinder.pages.pet.ScanBluetooth;
 public class Dashboard extends DrawerNav {
 
     ActivityDashboardBinding activityDashboardBinding;
-    private RecyclerView recordsView;
+    private RecyclerView recordsView, unlistedView;
     private DatabaseHelper databaseHelper;
     String orderByNewest = Constants.COLUMN_ADDED_TIMESTAMP + " DESC";
     String orderByOldest = Constants.COLUMN_ADDED_TIMESTAMP + " ASC";
@@ -42,6 +43,7 @@ public class Dashboard extends DrawerNav {
         allocateActivityTitle("Dashboard");
 
         recordsView = findViewById(R.id.recyclerView);
+        unlistedView = findViewById(R.id.recyclerView1);
 
         databaseHelper = new DatabaseHelper(this); // Initialize the databaseHelper object
 
@@ -59,13 +61,24 @@ public class Dashboard extends DrawerNav {
     private void loadRecords(String orderBy) {
         currentOrderByStatus = orderBy;
         RecordAdapter recordAdapter = new RecordAdapter(Dashboard.this,
-                databaseHelper.getAllRecords(orderBy));
+                databaseHelper.getAllRecords(orderBy), true);
         recordsView.setAdapter(recordAdapter);
+
+        if (!PetFinder.getInstance().getUnlistedPets().isEmpty()) {
+            findViewById(R.id.unlisted).setVisibility(View.VISIBLE);
+            findViewById(R.id.recyclerView1).setVisibility(View.VISIBLE);
+            RecordAdapter recordAdapter1 = new RecordAdapter(Dashboard.this,
+                    PetFinder.getInstance().getUnlistedPets(), false);
+            unlistedView.setAdapter(recordAdapter1);
+        } else {
+            findViewById(R.id.unlisted).setVisibility(View.GONE);
+            findViewById(R.id.recyclerView1).setVisibility(View.GONE);
+        }
     }
 
     private void searchRecords(String query){
         RecordAdapter recordAdapter = new RecordAdapter(Dashboard.this,
-                databaseHelper.searchRecords(query));
+                databaseHelper.searchRecords(query), true);
         recordsView.setAdapter(recordAdapter);
     }
 
