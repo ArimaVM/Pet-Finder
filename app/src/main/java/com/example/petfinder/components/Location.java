@@ -282,6 +282,7 @@ public class Location extends AppCompatActivity implements PetFinder.GPS.GPSChan
                 petFinder.updateGeofenceData();
             }
             geofencingView.setVisibility(View.GONE);
+            geofencePreference = findViewById(R.id.geofencePreference);
             if (geofencePreference.getVisibility()!=View.VISIBLE) {
                 geofencePreference.setVisibility(View.VISIBLE);
                 geofenceVisibility.setImageResource(R.mipmap.visible);
@@ -556,7 +557,6 @@ public class Location extends AppCompatActivity implements PetFinder.GPS.GPSChan
                     GEOFENCE_LATLNG_CONSTANT = petFinder.getGeofenceData().getLatLng();
                     GEOFENCE_RADIUS_CONSTANT = petFinder.getGeofenceData().getRadius();
                 } else {
-                    geofencePreference = findViewById(R.id.geofencePreference);
                     geofencePreference.setVisibility(View.GONE);
                 }
 
