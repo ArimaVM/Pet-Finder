@@ -24,7 +24,10 @@ import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 import com.example.petfinder.bluetooth.BluetoothObject;
 import com.example.petfinder.container.PetModel;
 import com.example.petfinder.container.RecordModel;
+import com.example.petfinder.container.dataModel.GeofenceData;
 import com.example.petfinder.container.dataModel.PedometerData;
+import com.example.petfinder.container.dataModel.MapPreferences;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -39,12 +42,15 @@ import java.util.List;
 import java.util.Objects;
 
 public class PetFinder extends Application implements Application.ActivityLifecycleCallbacks{
+
     private static final String TAG = "PetFinder";
     public BluetoothObject bluetoothObject;
     private static PetFinder instance;
     public String currentMacAddress;
     public PetModel currentPetModel;
     private Pedometer pedometer;
+    private GeofenceData geofenceData;
+    private MapPreferences mapPreferences;
     private GPS gps;
     private RepeatSend repeatSend;
 
@@ -72,20 +78,8 @@ public class PetFinder extends Application implements Application.ActivityLifecy
         gps = new GPS(PetFinder.this, getCurrentDate());
         databaseHelper = new DatabaseHelper(this);
         unlistedPets = new ArrayList<>();
-
-        //TODO: REMOVE THE FOLLOWING unlistedPets.add() AFTER DEBUGGING. FROM HERE:
-        unlistedPets.add(new RecordModel(null, "Reign", "Shih Tzu", "Male",
-                "8", "32", null, "1234124", "1253156"));
-        unlistedPets.add(new RecordModel(null, "Ariana", "Shih Tzu", "Female",
-                "9", "29", null, "1232124", "1253536"));
-        unlistedPets.add(new RecordModel(null, "Gorou", "Watatsumi General", "Male",
-                "18", "46", null, "1232124", "1253536"));
-        databaseHelper.storeData("D9-F0-66-01-6B-E2", "Razor", "Wolf",
-                "Male", "06/07/2022", 1, 23, null, "1234124",
-                "1253536");
-        //TO HERE.
-
-
+        geofenceData = new GeofenceData();
+        mapPreferences = new MapPreferences();
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
@@ -220,6 +214,24 @@ public class PetFinder extends Application implements Application.ActivityLifecy
         this.currentPetModel = currentPetModel;
     }
 
+    public GeofenceData getGeofenceData() {
+        if (geofenceData.getLatLng() == null){ geofenceData = databaseHelper.getGeofence(currentMacAddress); }
+        //NOTE:
+        // If geofenceData's latLng is still null after the previous line, that means no geofence
+        // data has been stored yet. In this case, a null value will be returned.
+        return geofenceData;
+    }
+
+    public void updateGeofenceData(){ geofenceData = databaseHelper.getGeofence(currentMacAddress); }
+
+    public MapPreferences getMapPreferences() {
+        if (mapPreferences.getMapStyle() == null){ mapPreferences = databaseHelper.getMapPreferences(currentMacAddress); }
+        //NOTE:
+        // If geofenceData's latLng is still null after the previous line, that means no geofence
+        // data has been stored yet. In this case, a null value will be returned.
+        return mapPreferences;
+    }
+    public void updateMapPreferences(){ mapPreferences = databaseHelper.getMapPreferences(currentMacAddress); }
 
     //DATA SETTERS
     @SuppressLint("Range")
@@ -384,6 +396,21 @@ public class PetFinder extends Application implements Application.ActivityLifecy
         DatabaseHelper databaseHelper;
         RepeatSend repeatSend;
 
+        //INTERFACES & CALLBACKS
+
+        GPSChangeCallback gpsChangeCallback;
+
+        public interface GPSChangeCallback{
+            void onGPSChange(LatLng latLng);
+            void onGPSNoData();
+        }
+
+        public void setGPSChangeCallback(GPSChangeCallback gpsChangeCallback){
+            this.gpsChangeCallback = gpsChangeCallback;
+        }
+
+
+        //ACTUAL CODE
         public GPS(Context context, String date) {
             this.date = date;
             databaseHelper = new DatabaseHelper(context);
@@ -476,6 +503,7 @@ public class PetFinder extends Application implements Application.ActivityLifecy
                 Latitude = null;
                 Longitude = null;
                 LocationStatus = "DATA_NOT_AVAILABLE";
+                gpsChangeCallback.onGPSNoData();
             } else {
                 String date, time;
                 if (value.contains("DATE_UNKNOWN")) {
@@ -502,6 +530,11 @@ public class PetFinder extends Application implements Application.ActivityLifecy
                     time = parts[1];
                 }
                 Log.d("GPS DATA", "Date: " + date + ", Time: " + time + ", Lat: " + Latitude + ", Lon: " + Longitude);
+
+                LocationStatus = "DATA_AVAILABLE";
+
+                //TRIGGER CALLBACK
+                gpsChangeCallback.onGPSChange(new LatLng(Latitude, Longitude));
 
                 //SAVE DATA TO DATABASE
                 databaseHelper.storeGPSData(bluetoothGatt.getDevice().getAddress(),
@@ -685,4 +718,5 @@ public class PetFinder extends Application implements Application.ActivityLifecy
             return str.matches("\\d+");
         }
     }
+
 }

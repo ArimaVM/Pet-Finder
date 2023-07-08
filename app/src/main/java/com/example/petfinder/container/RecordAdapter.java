@@ -30,11 +30,13 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
     private Context context;
     private ArrayList<RecordModel> recordsList;
     private int selectedItemPosition = RecyclerView.NO_POSITION;
+    private Boolean isListed;
     DatabaseHelper databaseHelper;
 
-    public RecordAdapter(Context context, ArrayList<RecordModel> recordsList) {
+    public RecordAdapter(Context context, ArrayList<RecordModel> recordsList, Boolean isListed) {
         this.context = context;
         this.recordsList = recordsList;
+        this.isListed = isListed;
         databaseHelper = new DatabaseHelper(context);
     }
 
@@ -76,13 +78,14 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
             holder.petPic.setImageURI(Uri.parse(image));
         }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PetFinder.getInstance().setCurrentMacAddress(id);
-                context.startActivity(new Intent(context, DisplayPetDetails.class));
-            }
-        });
+        View.OnClickListener listedClick = view -> {
+            PetFinder.getInstance().setCurrentMacAddress(id);
+            context.startActivity(new Intent(context, DisplayPetDetails.class));
+        };
+        View.OnClickListener unlistedClick = view -> {
+            //TODO: WHAT HAPPENS TO THIS NEW PET.
+        };
+        holder.itemView.setOnClickListener(isListed?listedClick:unlistedClick);
     }
 
     @Override

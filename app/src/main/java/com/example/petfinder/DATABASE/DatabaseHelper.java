@@ -7,18 +7,19 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.petfinder.container.DeviceModel;
 import com.example.petfinder.container.PetModel;
 import com.example.petfinder.container.RecordModel;
+import com.example.petfinder.container.dataModel.GPSData;
+import com.example.petfinder.container.dataModel.GeofenceData;
+import com.example.petfinder.container.dataModel.MapPreferences;
 import com.example.petfinder.container.dataModel.PedometerData;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-
-
 
     public Context context;
     public DatabaseHelper(@Nullable Context context) {
@@ -33,6 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(Constants.query3);
         db.execSQL(Constants.query4);
         db.execSQL(Constants.query5);
+        db.execSQL(Constants.query6);
     }
 
 
@@ -43,6 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME3);
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME4);
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME5);
+        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME6);
         onCreate(db);
     }
     public long storeData(String btAddress, String petName, String breed, String sex, String bdate, Integer age,
@@ -66,22 +69,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-
-    public long storeDeviceData(String deviceName, String latitude, String longitude, String btName, String btAddress){
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(Constants.COLUMN_DEVICENAME, deviceName);
-        values.put(Constants.COLUMN_LATITUDE, latitude);
-        values.put(Constants.COLUMN_LONGITUDE, longitude);
-        values.put(Constants.COLUMN_BTNAME, btName);
-        values.put(Constants.COLUMN_BTADDRESS, btAddress);
-
-        long id = db.insert(Constants.TABLE_NAME2, null, values);  // Corrected table name usage
-        db.close();
-        return id;
-    }
-
     public long storeGPSData(String address, String lat, String longi, String time, String date){
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -95,6 +82,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         long id = db.insert(Constants.TABLE_NAME4, null, values);  // Corrected table name usage
         db.close();
         return id;
+    }
+
+    @SuppressLint("Range")
+    public GPSData getLatestGPS(String MAC_ADDRESS){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(
+                Constants.TABLE_NAME4,
+                null,
+                Constants.COLUMN_ID + "= ?",
+                new String[]{MAC_ADDRESS},
+                null,
+                null,
+                Constants.COLUMN_DATE + " DESC, " + Constants.COLUMN_TIME + " DESC",
+                "1"
+        );
+
+        GPSData latestGPS = new GPSData();
+        if (cursor.moveToFirst()) {
+            latestGPS = new GPSData(
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID)),
+                    cursor.getDouble(cursor.getColumnIndex(Constants.COLUMN_LAT)),
+                    cursor.getDouble(cursor.getColumnIndex(Constants.COLUMN_LONG)),
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DATE2)),
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TIME))
+            );
+        }
+        cursor.close();
+        db.close();
+        return latestGPS;
     }
 
     public long storePedometerData(String MAC_ADDRESS, int numSteps, String date) {
@@ -236,51 +252,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public ArrayList<DeviceModel> getAllDeviceRecords (String orderBy){
-        ArrayList<DeviceModel> deviceList = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME2 + " ORDER BY " + orderBy;
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                @SuppressLint("Range") DeviceModel deviceModel = new DeviceModel(
-                        ""+cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_ID2)),
-                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DEVICENAME)),
-                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LATITUDE)),
-                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONGITUDE)),
-                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BTNAME)),
-                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BTADDRESS)));
-
-                deviceList.add(deviceModel);
-            } while (cursor.moveToNext());
-        }
-        db.close();
-        return deviceList;
-    }
-    public ArrayList<DeviceModel> searchDeviceRecords (String query) {
-        ArrayList<DeviceModel> deviceList = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME2 + " WHERE " + Constants.COLUMN_DEVICENAME + " LIKE '%" + query +"%'";
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                @SuppressLint("Range") DeviceModel deviceModel = new DeviceModel(
-                        ""+cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_ID2)),
-                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DEVICENAME)),
-                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LATITUDE)),
-                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LONGITUDE)),
-                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BTNAME)),
-                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BTADDRESS)));
-
-                deviceList.add(deviceModel);
-            } while (cursor.moveToNext());
-        }
-        db.close();
-        return deviceList;
-    }
-
     public ArrayList<RecordModel> searchRecords (String query) {
         ArrayList<RecordModel> recordsList = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME + " WHERE " + Constants.COLUMN_PETNAME + " LIKE '%" + query +"%'";
@@ -320,7 +291,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         //TODO: ALSO DELETE IN PET FEEDER IF NECESSARY.
     }
-
     public int deleteData(String whereClause, String[] whereValues) {
         //USED FOR CONTENT PROVIDER.
         SQLiteDatabase db = getWritableDatabase();
@@ -390,10 +360,123 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return petModel;
     }
 
-    public Cursor getPetWhere(String whereClause, String[] whereValues){
-        //USED FOR CONTENT RESOLVER.
-        String selectQuery = "SELECT * FROM " + Constants.TABLE_NAME + " WHERE " + whereClause;
+    public long storeGeofence(String MAC_ADDRESS, LatLng latLng, Integer radius){
+
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery(selectQuery, whereValues);
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID, MAC_ADDRESS);
+        values.put(Constants.COLUMN_LATITUDE, latLng.latitude);
+        values.put(Constants.COLUMN_LONGITUDE, latLng.longitude);
+        values.put(Constants.COLUMN_RADIUS, radius);
+
+        long id = db.insert(Constants.TABLE_NAME2, null, values);  // Corrected table name usage
+        db.close();
+        return id;
     }
+    public void updateGeofence(String MAC_ADDRESS, LatLng latLng, Integer radius) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID, MAC_ADDRESS);
+        values.put(Constants.COLUMN_LATITUDE, latLng.latitude);
+        values.put(Constants.COLUMN_LONGITUDE, latLng.longitude);
+        values.put(Constants.COLUMN_RADIUS, radius);
+
+        db.update(Constants.TABLE_NAME2, values, Constants.COLUMN_ID +"= ?", new String[] {MAC_ADDRESS});
+        db.close();
+    }
+    @SuppressLint("Range")
+    public GeofenceData getGeofence(String MAC_ADDRESS) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(
+                Constants.TABLE_NAME2,
+                null,
+                Constants.COLUMN_ID + "= ?",
+                new String[]{MAC_ADDRESS},
+                null,
+                null,
+                null,
+                "1"
+        );
+
+        GeofenceData geofenceData = new GeofenceData();
+        if (cursor.moveToFirst())
+            geofenceData = new GeofenceData(
+                    new LatLng(cursor.getDouble(cursor.getColumnIndex(Constants.COLUMN_LATITUDE)),
+                    cursor.getDouble(cursor.getColumnIndex(Constants.COLUMN_LONGITUDE))),
+                    cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_RADIUS)));
+
+        cursor.close();
+        db.close();
+        return geofenceData;
+    }
+
+    public long storeMapPreferences(String MAC_ADDRESS, Integer mapStyle,
+                                    Integer geofenceIcon, String geofenceColor, Integer geofenceSize,
+                                    Integer petIcon, String petColor, Integer petSize){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID, MAC_ADDRESS);
+        values.put(Constants.MAP_STYLE, mapStyle);
+        values.put(Constants.MAP_GEO_ICON, geofenceIcon);
+        values.put(Constants.MAP_GEO_COLOR, geofenceColor);
+        values.put(Constants.MAP_PET_ICON, petIcon);
+        values.put(Constants.MAP_PET_COLOR, petColor);
+        values.put(Constants.MAP_GEO_SIZE, geofenceSize);
+        values.put(Constants.MAP_PET_SIZE, petSize);
+
+        long id = db.insert(Constants.TABLE_NAME6, null, values);  // Corrected table name usage
+        db.close();
+        return id;
+    }
+    public void updateMapPreferences(String MAC_ADDRESS, Integer mapStyle,
+                                     Integer geofenceIcon, String geofenceColor, Integer geofenceSize,
+                                     Integer petIcon, String petColor, Integer petSize) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID, MAC_ADDRESS);
+        values.put(Constants.MAP_STYLE, mapStyle);
+        values.put(Constants.MAP_GEO_ICON, geofenceIcon);
+        values.put(Constants.MAP_GEO_COLOR, geofenceColor);
+        values.put(Constants.MAP_PET_ICON, petIcon);
+        values.put(Constants.MAP_PET_COLOR, petColor);
+        values.put(Constants.MAP_GEO_SIZE, geofenceSize);
+        values.put(Constants.MAP_PET_SIZE, petSize);
+
+        db.update(Constants.TABLE_NAME6, values, Constants.COLUMN_ID +"= ?", new String[] {MAC_ADDRESS});
+        db.close();
+    }
+    @SuppressLint("Range")
+    public MapPreferences getMapPreferences(String MAC_ADDRESS) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(
+                Constants.TABLE_NAME6,
+                null,
+                Constants.COLUMN_ID + "= ?",
+                new String[]{MAC_ADDRESS},
+                null,
+                null,
+                null,
+                "1"
+        );
+
+        MapPreferences mapPreferences = new MapPreferences();
+        if (cursor.moveToFirst())
+            mapPreferences = new MapPreferences(
+                    cursor.getInt(cursor.getColumnIndex(Constants.MAP_STYLE)),
+                    cursor.getInt(cursor.getColumnIndex(Constants.MAP_GEO_ICON)),
+                    cursor.getInt(cursor.getColumnIndex(Constants.MAP_PET_ICON)),
+                    cursor.getString(cursor.getColumnIndex(Constants.MAP_GEO_COLOR)),
+                    cursor.getString(cursor.getColumnIndex(Constants.MAP_PET_COLOR)),
+                    cursor.getInt(cursor.getColumnIndex(Constants.MAP_GEO_SIZE)),
+                    cursor.getInt(cursor.getColumnIndex(Constants.MAP_PET_SIZE)));
+        cursor.close();
+        db.close();
+        return mapPreferences;
+    }
+
 }

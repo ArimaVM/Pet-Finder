@@ -3,7 +3,7 @@ package com.example.petfinder.DATABASE;
 public class Constants {
 
     public static final String DATABASE_NAME = "PetKoinu.db";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 4;
 
     //TABLE1
     public static final String TABLE_NAME = "PetRecord";
@@ -33,21 +33,19 @@ public class Constants {
             + COLUMN_PET_FEEDER_ID + " TEXT);";
 
     //TABLE2
-    public static final String TABLE_NAME2 = "DeviceRecord";
+    public static final String TABLE_NAME2 = "Geofence";
     public static final String COLUMN_ID2 = "_id2";
-    public static final String COLUMN_DEVICENAME = "deviceName";
     public static final String COLUMN_LATITUDE = "latitude";
     public static final String COLUMN_LONGITUDE = "longitude";
-    public static final String COLUMN_BTNAME = "BTName";
-    public static final String COLUMN_BTADDRESS = "BTaddress";
+    public static final String COLUMN_RADIUS = "radius";
 
     public static String query2 = "CREATE TABLE " + TABLE_NAME2 + "("
             + COLUMN_ID2 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_DEVICENAME + " TEXT, "
-            + COLUMN_LATITUDE + " TEXT, "
-            + COLUMN_LONGITUDE + " TEXT, "
-            + COLUMN_BTNAME + " TEXT, "
-            + COLUMN_BTADDRESS + " TEXT);";
+            + COLUMN_LATITUDE + " DOUBLE, "
+            + COLUMN_LONGITUDE + " DOUBLE, "
+            + COLUMN_RADIUS + " INTEGER, "
+            + COLUMN_ID + " TEXT, "
+            + "FOREIGN KEY(" + COLUMN_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + "));";
 
     //Table3
     public static final String TABLE_NAME3 = "Pedometer";
@@ -95,5 +93,29 @@ public class Constants {
             + COLUMN_VETNAME + " TEXT, "
             + COLUMN_VETCONTACT + " TEXT, "
             + COLUMN_ID + " TEXT, "
+            + "FOREIGN KEY(" + COLUMN_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + "));";
+
+
+    //TABLE6
+    public static final String TABLE_NAME6 = "GeofencePreferences";
+    public static final String COLUMN_ID6 = "_id6";
+    public static final String MAP_STYLE = "map_style";
+    public static final String MAP_GEO_ICON = "geofence_marker_icon";
+    public static final String MAP_PET_ICON = "pet_marker_icon";
+    public static final String MAP_GEO_COLOR = "geofence_marker_color";
+    public static final String MAP_PET_COLOR = "pet_marker_color";
+    public static final String MAP_GEO_SIZE = "geofence_marker_size";
+    public static final String MAP_PET_SIZE = "pet_marker_size";
+
+    public static String query6 = "CREATE TABLE " + TABLE_NAME6 + "("
+            + COLUMN_ID6 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + MAP_STYLE + " INTEGER, "
+            + MAP_GEO_ICON + " INTEGER, "
+            + MAP_PET_ICON + " INTEGER, "
+            + MAP_GEO_COLOR + " TEXT, "
+            + MAP_PET_COLOR + " TEXT, "
+            + COLUMN_ID + " TEXT, "
+            + MAP_GEO_SIZE + " INTEGER, "
+            + MAP_PET_SIZE + " INTEGER, "
             + "FOREIGN KEY(" + COLUMN_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + "));";
 }

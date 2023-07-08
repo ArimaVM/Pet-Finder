@@ -105,4 +105,9 @@
     <string name="title_activity_maps">MapsActivity</string>
     <string name="bt_name">BT Name</string>
     <string name="mac_address">MAC Address</string>
+    <string name="geofence_instruction">Click anywhere on the map or you can use the buttons below to set the marker.</string>
+    <string name="phone_location">Use Phone\'s Location</string>
+    <string name="collar_location">Use Collar\'s \nLocation</string>
+    <string name="geofence_radius">Radius</string>
+    <string name="geofence">Geofence</string>
 </resources>

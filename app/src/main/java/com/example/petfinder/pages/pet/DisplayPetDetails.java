@@ -63,17 +63,12 @@ public class DisplayPetDetails extends AppCompatActivity
 
         bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setOnItemSelectedListener(item -> {
-            Intent intent;
             switch (item.getItemId()){
-                case R.id.nav_petProfile:
-                    break;
                 case R.id.nav_location:
-                    intent = new Intent(DisplayPetDetails.this, Location.class);
-                    intent.putExtra("isConnected", isConnected);
-                    startActivity(intent);
+                    startActivity(new Intent(DisplayPetDetails.this, Location.class));
                     finish();
                     break;
-
+                default: break;
             }
             return true;
         });
@@ -93,7 +88,6 @@ public class DisplayPetDetails extends AppCompatActivity
         bluetoothGattCallbackHandler.setDescriptorWriteCallback(this);
 
         if (bluetoothAdapter.isEnabled()) {
-
             Runnable connectToBT = () -> {
                 isConnected = true;
                 BluetoothDevice device = bluetoothAdapter.getRemoteDevice(recordID);
