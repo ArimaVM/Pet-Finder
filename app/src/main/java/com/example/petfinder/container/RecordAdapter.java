@@ -80,6 +80,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
 
         View.OnClickListener listedClick = view -> {
             PetFinder.getInstance().setCurrentMacAddress(id);
+            PetFinder.getInstance().setCurrentPetModel(databaseHelper.getRecordDetails(id));
             context.startActivity(new Intent(context, DisplayPetDetails.class));
         };
         View.OnClickListener unlistedClick = view -> {

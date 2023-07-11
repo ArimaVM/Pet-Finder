@@ -5,8 +5,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,13 +18,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.blogspot.atifsoftwares.circularimageview.CircularImageView;
-import com.example.petfinder.DATABASE.Constants;
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
 import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 import com.example.petfinder.components.Dashboard;
-import com.example.petfinder.components.Location;
 import com.example.petfinder.container.PetModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -68,7 +64,10 @@ public class DisplayPetDetails extends AppCompatActivity
                     startActivity(new Intent(DisplayPetDetails.this, Location.class));
                     finish();
                     break;
-                default: break;
+                case R.id.nav_reports:
+                    startActivity(new Intent(DisplayPetDetails.this, Reports.class));
+                    finish();
+                    break;
             }
             return true;
         });
@@ -88,7 +87,7 @@ public class DisplayPetDetails extends AppCompatActivity
         bluetoothGattCallbackHandler.setDescriptorWriteCallback(this);
 
         if (bluetoothAdapter.isEnabled()) {
-            Runnable connectToBT = () -> {
+            @SuppressLint("MissingPermission") Runnable connectToBT = () -> {
                 isConnected = true;
                 BluetoothDevice device = bluetoothAdapter.getRemoteDevice(recordID);
                 bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
@@ -121,6 +120,7 @@ public class DisplayPetDetails extends AppCompatActivity
         showRecordDetails();
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onBackPressed() {
         if (!petFinder.getBluetoothObject().isNull()) {

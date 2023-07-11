@@ -503,7 +503,7 @@ public class PetFinder extends Application implements Application.ActivityLifecy
                 Latitude = null;
                 Longitude = null;
                 LocationStatus = "DATA_NOT_AVAILABLE";
-                gpsChangeCallback.onGPSNoData();
+                if (gpsChangeCallback!=null) gpsChangeCallback.onGPSNoData();
             } else {
                 String date, time;
                 if (value.contains("DATE_UNKNOWN")) {
@@ -534,7 +534,7 @@ public class PetFinder extends Application implements Application.ActivityLifecy
                 LocationStatus = "DATA_AVAILABLE";
 
                 //TRIGGER CALLBACK
-                gpsChangeCallback.onGPSChange(new LatLng(Latitude, Longitude));
+                if (gpsChangeCallback!=null) gpsChangeCallback.onGPSChange(new LatLng(Latitude, Longitude));
 
                 //SAVE DATA TO DATABASE
                 databaseHelper.storeGPSData(bluetoothGatt.getDevice().getAddress(),

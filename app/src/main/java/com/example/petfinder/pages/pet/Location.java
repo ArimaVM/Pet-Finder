@@ -1,4 +1,4 @@
-package com.example.petfinder.components;
+package com.example.petfinder.pages.pet;
 
 import android.Manifest;
 import android.animation.LayoutTransition;
@@ -53,7 +53,6 @@ import com.example.petfinder.R;
 import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 import com.example.petfinder.container.dataModel;
-import com.example.petfinder.pages.pet.DisplayPetDetails;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -74,9 +73,7 @@ import java.util.concurrent.CountDownLatch;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 
-public class Location extends AppCompatActivity implements PetFinder.GPS.GPSChangeCallback,
-                                            BluetoothGattCallbackHandler.DescriptorWriteCallback,
-                                            BluetoothGattCallbackHandler.ConnectionStateChangeCallback{
+public class Location extends AppCompatActivity {
 
     private PetFinder petFinder;
     private BluetoothGatt bluetoothGatt;
@@ -172,7 +169,24 @@ public class Location extends AppCompatActivity implements PetFinder.GPS.GPSChan
 
         petFinder = PetFinder.getInstance();
         gpsObject = petFinder.getGps();
-        gpsObject.setGPSChangeCallback(this);
+        gpsObject.setGPSChangeCallback(new PetFinder.GPS.GPSChangeCallback() {
+            @Override
+            public void onGPSChange(LatLng latLng) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        petLatLng = latLng;
+                        if (googleMap!=null) onPetCurrentLocation();
+                    }
+                });
+            }
+
+            @Override
+            public void onGPSNoData() {
+                setWarning("No GPS Signal.",
+                        "Please wait until the collar detects a GPS signal.");
+            }
+        });
         repeatSend = petFinder.getRepeatSend();
         geofenceLatLng = petFinder.getGeofenceData().getLatLng();
         databaseHelper = new DatabaseHelper(this);
@@ -214,11 +228,12 @@ public class Location extends AppCompatActivity implements PetFinder.GPS.GPSChan
                 switch (item.getItemId()) {
                     case R.id.nav_petProfile:
                         startActivity(new Intent(Location.this, DisplayPetDetails.class));
+                        finish();
                         break;
-                    case R.id.nav_location:
+                    case R.id.nav_reports:
+                        startActivity(new Intent(Location.this, Reports.class));
+                        finish();
                         break;
-//                    case R.id.statistics:
-//                        break;
                 }
                 return true;
             }
@@ -576,7 +591,10 @@ public class Location extends AppCompatActivity implements PetFinder.GPS.GPSChan
                 if (!petFinder.getBluetoothObject().isNull()){
                     petFinder.getBluetoothObject()
                             .getHandlerInstance()
-                            .setConnectionStateChangeCallback(Location.this);
+                            .setConnectionStateChangeCallback(new BluetoothGattCallbackHandler.ConnectionStateChangeCallback() {
+                                @Override
+                                public void onConnectionStateChange(boolean isConnected) { onConnectionStateChanged(isConnected); }
+                            });
                 }
 
                 //CHECK PERMISSION FOR PHONE'S LOCATION
@@ -613,8 +631,25 @@ public class Location extends AppCompatActivity implements PetFinder.GPS.GPSChan
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         bluetoothGattCallbackHandler =
                 new BluetoothGattCallbackHandler(Location.this, new Handler());
-        bluetoothGattCallbackHandler.setConnectionStateChangeCallback(this);
-        bluetoothGattCallbackHandler.setDescriptorWriteCallback(this);
+        bluetoothGattCallbackHandler.setConnectionStateChangeCallback(new BluetoothGattCallbackHandler.ConnectionStateChangeCallback() {
+            @Override
+            public void onConnectionStateChange(boolean isConnected) { onConnectionStateChanged(isConnected); }
+        });
+        bluetoothGattCallbackHandler.setDescriptorWriteCallback(new BluetoothGattCallbackHandler.DescriptorWriteCallback() {
+            @Override
+            public void onWait() {
+                if (petFinder.bluetoothObject.isNull()) {
+                    petFinder.setBluetoothObject(bluetoothGatt,
+                            bluetoothGattCallbackHandler.getCharacteristic(),
+                            bluetoothGattCallbackHandler);
+                }
+                removeWarning();
+                finish();
+                overridePendingTransition(0, 0);
+                startActivity(getIntent());
+                overridePendingTransition(0, 0);
+            }
+        });
         if (bluetoothAdapter.isEnabled()) {
             Runnable connectToBT = () -> {
                 BluetoothDevice device = bluetoothAdapter.getRemoteDevice(petFinder.getCurrentMacAddress());
@@ -917,23 +952,6 @@ public class Location extends AppCompatActivity implements PetFinder.GPS.GPSChan
         Toast.makeText(Location.this, message, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onGPSChange(LatLng latLng) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                petLatLng = latLng;
-                if (googleMap!=null) onPetCurrentLocation();
-            }
-        });
-    }
-
-    @Override
-    public void onGPSNoData() {
-        setWarning("No GPS Signal.",
-                 "Please wait until the collar detects a GPS signal.");
-    }
-
     private void setWarning(String reason, String resolution){
         runOnUiThread(new Runnable() {
             @Override
@@ -956,22 +974,7 @@ public class Location extends AppCompatActivity implements PetFinder.GPS.GPSChan
         });
     }
 
-    @Override
-    public void onWait() {
-        if (petFinder.bluetoothObject.isNull()) {
-            petFinder.setBluetoothObject(bluetoothGatt,
-                    bluetoothGattCallbackHandler.getCharacteristic(),
-                    bluetoothGattCallbackHandler);
-        }
-        removeWarning();
-        finish();
-        overridePendingTransition(0, 0);
-        startActivity(getIntent());
-        overridePendingTransition(0, 0);
-    }
-
-    @Override
-    public void onConnectionStateChange(boolean isConnected) {
+    private void onConnectionStateChanged(Boolean isConnected){
         if (isConnected){
             removeWarning();
             finish();

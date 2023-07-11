@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/titleReports"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="[PET NAME]'s Daily Steps"
+        android:textAlignment="center"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/pedometerData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="[PEDOMETER_VALUE]"
+        android:textAlignment="center"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/orange"
+        android:textSize="40sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/pedometerConversion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="[METERS] meters"
+        android:textAlignment="center"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/orange"
+        android:textSize="25sp"
+        android:textStyle="italic"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/pedometerBarGraph"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginRight="50dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/dailyReportsPedometer"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/purple_700"
+                android:text="Daily"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/monthlyReportsPedometer"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/purple_200"
+                android:text="Monthly"
+                android:textAllCaps="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

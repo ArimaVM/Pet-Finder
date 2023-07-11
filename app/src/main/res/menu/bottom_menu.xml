@@ -9,5 +9,9 @@
             android:id="@+id/nav_location"
             android:icon="@drawable/ic_location"
             android:title="@string/strLocation"/>
+        <item
+            android:id="@+id/nav_reports"
+            android:icon="@drawable/ic_statistics"
+            android:title="@string/strReports"/>
     </group>
 </menu>

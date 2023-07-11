@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.container.PetModel;
 import com.example.petfinder.container.RecordModel;
 import com.example.petfinder.container.dataModel.GPSData;
@@ -17,7 +18,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -244,7 +248,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null,
-                Constants.COLUMN_DATE+" DESC",
+                null,
                 null
         );
         cursor.close();
@@ -479,4 +483,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return mapPreferences;
     }
 
+    public SQLiteDatabase getReadableDatabase(){
+        return this.getWritableDatabase();
+    }
 }

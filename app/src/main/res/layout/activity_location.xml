@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/purple_background"
-    tools:context=".components.Location">
+    tools:context=".pages.pet.Location">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/pet_toolbar"
