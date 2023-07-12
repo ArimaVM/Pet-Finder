@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
@@ -116,11 +117,31 @@ public class Dashboard extends DrawerNav {
             sortOptionDialog();
         }
         else if (id ==R.id.deleteAll){
-            databaseHelper.deleteAllData();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Delete Confirmation")
+                    .setMessage("Choose an option:")
+                    .setPositiveButton("Delete in this app", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            databaseHelper.deleteAllData();
+                        }
+                    })
+                    .setNegativeButton("Delete in both apps", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            showToast("Deleted in Petfinder and Petfeeder");
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
             onResume();
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     private void sortOptionDialog() {

@@ -1,6 +1,8 @@
 package com.example.petfinder.container;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -129,12 +132,36 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
             switch (item.getItemId()) {
                 case R.id.action_popup_delete:
                     Log.d(TAG, "onMenuItemClick: action_popup_delete");
-                    deleteSelectedItem();
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+                    builder.setTitle("Delete Confirmation")
+                            .setMessage("Choose an option:")
+                            .setPositiveButton("Delete in this app", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    deleteSelectedItem();
+                                }
+                            })
+                            .setNegativeButton("Delete in both apps", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    showToast("Deleted in Petfinder and Petfeeder");
+                                }
+                            });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+
                     return true;
 
                 default:
                     return false;
             }
+        }
+
+        private void showToast(String message) {
+            Toast.makeText(itemView.getContext(), message, Toast.LENGTH_SHORT).show();
         }
 
         private void deleteSelectedItem() {
