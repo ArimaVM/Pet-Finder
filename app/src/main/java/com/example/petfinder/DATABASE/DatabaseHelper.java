@@ -74,6 +74,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    public long updateHealthInfo(String btAddress, String Allergies, String Medications, String VetName, String VetContact) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID, btAddress); // Use Bluetooth address as ID
+        values.put(Constants.COLUMN_ALLERGIES, Allergies);
+        values.put(Constants.COLUMN_MEDICATIONS, Medications);
+        values.put(Constants.COLUMN_VETNAME, VetName);
+        values.put(Constants.COLUMN_VETCONTACT, VetContact);
+
+        long returnValue =
+                db.update(Constants.TABLE_NAME5, values, Constants.COLUMN_ID +" = ?", new String[] {btAddress});
+
+        if (returnValue==0){
+            //if update affected no lines, it means pet has no health information stored yet.
+            returnValue = db.insertWithOnConflict(Constants.TABLE_NAME5, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+        }
+
+        db.close();
+        return returnValue;
+    }
+
     public long storeGPSData(String address, String lat, String longi, String time, String date){
         SQLiteDatabase db = this.getWritableDatabase();
 
