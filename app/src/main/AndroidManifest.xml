@@ -92,8 +92,8 @@
             android:theme="@style/Base.Theme.AppCompat" />
 
         <provider
-            android:name=".DataSharing.PetFinderContentProvider"
             android:authorities="com.example.petfinder"
+            android:name=".DataSharing.PetFinderContentProvider"
             android:exported="true" />
     </application>
 

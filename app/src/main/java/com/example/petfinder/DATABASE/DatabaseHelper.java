@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.petfinder.DataSharing.PetFinderContentProvider;
 import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.container.PetModel;
 import com.example.petfinder.container.RecordModel;
@@ -127,6 +128,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long id = db.insert(Constants.TABLE_NAME3, null, values);  // Corrected table name usage
         db.close();
+
+        //INSERT TO PET FEEDER IF THE FOLLOWING CONDITIONS ARE MET:
+        // - IF PET IS IMPORTED TO THE PET FEEDER.
+        // - IF PET FEEDER IS INSTALLED IN THE SYSTEM.
+        PetFinder petFinder = PetFinder.getInstance();
+        if (petFinder.getContentProviderExists()) {
+            String petFeederID = getPetFeederIDFromId(MAC_ADDRESS);
+            if (petFeederID != null) {
+                values.remove(Constants.COLUMN_ID);
+                values.put(Constants.COLUMN_ID, petFeederID);
+                petFinder.getCResolver().insert(PetFinderContentProvider.CONTENT_URI_STEP, values);
+            }
+        }
         return id;
     }
 
@@ -148,6 +162,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int returnValue =
                 db.update(Constants.TABLE_NAME, values, Constants.COLUMN_ID +" = ?", new String[] {id});
+
+        //INSERT TO PET FEEDER IF THE FOLLOWING CONDITIONS ARE MET:
+        // - IF PET IS IMPORTED TO THE PET FEEDER.
+        // - IF PET FEEDER IS INSTALLED IN THE SYSTEM.
+        PetFinder petFinder = PetFinder.getInstance();
+        if (petFinder.getContentProviderExists()) {
+            if (petFeederID != null) {
+                values.put(Constants.COLUMN_ID, petFeederID);
+                values.remove(Constants.COLUMN_PET_FEEDER_ID);
+                values.put(Constants.COLUMN_PET_FINDER_ID, id);
+                petFinder.getCResolver().insert(PetFinderContentProvider.CONTENT_URI_PETS, values);
+            }
+        }
+
         db.close();
 
         //TODO: ALSO UPDATE IN PET FEEDER IF NECESSARY.
@@ -165,6 +193,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_DATE +" = ? AND "+ Constants.COLUMN_ID +"= ?", new String[] {date, id});
         db.close();
+
+        //INSERT TO PET FEEDER IF THE FOLLOWING CONDITIONS ARE MET:
+        // - IF PET IS IMPORTED TO THE PET FEEDER.
+        // - IF PET FEEDER IS INSTALLED IN THE SYSTEM.
+        PetFinder petFinder = PetFinder.getInstance();
+        if (petFinder.getContentProviderExists()) {
+            String petFeederID = getPetFeederIDFromId(id);
+            if (petFeederID != null) {
+                values.remove(Constants.COLUMN_ID);
+                values.put(Constants.COLUMN_ID, petFeederID);
+                petFinder.getCResolver().update(PetFinderContentProvider.CONTENT_URI_STEP, values, null);
+            }
+        }
     }
 
     public ArrayList<RecordModel> getAllRecords (String orderby) {
@@ -199,16 +240,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String table2 = Constants.TABLE_NAME5;
         String ID = Constants.COLUMN_ID;
 
-        String selectQuery = "SELECT * FROM " + table1 + " INNER JOIN " + table2 +
-                " ON " + table1+"."+ID + " = " + table2+"."+ID +
-                " UNION " +
-                "SELECT * FROM " + table2 + " LEFT OUTER JOIN " + table1 +
-                " ON " + table1+"."+ID + " = " + table2+"."+ID;
+        String selectQuery = "SELECT * FROM " + table1 + " LEFT JOIN " + table2 +
+                " ON " + table1 + "." + ID + " = " + table2 + "." + ID;
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        db.close();
-        return cursor;
+        return db.rawQuery(selectQuery, null);
     }
 
     @SuppressLint("Range")
@@ -241,7 +277,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getAllSteps() {
         //USED FOR CONTENT PROVIDER.
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(
+        return db.query(
                 Constants.TABLE_NAME3,
                 null,
                 null,
@@ -251,9 +287,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 null,
                 null
         );
-        cursor.close();
-        db.close();
-        return cursor;
     }
 
     public ArrayList<RecordModel> searchRecords (String query) {
@@ -284,7 +317,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void deleteData(String id) {
         SQLiteDatabase db = getWritableDatabase();
+        //DELETE TO ALL TABLES WHERE DATA IS ABOUT PET.
         db.delete(Constants.TABLE_NAME, Constants.COLUMN_ID + " = ?", new String[]{id});
+        db.delete(Constants.TABLE_NAME2, Constants.COLUMN_ID + " = ?", new String[]{id});
+        db.delete(Constants.TABLE_NAME3, Constants.COLUMN_ID + " = ?", new String[]{id});
+        db.delete(Constants.TABLE_NAME4, Constants.COLUMN_ID + " = ?", new String[]{id});
+        db.delete(Constants.TABLE_NAME5, Constants.COLUMN_ID + " = ?", new String[]{id});
+        db.delete(Constants.TABLE_NAME6, Constants.COLUMN_ID + " = ?", new String[]{id});
         db.close();
 
         //TODO: ALSO DELETE IN PET FEEDER IF NECESSARY.
@@ -295,6 +334,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         //TODO: ALSO DELETE IN PET FEEDER IF NECESSARY.
     }
+
     public int deleteData(String whereClause, String[] whereValues) {
         //USED FOR CONTENT PROVIDER.
         SQLiteDatabase db = getWritableDatabase();
@@ -481,6 +521,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return mapPreferences;
+    }
+
+
+    @SuppressLint("Range")
+    public String getIdFromPetFeederID(String petFeederId) {
+        String query = "SELECT " + Constants.COLUMN_ID + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.COLUMN_PET_FEEDER_ID + " = ?";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, new String[]{petFeederId});
+
+        String returnValue = null;
+        if (cursor.moveToFirst() && cursor.getColumnIndex(Constants.COLUMN_ID) != -1) {
+            returnValue = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID));
+        }
+
+        cursor.close();
+        return returnValue;
+    }
+    @SuppressLint("Range")
+    public String getPetFeederIDFromId(String MAC_ADDRESS) {
+        String query = "SELECT " + Constants.COLUMN_PET_FEEDER_ID + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.COLUMN_ID + " = ?";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, new String[]{MAC_ADDRESS});
+
+        String returnValue = null;
+        if (cursor.moveToFirst() && cursor.getColumnIndex(Constants.COLUMN_PET_FEEDER_ID) != -1) {
+            returnValue = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PET_FEEDER_ID));
+        }
+        cursor.close();
+        return returnValue;
     }
 
     public SQLiteDatabase getReadableDatabase(){

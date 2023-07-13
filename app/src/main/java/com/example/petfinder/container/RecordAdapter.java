@@ -58,11 +58,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
         String petName = model.getName();
         String breed = model.getBreed();
         String sex = model.getSex();
-        String age = model.getAge();
-        String weight = model.getWeight();
         String image = model.getImage();
-        String addedTime = model.getAddedtime();
-        String updatedTime = model.getUpdatedtime();
 
         holder.petName.setText(petName);
         holder.petBreed.setText(breed);

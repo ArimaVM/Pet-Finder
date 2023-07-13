@@ -7,6 +7,8 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -58,8 +60,6 @@ public class PetFinder extends Application implements Application.ActivityLifecy
     ContentObserver contentObserver;
     DatabaseHelper databaseHelper;
 
-    Handler handler;
-
     Boolean contentProviderExists = false;
     Boolean previousContentProviderExists = false;
 
@@ -81,6 +81,8 @@ public class PetFinder extends Application implements Application.ActivityLifecy
         geofenceData = new GeofenceData();
         mapPreferences = new MapPreferences();
 
+        contentResolver = getContentResolver();
+
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         isContentUriExists();
@@ -90,19 +92,21 @@ public class PetFinder extends Application implements Application.ActivityLifecy
     }
 
     private void isContentUriExists() {
-        Uri uri = PetProviderConstants.CONTENT_URI_PETS;
-        ContentResolver contentResolver = getContentResolver();
-        Cursor cursor = null;
+        Uri uri_pets = PetProviderConstants.CONTENT_URI_PETS;
+        Uri uri_step = PetProviderConstants.CONTENT_URI_STEP;
+        Cursor cursorPets = null;
+        String cursorStep;
 
         try {
-            cursor = contentResolver.query(uri, null, null, null, null);
-            contentProviderExists = cursor != null;
+            cursorPets = contentResolver.query(uri_pets, null, null, null, null);
+            cursorStep = contentResolver.getType(uri_step);
+            contentProviderExists = cursorPets != null && cursorStep != null;
         } catch (Exception e) {
             e.printStackTrace();
             contentProviderExists = false;
         } finally {
-            if (cursor != null) {
-                cursor.close();
+            if (cursorPets != null) {
+                cursorPets.close();
             }
         }
 
@@ -111,15 +115,13 @@ public class PetFinder extends Application implements Application.ActivityLifecy
             contentInitialize();
     }
 
-
     private void contentInitialize(){
         if (contentProviderExists) {
 
             previousContentProviderExists = contentProviderExists;
             //IF PET FEEDER IS INSTALLED
-            handler = new Handler();
             contentResolver = getContentResolver();
-            contentObserver = new ContentObserver(handler) {
+            contentObserver = new ContentObserver(new Handler()) {
                 //THIS OBSERVER IS FOR DETECTING CHANGES TO PET FEEDER'S DATABASE.
                 @Override
                 public void onChange(boolean selfChange) {
@@ -221,7 +223,6 @@ public class PetFinder extends Application implements Application.ActivityLifecy
         // data has been stored yet. In this case, a null value will be returned.
         return geofenceData;
     }
-
     public void updateGeofenceData(){ geofenceData = databaseHelper.getGeofence(currentMacAddress); }
 
     public MapPreferences getMapPreferences() {
@@ -244,6 +245,7 @@ public class PetFinder extends Application implements Application.ActivityLifecy
                 null,
                 null,
                 null);
+        unlistedPets.clear();
         if (cursor!=null && cursor.getCount()>0){
             while (cursor.moveToNext()){
                 //Reminder: Pets without a collar mac address will not be stored in the database.
@@ -264,6 +266,14 @@ public class PetFinder extends Application implements Application.ActivityLifecy
             cursor.close();
         }
     }
+
+    public ContentResolver getCResolver() {
+        return contentResolver;
+    }
+    public Boolean getContentProviderExists() {
+        return contentProviderExists;
+    }
+
     public ArrayList<RecordModel> getUnlistedPets() {
         return unlistedPets;
     }
@@ -276,15 +286,10 @@ public class PetFinder extends Application implements Application.ActivityLifecy
         repeatSend.emptyList();
     }
     @Override
-    public void onActivityCreated(@NonNull Activity activity, @androidx.annotation.Nullable Bundle bundle) {
-        isContentUriExists();
-
-    }
+    public void onActivityCreated(@NonNull Activity activity, @androidx.annotation.Nullable Bundle bundle) {}
 
     @Override
-    public void onActivityStarted(@NonNull Activity activity) {
-        isContentUriExists();
-    }
+    public void onActivityStarted(@NonNull Activity activity) {}
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {

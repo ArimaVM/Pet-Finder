@@ -28,6 +28,7 @@ public class Dashboard extends DrawerNav {
     ActivityDashboardBinding activityDashboardBinding;
     private RecyclerView recordsView, unlistedView;
     private DatabaseHelper databaseHelper;
+
     String orderByNewest = Constants.COLUMN_ADDED_TIMESTAMP + " DESC";
     String orderByOldest = Constants.COLUMN_ADDED_TIMESTAMP + " ASC";
     String orderByTitleAsc = Constants.COLUMN_PETNAME + " ASC";
