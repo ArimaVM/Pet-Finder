@@ -44,7 +44,11 @@ public class PetFinderContentProvider extends ContentProvider {
         Cursor cursor = null;
         switch (URI_MATCHER.match(uri)){
             case PETS:
-                cursor = databaseHelper.getAllPets();
+                if (selection==null) {
+                    cursor = databaseHelper.getAllPets();
+                } else {
+                    cursor = databaseHelper.query(uri, projection, selection, selectionArgs, sortOrder, URI_MATCHER, PETS, getContext());
+                }
                 break;
             case STEP:
                 cursor = databaseHelper.getAllSteps();
@@ -116,7 +120,6 @@ public class PetFinderContentProvider extends ContentProvider {
                 values.getAsInteger(Constants.COLUMN_AGE),
                 values.getAsInteger(Constants.COLUMN_WEIGHT),
                 values.getAsString(Constants.COLUMN_IMAGE),
-                values.getAsString(Constants.COLUMN_ADDED_TIMESTAMP),
                 values.getAsString(Constants.COLUMN_UPDATED_TIMESTAMP),
                 values.getAsString(Constants.COLUMN_ID));
         getContext().getContentResolver().notifyChange(uri, null);

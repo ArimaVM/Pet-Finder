@@ -1,32 +1,23 @@
 package com.example.petfinder.components;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.os.Bundle;
-import android.view.View;
 
 import com.example.petfinder.R;
+import com.example.petfinder.container.DrawerNav;
+import com.example.petfinder.databinding.ActivityCreditsBinding;
 
-public class Credits extends AppCompatActivity {
+public class Credits extends DrawerNav {
+
+    ActivityCreditsBinding activityCreditsBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_credits);
 
-        Toolbar myToolbar = findViewById(R.id.credit_toolbar);
-        setSupportActionBar(myToolbar);
+        activityCreditsBinding = ActivityCreditsBinding.inflate(getLayoutInflater());
+        setContentView(activityCreditsBinding.getRoot());
 
-        // Set the custom back arrow as the navigation icon
-        myToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
-
-        // Set a click listener on the navigation icon
-        myToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        allocateActivityTitle("About");
     }
 }

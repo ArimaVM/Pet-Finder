@@ -24,17 +24,28 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.petfinder.R;
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.application.PetFinder;
+import com.example.petfinder.components.Dashboard;
+import com.example.petfinder.components.DeleteAlertDialogue;
 import com.example.petfinder.pages.pet.DisplayPetDetails;
+import com.example.petfinder.pages.pet.EditPet;
+import com.example.petfinder.pages.pet.ScanBluetooth;
 
 import java.util.ArrayList;
 
 public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHolder>{
 
-    private Context context;
-    private ArrayList<RecordModel> recordsList;
-    private int selectedItemPosition = RecyclerView.NO_POSITION;
-    private Boolean isListed;
+    private final Context context;
+    private final ArrayList<RecordModel> recordsList;
+    private final Boolean isListed;
+    private OnRefresh onRefresh;
     DatabaseHelper databaseHelper;
+
+    public interface OnRefresh {
+        void onRefresh();
+    }
+    public void setOnRefresh(OnRefresh onRefresh){
+        this.onRefresh = onRefresh;
+    }
 
     public RecordAdapter(Context context, ArrayList<RecordModel> recordsList, Boolean isListed) {
         this.context = context;
@@ -50,7 +61,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
         return new RecordHolder(view);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onBindViewHolder(@NonNull RecordHolder holder, int position) {
         RecordModel model = recordsList.get(position);
@@ -60,6 +70,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
         String sex = model.getSex();
         String image = model.getImage();
 
+        holder.id = id;
         holder.petName.setText(petName);
         holder.petBreed.setText(breed);
 
@@ -77,15 +88,34 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
             holder.petPic.setImageURI(Uri.parse(image));
         }
 
+        if (!isListed) holder.imageButton.setVisibility(View.GONE);
+
         View.OnClickListener listedClick = view -> {
             PetFinder.getInstance().setCurrentMacAddress(id);
             PetFinder.getInstance().setCurrentPetModel(databaseHelper.getRecordDetails(id));
             context.startActivity(new Intent(context, DisplayPetDetails.class));
         };
         View.OnClickListener unlistedClick = view -> {
-            //TODO: WHAT HAPPENS TO THIS NEW PET.
+            Intent intent = new Intent(context, ScanBluetooth.class);
+            intent.putExtra("UNLISTED", model.getPetFeederID());
+            context.startActivity(intent);
         };
         holder.itemView.setOnClickListener(isListed?listedClick:unlistedClick);
+        holder.imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DeleteAlertDialogue.ShowDeleteAlertDialogue showDeleteAlertDialogue =
+                        new DeleteAlertDialogue().setDatabaseHelper(view.getContext()).setToSingle(holder.id);
+
+                showDeleteAlertDialogue.onActionFinished(new DeleteAlertDialogue.ShowDeleteAlertDialogue.ActionFinished() {
+                    @Override
+                    public void onActionFinished(Boolean value) {
+                        if (onRefresh!=null) onRefresh.onRefresh();
+                    }
+                });
+                showDeleteAlertDialogue.DeleteShow();
+            }
+        });
     }
 
     @Override
@@ -93,12 +123,13 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
         return recordsList.size();
     }
 
-    class RecordHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+    class RecordHolder extends RecyclerView.ViewHolder {
 
         private static final String TAG = "RecordHolder";
         ImageView imageButton;
         ImageView petPic;
         TextView petName, petBreed, petSex;
+        String id;
 
         public RecordHolder(@NonNull View itemView) {
             super(itemView);
@@ -108,65 +139,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
             petBreed = itemView.findViewById(R.id.petbreed);
             petSex = itemView.findViewById(R.id.sexPet);
             imageButton = itemView.findViewById(R.id.imageButton);
-            imageButton.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            showPopupMenu(v);
-        }
-
-        private void showPopupMenu(View view) {
-            PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
-             popupMenu.inflate(R.menu.popup_menu);
-             popupMenu.setOnMenuItemClickListener(this);
-             popupMenu.show();
-        }
-
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.action_popup_delete:
-                    Log.d(TAG, "onMenuItemClick: action_popup_delete");
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
-                    builder.setTitle("Delete Confirmation")
-                            .setMessage("Choose an option:")
-                            .setPositiveButton("Delete in this app", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    deleteSelectedItem();
-                                }
-                            })
-                            .setNegativeButton("Delete in both apps", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    showToast("Deleted in Petfinder and Petfeeder");
-                                }
-                            });
-
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
-
-                    return true;
-
-                default:
-                    return false;
-            }
-        }
-
-        private void showToast(String message) {
-            Toast.makeText(itemView.getContext(), message, Toast.LENGTH_SHORT).show();
-        }
-
-        private void deleteSelectedItem() {
-            int position = getAdapterPosition();
-
-            if (position != RecyclerView.NO_POSITION) {
-                recordsList.remove(position);
-                notifyItemRemoved(position);
-            }
         }
     }
 }

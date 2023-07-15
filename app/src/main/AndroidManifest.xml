@@ -55,9 +55,6 @@
             android:name=".pages.pet.DisplayPetDetails"
             android:exported="false" />
         <activity
-            android:name=".pages.user.UserInfo"
-            android:exported="false" />
-        <activity
             android:name=".pages.pet.EditPet"
             android:exported="false" />
         <activity

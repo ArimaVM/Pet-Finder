@@ -63,6 +63,8 @@ public class PetFinder extends Application implements Application.ActivityLifecy
     Boolean contentProviderExists = false;
     Boolean previousContentProviderExists = false;
 
+    private int drawerNavID = 0;
+
     ArrayList<RecordModel> unlistedPets;
 
     @Override
@@ -84,7 +86,6 @@ public class PetFinder extends Application implements Application.ActivityLifecy
         contentResolver = getContentResolver();
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-
         isContentUriExists();
         contentInitialize();
 
@@ -216,6 +217,9 @@ public class PetFinder extends Application implements Application.ActivityLifecy
         this.currentPetModel = currentPetModel;
     }
 
+    public int getDrawerNavID() {
+        return drawerNavID;
+    }
     public GeofenceData getGeofenceData() {
         if (geofenceData.getLatLng() == null){ geofenceData = databaseHelper.getGeofence(currentMacAddress); }
         //NOTE:
@@ -235,6 +239,10 @@ public class PetFinder extends Application implements Application.ActivityLifecy
     public void updateMapPreferences(){ mapPreferences = databaseHelper.getMapPreferences(currentMacAddress); }
 
     //DATA SETTERS
+    public void setDrawerNavID(int drawerNavID) {
+        this.drawerNavID = drawerNavID;
+    }
+
     @SuppressLint("Range")
     private void setUnlistedPets(){
         if (!contentProviderExists) return;
@@ -255,6 +263,7 @@ public class PetFinder extends Application implements Application.ActivityLifecy
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PETNAME)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BREED)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_SEX)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BIRTHDATE)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_AGE)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_WEIGHT)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE)),

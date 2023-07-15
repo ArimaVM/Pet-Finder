@@ -14,7 +14,7 @@
 
     //Credits
     <string name="credits">CREDITS</string>
-    <string name="credits_info"><b>The Feed and Find Initiative Team</b>\nCheryl Marie Chomis Alimba\nHyrum Roi Sapurco Bravo\nJasper Daile Tuibeo Corpuz\nJohn Homer Sayno Dar\nAr-jay De La Fuente\nKirby Ann Aycardo De Los Reyes\nAngelo Millares Echano\nArriana Mae Vargas Malubay\nIvan Meir Pablo Morada\nRenze Meinard Mortiga\nWendee Davillo Postre\nChristine Magana Toral\nKai Lapak Yaneza\n\n<b>Team Koinu</b>\nCheryl Marie Chomis Alimba\nAngelo Millares Echano\nArriana Mae Vargas Malubay\nIvan Meir Pablo Morada\nRenze Meinard Mortiga\nChristine Magana Toral\nKai Lapak Yaneza\n\n<b>Circuit Designers</b>\nAngelo Millares Echano\nKai Lapak Yaneza\n\n<b>Mobile Developers</b>\nCheryl Marie Chomis Alimba\nArriana Mae Vargas Malubay\nIvan Meir Morada\nAngelo Millares Echano\nKai Lapak Yaneza\n\n<b>Researchers</b>\nRenze Meinard Mortiga\nChristine Magana Toral\n\n<b>Special Thanks To:</b>\nTeam Lumos\nThe Institute of Computer Studies\nCamarines Norte State College\n3A Glass and Aluminum Works and Services\nand\nProfessor Marc Lester Acunin</string>
+    <string name="credits_info"><b>The Feed and Find Initiative Team</b>\nCheryl Marie Chomis Alimba\nHyrum Roi Sapurco Bravo\nJasper Daile Tuibeo Corpuz\nJohn Homer Sayno Dar\nAr-jay De La Fuente\nKirby Ann Aycardo De Los Reyes\nAngelo Millares Echano\nArriana Mae Vargas Malubay\nIvan Meir Pablo Morada\nRenze Meinard Mortiga\nWendee Davillo Postre\nChristine Magana Toral\nKai Lapak Yaneza\n\n<b>Team Koinu</b>\nCheryl Marie Chomis Alimba\nAngelo Millares Echano\nArriana Mae Vargas Malubay\nIvan Meir Pablo Morada\nRenze Meinard Mortiga\nChristine Magana Toral\nKai Lapak Yaneza\n\n<b>Circuit Designers</b>\nAngelo Millares Echano\nKai Lapak Yaneza\n\n<b>Mobile Developers</b>\nCheryl Marie Chomis Alimba\nAngelo Millares Echano\nArriana Mae Vargas Malubay\nIvan Meir Morada\nKai Lapak Yaneza\n\n<b>Researchers</b>\nRenze Meinard Mortiga\nChristine Magana Toral\n\n<b>Special Thanks To:</b>\nTeam Lumos\nThe Institute of Computer Studies\nCamarines Norte State College\n3A Glass and Aluminum Works and Services\nand\nProfessor Marc Lester Acunin</string>
     <string name="logo">logo</string>
     <string name="app">Feed and Find:</string>
     <string name="open">open</string>
@@ -27,8 +27,6 @@
     <string name="strReports">Reports</string>
     <string name="strOther">Other</string>
     <string name="strFeeder">Feeder</string>
-    <string name="strSetting">Settings</string>
-    <string name="strLogout">Log out</string>
     <string name="navigation_header">navigation header</string>
     <string name="my_app">My App</string>
     <string name="addbtn_descrip">Add Pet</string>

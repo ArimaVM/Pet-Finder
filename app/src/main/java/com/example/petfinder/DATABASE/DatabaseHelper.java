@@ -3,11 +3,16 @@ package com.example.petfinder.DATABASE;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.example.petfinder.DataSharing.PetFinderContentProvider;
+import com.example.petfinder.DataSharing.PetProviderConstants;
 import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.container.PetModel;
 import com.example.petfinder.container.RecordModel;
@@ -19,10 +24,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.Collections;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -53,6 +56,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME6);
         onCreate(db);
     }
+
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
+                        String sortOrder, UriMatcher URI_MATCHER, int PETS, Context context) {
+        // Implement the query operation for the Content Provider
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor;
+
+        int match = URI_MATCHER.match(uri);
+        if (match == PETS) {// Query the pets table
+            cursor = db.query(Constants.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+        } else {
+            throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+
+        // Set the notification URI on the cursor
+        if (context != null) {
+            cursor.setNotificationUri(context.getContentResolver(), uri);
+        }
+
+        return cursor;
+    }
+
     public long storeData(String btAddress, String petName, String breed, String sex, String bdate, Integer age,
                           Integer weight, String petPic, String addedtime, String updatedtime) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -73,13 +98,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return id;
     }
+    public long storeData(String btAddress, String petName, String breed, String sex, String bdate, Integer age,
+                          Integer weight, String petPic, String addedtime, String updatedtime, String PetFeederId) {
+        SQLiteDatabase db = this.getWritableDatabase();
 
-    public long updateHealthInfo(String btAddress, String Allergies, String Medications, String VetName, String VetContact) {
+        ContentValues values = new ContentValues();
+        values.put(Constants.COLUMN_ID, btAddress); // Use Bluetooth address as ID
+        values.put(Constants.COLUMN_PETNAME, petName);
+        values.put(Constants.COLUMN_BREED, breed);
+        values.put(Constants.COLUMN_SEX, sex);
+        values.put(Constants.COLUMN_BIRTHDATE, bdate);
+        values.put(Constants.COLUMN_AGE, age);
+        values.put(Constants.COLUMN_WEIGHT, weight);
+        values.put(Constants.COLUMN_IMAGE, petPic);
+        values.put(Constants.COLUMN_ADDED_TIMESTAMP, addedtime);
+        values.put(Constants.COLUMN_UPDATED_TIMESTAMP, updatedtime);
+        values.put(Constants.COLUMN_PET_FEEDER_ID, PetFeederId);
+
+        long id = db.insertWithOnConflict(Constants.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+        db.close();
+
+        //CALLING THIS FUNCTION MEANS THAT WHAT WAS STORED HAS A PET FEEDER ID. UPDATE THE PET FEEDER PET INFO.
+        if (PetFinder.getInstance().getContentProviderExists()) {
+            values.remove(Constants.COLUMN_ID);
+            values.put(Constants.COLUMN_ID, PetFeederId);
+            values.remove(Constants.COLUMN_PET_FEEDER_ID);
+            values.put(Constants.COLUMN_PET_FINDER_ID, btAddress);
+            PetFinder.getInstance().getCResolver().update(PetProviderConstants.CONTENT_URI_PETS, values, null, null);
+        }
+        return id;
+    }
+
+    public long updateHealthInfo(String btAddress, String Allergies, String treats, String Medications, String VetName, String VetContact) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(Constants.COLUMN_ID, btAddress); // Use Bluetooth address as ID
         values.put(Constants.COLUMN_ALLERGIES, Allergies);
+        values.put(Constants.COLUMN_TREATS, treats);
         values.put(Constants.COLUMN_MEDICATIONS, Medications);
         values.put(Constants.COLUMN_VETNAME, VetName);
         values.put(Constants.COLUMN_VETCONTACT, VetContact);
@@ -150,24 +206,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long id = db.insert(Constants.TABLE_NAME3, null, values);  // Corrected table name usage
         db.close();
-
-        //INSERT TO PET FEEDER IF THE FOLLOWING CONDITIONS ARE MET:
-        // - IF PET IS IMPORTED TO THE PET FEEDER.
-        // - IF PET FEEDER IS INSTALLED IN THE SYSTEM.
-        PetFinder petFinder = PetFinder.getInstance();
-        if (petFinder.getContentProviderExists()) {
-            String petFeederID = getPetFeederIDFromId(MAC_ADDRESS);
-            if (petFeederID != null) {
-                values.remove(Constants.COLUMN_ID);
-                values.put(Constants.COLUMN_ID, petFeederID);
-                petFinder.getCResolver().insert(PetFinderContentProvider.CONTENT_URI_STEP, values);
-            }
-        }
         return id;
     }
 
     public int updateData(String id, String petName, String breed, String sex, String bdate, Integer age,
-                           Integer weight, String petPic, String addedtime, String updatedtime, String petFeederID) {
+                           Integer weight, String petPic, String updatedtime, String petFeederID) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -178,14 +221,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Constants.COLUMN_AGE, age);
         values.put(Constants.COLUMN_WEIGHT, weight);
         values.put(Constants.COLUMN_IMAGE, petPic);
-        values.put(Constants.COLUMN_ADDED_TIMESTAMP, addedtime);
         values.put(Constants.COLUMN_UPDATED_TIMESTAMP, updatedtime);
         values.put(Constants.COLUMN_PET_FEEDER_ID, petFeederID);
 
         int returnValue =
                 db.update(Constants.TABLE_NAME, values, Constants.COLUMN_ID +" = ?", new String[] {id});
 
-        //INSERT TO PET FEEDER IF THE FOLLOWING CONDITIONS ARE MET:
+        //UPDATE TO PET FEEDER IF THE FOLLOWING CONDITIONS ARE MET:
         // - IF PET IS IMPORTED TO THE PET FEEDER.
         // - IF PET FEEDER IS INSTALLED IN THE SYSTEM.
         PetFinder petFinder = PetFinder.getInstance();
@@ -194,7 +236,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 values.put(Constants.COLUMN_ID, petFeederID);
                 values.remove(Constants.COLUMN_PET_FEEDER_ID);
                 values.put(Constants.COLUMN_PET_FINDER_ID, id);
-                petFinder.getCResolver().insert(PetFinderContentProvider.CONTENT_URI_PETS, values);
+                petFinder.getCResolver().update(PetFinderContentProvider.CONTENT_URI_PETS, values, null, null);
             }
         }
 
@@ -215,19 +257,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.update(Constants.TABLE_NAME3, values, Constants.COLUMN_DATE +" = ? AND "+ Constants.COLUMN_ID +"= ?", new String[] {date, id});
         db.close();
-
-        //INSERT TO PET FEEDER IF THE FOLLOWING CONDITIONS ARE MET:
-        // - IF PET IS IMPORTED TO THE PET FEEDER.
-        // - IF PET FEEDER IS INSTALLED IN THE SYSTEM.
-        PetFinder petFinder = PetFinder.getInstance();
-        if (petFinder.getContentProviderExists()) {
-            String petFeederID = getPetFeederIDFromId(id);
-            if (petFeederID != null) {
-                values.remove(Constants.COLUMN_ID);
-                values.put(Constants.COLUMN_ID, petFeederID);
-                petFinder.getCResolver().update(PetFinderContentProvider.CONTENT_URI_STEP, values, null);
-            }
-        }
     }
 
     public ArrayList<RecordModel> getAllRecords (String orderby) {
@@ -243,6 +272,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PETNAME)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BREED)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_SEX)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BIRTHDATE)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_AGE)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_WEIGHT)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE)),
@@ -324,6 +354,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PETNAME)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BREED)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_SEX)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_BIRTHDATE)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_AGE)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_WEIGHT)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE)),
@@ -337,7 +368,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return recordsList;
     }
 
-    public void deleteData(String id) {
+    public void deleteData(String id, Boolean deleteInBothApps) {
+        if (PetFinder.getInstance().getContentProviderExists()) {
+            String petId = getPetFeederIDFromId(id);
+            if (petId!=null) {
+                String whereClause = Constants.COLUMN_ID + " = ? ";
+                if (deleteInBothApps) {
+                    PetFinder.getInstance().getCResolver().delete(PetProviderConstants.CONTENT_URI_PETS,
+                            whereClause,
+                            new String[]{petId});
+                } else {
+                    PetModel petModel = getRecordDetails(id);
+                    ContentValues values = new ContentValues();
+                    values.put(Constants.COLUMN_ID, petId); // Use Bluetooth address as ID
+                    values.put(Constants.COLUMN_PETNAME, petModel.getName());
+                    values.put(Constants.COLUMN_BREED, petModel.getBreed());
+                    values.put(Constants.COLUMN_SEX, petModel.getSex());
+                    values.put(Constants.COLUMN_BIRTHDATE, petModel.getBirthdate());
+                    values.put(Constants.COLUMN_AGE, petModel.getAge());
+                    values.put(Constants.COLUMN_WEIGHT, petModel.getWeight());
+                    values.put(Constants.COLUMN_IMAGE, petModel.getImage());
+                    values.put(Constants.COLUMN_ADDED_TIMESTAMP, petModel.getAdded_timestamp());
+                    values.put(Constants.COLUMN_UPDATED_TIMESTAMP, System.currentTimeMillis());
+                    values.putNull(Constants.COLUMN_PET_FINDER_ID);
+
+                    PetFinder.getInstance().getCResolver().update(PetProviderConstants.CONTENT_URI_PETS,
+                            values,
+                            whereClause,
+                            new String[]{petId});
+                }
+            }
+        }
         SQLiteDatabase db = getWritableDatabase();
         //DELETE TO ALL TABLES WHERE DATA IS ABOUT PET.
         db.delete(Constants.TABLE_NAME, Constants.COLUMN_ID + " = ?", new String[]{id});
@@ -347,14 +408,61 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete(Constants.TABLE_NAME5, Constants.COLUMN_ID + " = ?", new String[]{id});
         db.delete(Constants.TABLE_NAME6, Constants.COLUMN_ID + " = ?", new String[]{id});
         db.close();
-
-        //TODO: ALSO DELETE IN PET FEEDER IF NECESSARY.
     }
-    public void deleteAllData(){
+    @SuppressLint("Range")
+    public void deleteAllData(Boolean deleteInBothApps){
+        if (PetFinder.getInstance().getContentProviderExists()) {
+            if (deleteInBothApps){
+                //get all pet IDs
+                Cursor cursor = getAllPets();
+                ArrayList<String> petIds = new ArrayList<>();
+                while (cursor.moveToNext()){
+                    String id = getPetFeederIDFromId(cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID)));
+                    if (id!=null) petIds.add(id);
+                }
+                if (petIds.size()!=0) {
+                    String whereClause = Constants.COLUMN_ID + " IN (" + TextUtils.join(",",
+                            Collections.nCopies(petIds.size(), "?")) + ")";
+                    PetFinder.getInstance().getCResolver().delete(PetProviderConstants.CONTENT_URI_PETS,
+                            whereClause,
+                            petIds.toArray(new String[petIds.size()]));
+                }
+            } else {
+                Cursor cursor = getAllPets();
+                while (cursor.moveToNext()){
+                    String petFinderID = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID));
+                    String petFeederID = getPetFeederIDFromId(petFinderID);
+                    if (petFeederID!=null){
+                        PetModel petModel = getRecordDetails(petFinderID);
+                        ContentValues values = new ContentValues();
+                        values.put(Constants.COLUMN_ID, petFeederID); // Use Bluetooth address as ID
+                        values.put(Constants.COLUMN_PETNAME, petModel.getName());
+                        values.put(Constants.COLUMN_BREED, petModel.getBreed());
+                        values.put(Constants.COLUMN_SEX, petModel.getSex());
+                        values.put(Constants.COLUMN_BIRTHDATE, petModel.getBirthdate());
+                        values.put(Constants.COLUMN_AGE, petModel.getAge());
+                        values.put(Constants.COLUMN_WEIGHT, petModel.getWeight());
+                        values.put(Constants.COLUMN_IMAGE, petModel.getImage());
+                        values.put(Constants.COLUMN_ADDED_TIMESTAMP, petModel.getAdded_timestamp());
+                        values.put(Constants.COLUMN_UPDATED_TIMESTAMP, System.currentTimeMillis());
+                        values.putNull(Constants.COLUMN_PET_FINDER_ID);
+                        PetFinder.getInstance().getCResolver().update(PetProviderConstants.CONTENT_URI_PETS,
+                                values,
+                                Constants.COLUMN_ID + " = ? ",
+                                new String[]{petFeederID});
+                    };
+                }
+            }
+        }
+
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DELETE FROM " + Constants.TABLE_NAME);
+        db.execSQL("DELETE FROM " + Constants.TABLE_NAME2);
+        db.execSQL("DELETE FROM " + Constants.TABLE_NAME3);
+        db.execSQL("DELETE FROM " + Constants.TABLE_NAME4);
+        db.execSQL("DELETE FROM " + Constants.TABLE_NAME5);
+        db.execSQL("DELETE FROM " + Constants.TABLE_NAME6);
         db.close();
-        //TODO: ALSO DELETE IN PET FEEDER IF NECESSARY.
     }
 
     public int deleteData(String whereClause, String[] whereValues) {
@@ -398,7 +506,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         PetModel petModel = new PetModel();
-
         if (cursor.moveToFirst()) {
             do {
                 petModel.setMAC_ADDRESS(
@@ -419,10 +526,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE)));
                 petModel.setPetFeederID(
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PET_FEEDER_ID)));
+                petModel.setAdded_timestamp(
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ADDED_TIMESTAMP)));
+                petModel.setUpdated_timestamp(
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_UPDATED_TIMESTAMP)));
             } while (cursor.moveToNext());
         }
-        db.close();
 
+        selectQuery = "SELECT * FROM " + Constants.TABLE_NAME5 + " WHERE " + Constants.COLUMN_ID + "=\"" + recordID + "\"";
+        cursor = db.rawQuery(selectQuery, null);
+        if (cursor.getCount()>0) {
+            if (cursor.moveToFirst()) {
+                petModel.setAllergies(
+                        "" + cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ALLERGIES)));
+                petModel.setTreats(
+                        "" + cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TREATS)));
+                petModel.setMedications(
+                        "" + cursor.getString(cursor.getColumnIndex(Constants.COLUMN_MEDICATIONS)));
+                petModel.setVetName(
+                        "" + cursor.getString(cursor.getColumnIndex(Constants.COLUMN_VETNAME)));
+                petModel.setVetContact(
+                        cursor.getString(cursor.getColumnIndex(Constants.COLUMN_VETCONTACT)));
+            }
+        }
+        db.close();
         return petModel;
     }
 
@@ -562,6 +689,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     @SuppressLint("Range")
     public String getPetFeederIDFromId(String MAC_ADDRESS) {
+        if (MAC_ADDRESS==null) return null;
         String query = "SELECT " + Constants.COLUMN_PET_FEEDER_ID + " FROM " + Constants.TABLE_NAME + " WHERE " + Constants.COLUMN_ID + " = ?";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, new String[]{MAC_ADDRESS});

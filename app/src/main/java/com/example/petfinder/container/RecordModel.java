@@ -1,13 +1,14 @@
 package com.example.petfinder.container;
 
 public class RecordModel {
-    String id, name, breed, sex, age, weight, image, addedtime, updatedtime, petFeederID;
+    String id, name, breed, sex, age, birthdate, weight, image, addedtime, updatedtime, petFeederID;
 
-    public RecordModel(String id, String name, String breed, String sex, String age, String weight, String image, String addedtime, String updatedtime) {
+    public RecordModel(String id, String name, String breed, String sex, String birthdate, String age, String weight, String image, String addedtime, String updatedtime) {
         this.id = id;
         this.name = name;
         this.breed = breed;
         this.sex = sex;
+        this.birthdate = birthdate;
         this.age = age;
         this.weight = weight;
         this.image = image;
@@ -15,11 +16,12 @@ public class RecordModel {
         this.updatedtime = updatedtime;
         this.petFeederID = null;
     }
-    public RecordModel(String id, String name, String breed, String sex, String age, String weight, String image, String addedtime, String updatedtime, String petFeederId) {
+    public RecordModel(String id, String name, String breed, String sex, String birthdate, String age, String weight, String image, String addedtime, String updatedtime, String petFeederId) {
         this.id = id;
         this.name = name;
         this.breed = breed;
         this.sex = sex;
+        this.birthdate = birthdate;
         this.age = age;
         this.weight = weight;
         this.image = image;
@@ -54,6 +56,13 @@ public class RecordModel {
     }
     public void setSex(String sex) {
         this.sex = sex;
+    }
+
+    public String getBirthdate() {
+        return birthdate;
+    }
+    public void setBirthdate(String birthdate) {
+        this.birthdate = birthdate;
     }
 
     public String getAge() {

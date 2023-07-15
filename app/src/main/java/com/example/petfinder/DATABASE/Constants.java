@@ -3,7 +3,7 @@ package com.example.petfinder.DATABASE;
 public class Constants {
 
     public static final String DATABASE_NAME = "PetKoinu.db";
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 6;
 
     //TABLE1
     public static final String TABLE_NAME = "PetRecord";
@@ -58,7 +58,8 @@ public class Constants {
             + COLUMN_NUMSTEPS + " INTEGER, "
             + COLUMN_DATE + " TEXT, "
             + COLUMN_ID + " TEXT, "
-            + "FOREIGN KEY(" + COLUMN_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + "));";
+            + "FOREIGN KEY(" + COLUMN_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + "), "
+            + "UNIQUE (" + COLUMN_DATE + ", " + COLUMN_ID + "));";
 
 
     //TABLE4
@@ -82,6 +83,7 @@ public class Constants {
     public static final String TABLE_NAME5 = "PetMoreInfo";
     public static final String COLUMN_ID5 = "_id5";
     public static final String COLUMN_ALLERGIES = "allergies";
+    public static final String COLUMN_TREATS = "treats";
     public static final String COLUMN_MEDICATIONS = "medications";
     public static final String COLUMN_VETNAME = "vetName";
     public static final String COLUMN_VETCONTACT = "vetContact";
@@ -89,6 +91,7 @@ public class Constants {
     public static String query5 = "CREATE TABLE " + TABLE_NAME5 + "("
             + COLUMN_ID5 + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_ALLERGIES + " TEXT, "
+            + COLUMN_TREATS + " TEXT, "
             + COLUMN_MEDICATIONS + " TEXT, "
             + COLUMN_VETNAME + " TEXT, "
             + COLUMN_VETCONTACT + " TEXT, "

@@ -7,19 +7,6 @@
     android:background="@drawable/purple_background"
     tools:context=".components.Credits">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/credit_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="#6823EA"
-        android:elevation="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Credits"
-        app:titleTextColor="@color/white"/>
-
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
@@ -40,52 +27,45 @@
             <ImageView
                 android:id="@+id/imageView3"
                 android:layout_width="151dp"
-                android:layout_height="273dp"
-                android:layout_marginTop="10dp"
+                android:layout_height="170dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.503"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0"
-                app:srcCompat="@drawable/tffi_logo" />
+                app:srcCompat="@drawable/tffi_logo"  />
 
             <TextView
                 android:id="@+id/title2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-50dp"
-                android:layout_marginBottom="436dp"
                 android:text="@string/credits"
                 android:textAlignment="center"
                 android:textColor="#090909"
                 android:textSize="25sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView3"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
             <TextView
-                android:id="@+id/aboutText"
+                android:id="@+id/creditsText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/rounded_corner_background"
+                android:justificationMode="inter_word"
                 android:padding="16dp"
                 android:text="@string/credits_info"
-                android:textAlignment="center"
                 android:textColor="#090909"
-                android:textSize="18sp"
+                android:textSize="22sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView3"
+                app:layout_constraintTop_toBottomOf="@+id/title2"
                 app:layout_constraintWidth_default="wrap"
-                app:layout_constraintWidth_max="350dp"
-                app:layout_constraintWidth_percent="0.9" />
+                app:layout_constraintWidth_max="350dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

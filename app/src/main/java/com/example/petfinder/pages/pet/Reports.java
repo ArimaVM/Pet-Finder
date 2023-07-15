@@ -249,8 +249,8 @@ public class Reports extends AppCompatActivity {
                         gpsPieChart = layout.findViewById(R.id.gpsPieChart);
                         showGPSPieChart(GPSMode.DAILY);
                     } else {
-                        findViewById(R.id.noGeofence).setVisibility(View.VISIBLE);
-                        findViewById(R.id.geofenceChart).setVisibility(View.GONE);
+                        layout.findViewById(R.id.noGeofence).setVisibility(View.VISIBLE);
+                        layout.findViewById(R.id.geofenceChart).setVisibility(View.GONE);
                     }
                     break;
                 case R.layout.reports_gps2:
@@ -691,7 +691,7 @@ public class Reports extends AppCompatActivity {
                         R.color.purple_200);
             }
             //set map view
-            googleMap2.animateCamera(CameraUpdateFactory.newLatLngZoom(view, 20));
+            if (view!=null) googleMap2.animateCamera(CameraUpdateFactory.newLatLngZoom(view, 20));
 
         }
         private void setMarker(GoogleMap googleMap, LatLng latLng, Double radius, String color, Double scale, Integer strokeColor, Integer fillColor){
@@ -769,7 +769,7 @@ public class Reports extends AppCompatActivity {
             }
 
             //set map view
-            googleMap3.animateCamera(CameraUpdateFactory.newLatLngZoom(view, 20));
+            if (view!=null) googleMap3.animateCamera(CameraUpdateFactory.newLatLngZoom(view, 20));
 
         }
         private void drawMarker(List<LatLng> l) {

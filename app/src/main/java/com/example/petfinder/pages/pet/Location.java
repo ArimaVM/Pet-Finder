@@ -572,7 +572,7 @@ public class Location extends AppCompatActivity {
                     GEOFENCE_LATLNG_CONSTANT = petFinder.getGeofenceData().getLatLng();
                     GEOFENCE_RADIUS_CONSTANT = petFinder.getGeofenceData().getRadius();
                 } else {
-                    geofencePreference.setVisibility(View.GONE);
+                    if (geofencePreference!=null) geofencePreference.setVisibility(View.GONE);
                 }
 
                 //SET WARNING

@@ -10,9 +10,12 @@ import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,10 +34,23 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.petfinder.application.PetFinder;
-import com.example.petfinder.container.ScanBTListViewAdapter;
+import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
+import com.example.petfinder.application.PetFinder;
 import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
+import com.example.petfinder.components.Dashboard;
+import com.example.petfinder.container.RecordModel;
+import com.example.petfinder.container.ScanBTListViewAdapter;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.maps.model.Dash;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +76,7 @@ public class ScanBluetooth extends AppCompatActivity
     PetFinder petFinder;
 
     private boolean isScanning = false;
+    private String unlistedID = "";
 
     private BluetoothGatt bluetoothGatt;
     private BluetoothGattCharacteristic characteristic;
@@ -98,6 +115,11 @@ public class ScanBluetooth extends AppCompatActivity
             return;
         }
 
+        if (getIntent().hasExtra("UNLISTED")){
+            //if contains `UNLISTED`, it means the purpose of this is to import.
+            unlistedID = getIntent().getStringExtra("UNLISTED");
+        }
+
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
@@ -130,14 +152,11 @@ public class ScanBluetooth extends AppCompatActivity
         if (bluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth not supported", Toast.LENGTH_SHORT).show();
             finish();
-        } else if (!bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-
-        // Check if location permission is granted
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+        } else {
+            if (!bluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            } else checkLocationPermissions();
         }
 
         // Initialize the Bluetooth LE scanner and scan settings
@@ -164,14 +183,7 @@ public class ScanBluetooth extends AppCompatActivity
             if (isScanning) {
                 stopScan();
             } else {
-                // Check if location permission is granted
-                if (ContextCompat.checkSelfPermission(ScanBluetooth.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    // Location permission is granted, start scanning
-                    startScan();
-                } else {
-                    // Location permission is not granted, request the permission
-                    ActivityCompat.requestPermissions(ScanBluetooth.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
-                }
+                startScan();
             }
         });
 
@@ -196,6 +208,16 @@ public class ScanBluetooth extends AppCompatActivity
             }
         } else {
             makeToastOnUI("An error occured. Please try again later.");
+        }
+    }
+
+    public void checkLocationPermissions(){
+        //CHECK IF PERMISSION IS GRANTED
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+        } else {
+            //REQUEST TO ENABLE LOCATION IF PERMISSION IS GRANTED.
+            enableLoc();
         }
     }
 
@@ -276,24 +298,12 @@ public class ScanBluetooth extends AppCompatActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Location permission granted, start scanning
-                startScan();
+                //ENABLE LOCATION
+                enableLoc();
             } else {
-                // Location permission denied, show a dialog and ask the user to grant permission
-                new AlertDialog.Builder(this)
-                        .setTitle("Location Permission Required")
-                        .setMessage("Please grant location permission to scan for Bluetooth devices.")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Open app settings to allow the user to grant permission
-                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                intent.setData(Uri.fromParts("package", getPackageName(), null));
-                                startActivity(intent);
-                            }
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
+                Toast.makeText(this, "Location services is necessary to scan the device.", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(ScanBluetooth.this, Dashboard.class));
+                finish();
             }
         }
     }
@@ -306,9 +316,12 @@ public class ScanBluetooth extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 // Bluetooth is enabled, initialize the Bluetooth LE scanner
                 bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+                checkLocationPermissions();
             } else {
                 // Bluetooth enabling was canceled or failed, handle the error
-                Toast.makeText(this, "Failed to enable Bluetooth", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Bluetooth is necessary to scan the device.", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(ScanBluetooth.this, Dashboard.class));
+                finish();
             }
         }
     }
@@ -334,6 +347,42 @@ public class ScanBluetooth extends AppCompatActivity
         askForVerification();
     }
 
+    private void enableLoc() {
+
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(30 * 1000);
+        locationRequest.setFastestInterval(5 * 1000);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+
+        builder.setAlwaysShow(true);
+
+        Task<LocationSettingsResponse> result =
+                LocationServices.getSettingsClient(this).checkLocationSettings(builder.build());
+        result.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
+            @Override
+            public void onComplete(Task<LocationSettingsResponse> task) {
+                try {
+                    LocationSettingsResponse response = task.getResult(ApiException.class);
+                } catch (ApiException exception) {
+                    switch (exception.getStatusCode()) {
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            try {
+                                ResolvableApiException resolvable = (ResolvableApiException) exception;
+                                resolvable.startResolutionForResult(
+                                        ScanBluetooth.this, 1001);
+                            } catch (IntentSender.SendIntentException ignored) {}
+                            break;
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE: break;
+                    }
+                }
+            }
+        });
+
+    }
+
     @Override
     public void onItemClick(int position, boolean isUsed) {
 
@@ -344,7 +393,10 @@ public class ScanBluetooth extends AppCompatActivity
             petFinder.setCurrentMacAddress(bluetoothAddress);
             ScanBluetooth.this.startActivity(new Intent(ScanBluetooth.this, DisplayPetDetails.class));
             finish();
-        } else connectToDevice(device);
+        } else {
+            Toast.makeText(ScanBluetooth.this, "Trying to connect...", Toast.LENGTH_SHORT).show();
+            connectToDevice(device);
+        }
     }
 
     @Override
@@ -370,12 +422,36 @@ public class ScanBluetooth extends AppCompatActivity
                if (petFinder.bluetoothObject.isNull()){...}
         */
         petFinder.setBluetoothObject(bluetoothGatt, characteristic, bluetoothGattCallbackHandler);
+        if (unlistedID.isEmpty()) {
+            petFinder.setCurrentMacAddress(bluetoothAddress);
+            startActivity(new Intent(ScanBluetooth.this, AddPet.class));
+            finish();
+        } else {
+            petFinder.setCurrentMacAddress(bluetoothAddress);
+            DatabaseHelper databaseHelper = new DatabaseHelper(this);
+            RecordModel petModel = null;
+            for (RecordModel recordModel: PetFinder.getInstance().getUnlistedPets()) {
+                if (recordModel.getPetFeederID().equals(unlistedID)) petModel = recordModel;
+            }
+            if (petModel!=null) {
+                databaseHelper.storeData(
+                        ""+bluetoothAddress,
+                        ""+petModel.getName(),
+                        ""+petModel.getBreed(),
+                        ""+petModel.getSex(),
+                        ""+petModel.getBirthdate(),
+                        Integer.parseInt(petModel.getAge()),
+                        Integer.parseInt(petModel.getWeight()),
+                        ""+petModel.getImage(),
+                        ""+petModel.getAddedtime(),
+                        ""+petModel.getUpdatedtime(),
+                        ""+unlistedID
+                        );
+            }
 
-        petFinder.setCurrentMacAddress(bluetoothAddress);
-        Intent intent = new Intent(ScanBluetooth.this, AddPet.class);
-        intent.putExtra("isEditMode", false);
-        startActivity(intent);
-        finish();
+            startActivity(new Intent(ScanBluetooth.this, DisplayPetDetails.class));
+            finish();
+        }
     }
 
     private void disconnectGatt() {

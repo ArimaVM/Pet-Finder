@@ -1,26 +1,29 @@
 package com.example.petfinder.container;
 
-import java.util.List;
-
 public class PetModel {
-    String MAC_ADDRESS, Name, Breed, Sex, Birthdate, VetName, VetContact, Image, PetFeederID;
+    String MAC_ADDRESS, Name, Breed, Sex, Birthdate, Allergies, Treats, Medications, VetName, VetContact, Image, PetFeederID;
     Integer Age, Weight;
-    List<String> Allergies, Medications;
+    String added_timestamp, updated_timestamp;
 
     public void nullify(){
-        MAC_ADDRESS = null;
-        Name = null;
-        Breed = null;
-        Sex = null;
-        Birthdate = null;
-        VetName = null;
-        VetContact = null;
-        Image = null;
-        Age = null;
-        Weight = null;
-        Allergies = null;
-        Medications = null;
-        PetFeederID = null;
+        MAC_ADDRESS = "";
+        Name = "";
+        Breed = "";
+        Sex = "";
+        Birthdate = "";
+        VetName = "";
+        VetContact = "";
+        Image = "";
+        Age = 0;
+        Weight = 0;
+        Allergies = "";
+        Treats = "";
+        Medications = "";
+        PetFeederID = "";
+    }
+
+    public PetModel() {
+        nullify();
     }
 
     public String getMAC_ADDRESS() {
@@ -65,20 +68,6 @@ public class PetModel {
         Birthdate = birthdate;
     }
 
-    public String getVetName() {
-        return VetName;
-    }
-    public void setVetName(String vetName) {
-        VetName = vetName;
-    }
-
-    public String getVetContact() {
-        return VetContact;
-    }
-    public void setVetContact(String vetContact) {
-        VetContact = vetContact;
-    }
-
     public Integer getAge() {
         return Age;
     }
@@ -93,18 +82,39 @@ public class PetModel {
         Weight = weight;
     }
 
-    public List<String> getAllergies() {
+    public String getAllergies() {
         return Allergies;
     }
-    public void setAllergies(List<String> allergies) {
+    public void setAllergies(String allergies) {
         Allergies = allergies;
     }
 
-    public List<String> getMedications() {
+    public String getTreats() {
+        return Treats;
+    }
+    public void setTreats(String treats) {
+        Treats = treats;
+    }
+
+    public String getMedications() {
         return Medications;
     }
-    public void setMedications(List<String> medications) {
+    public void setMedications(String medications) {
         Medications = medications;
+    }
+
+    public String getVetName() {
+        return VetName;
+    }
+    public void setVetName(String vetName) {
+        VetName = vetName;
+    }
+
+    public String getVetContact() {
+        return VetContact;
+    }
+    public void setVetContact(String vetContact) {
+        VetContact = vetContact;
     }
 
     public String getPetFeederID() {
@@ -112,5 +122,19 @@ public class PetModel {
     }
     public void setPetFeederID(String petFeederID) {
         PetFeederID = petFeederID;
+    }
+
+    public String getAdded_timestamp() {
+        return added_timestamp;
+    }
+    public void setAdded_timestamp(String added_timestamp) {
+        this.added_timestamp = added_timestamp;
+    }
+
+    public String getUpdated_timestamp() {
+        return updated_timestamp;
+    }
+    public void setUpdated_timestamp(String updated_timestamp) {
+        this.updated_timestamp = updated_timestamp;
     }
 }

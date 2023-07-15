@@ -1,9 +1,13 @@
 package com.example.petfinder.components;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothGatt;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +21,7 @@ import com.example.petfinder.DATABASE.Constants;
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
 import com.example.petfinder.application.PetFinder;
+import com.example.petfinder.bluetooth.BluetoothGattCallbackHandler;
 import com.example.petfinder.container.DrawerNav;
 import com.example.petfinder.container.RecordAdapter;
 import com.example.petfinder.databinding.ActivityDashboardBinding;
@@ -51,6 +56,15 @@ public class Dashboard extends DrawerNav {
 
         loadRecords(orderByNewest);
 
+        //MAKE SURE USER IS DISCONNECTED TO BLUETOOTH
+        if (!PetFinder.getInstance().getBluetoothObject().isNull()){
+            BluetoothGatt gatt = PetFinder.getInstance().getBluetoothObject().getBluetoothGatt();
+            gatt.disconnect();
+            gatt.close();
+            PetFinder.getInstance().deleteBluetoothObject();
+            PetFinder.getInstance().removeCurrentMacAddress();
+        }
+
         activityDashboardBinding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -64,6 +78,12 @@ public class Dashboard extends DrawerNav {
         currentOrderByStatus = orderBy;
         RecordAdapter recordAdapter = new RecordAdapter(Dashboard.this,
                 databaseHelper.getAllRecords(orderBy), true);
+        recordAdapter.setOnRefresh(new RecordAdapter.OnRefresh() {
+            @Override
+            public void onRefresh() {
+                onResume();
+            }
+        });
         recordsView.setAdapter(recordAdapter);
 
         if (!PetFinder.getInstance().getUnlistedPets().isEmpty()) {
@@ -113,36 +133,25 @@ public class Dashboard extends DrawerNav {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id ==R.id.sort){
-            sortOptionDialog();
-        }
-        else if (id ==R.id.deleteAll){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Delete Confirmation")
-                    .setMessage("Choose an option:")
-                    .setPositiveButton("Delete in this app", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            databaseHelper.deleteAllData();
-                        }
-                    })
-                    .setNegativeButton("Delete in both apps", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            showToast("Deleted in Petfinder and Petfeeder");
-                        }
-                    });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-            onResume();
+        switch (item.getItemId()){
+            case R.id.sort:
+                sortOptionDialog();
+                break;
+            case R.id.deleteAll:
+                openDeleteDialouge();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    private void openDeleteDialouge() {
+        DeleteAlertDialogue.ShowDeleteAlertDialogue showDeleteAlertDialogue = new DeleteAlertDialogue().setDatabaseHelper(this).setToAll();
+        showDeleteAlertDialogue.onActionFinished(new DeleteAlertDialogue.ShowDeleteAlertDialogue.ActionFinished() {
+            @Override
+            public void onActionFinished(Boolean value) {
+                loadRecords(orderByNewest);
+            }
+        });
+        showDeleteAlertDialogue.DeleteShow();
     }
 
     private void sortOptionDialog() {
@@ -167,5 +176,27 @@ public class Dashboard extends DrawerNav {
                     }
                 })
                 .create().show();
+    }
+
+    boolean doubleBackToExitPressedOnce = false;
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast toast = Toast.makeText(this, "Click again to exit.", Toast.LENGTH_SHORT);
+        toast.show();
+
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                toast.cancel();
+                doubleBackToExitPressedOnce=false;
+            }
+        }, 2000);
     }
 }

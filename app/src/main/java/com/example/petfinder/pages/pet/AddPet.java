@@ -305,8 +305,6 @@ public class AddPet extends AppCompatActivity {
         weight = Integer.valueOf(pweight.getText().toString().trim());
         btAddress = mMacData.getText().toString().trim();
 
-        Intent intent = new Intent(AddPet.this, EditPet.class);
-        intent.putExtra("isEditMode", false); // Set the edit mode to false, as it's a new pet
         petFinder.setCurrentMacAddress(btAddress);
         String timestamp = ""+System.currentTimeMillis();
         long id = databaseHelper.storeData(

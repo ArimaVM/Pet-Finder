@@ -14,6 +14,7 @@ import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,6 +32,8 @@ import com.blogspot.atifsoftwares.circularimageview.CircularImageView;
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.R;
 import com.example.petfinder.application.PetFinder;
+import com.example.petfinder.components.Dashboard;
+import com.example.petfinder.components.DeleteAlertDialogue;
 import com.example.petfinder.container.PetModel;
 import com.google.android.material.textfield.TextInputEditText;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -59,7 +62,6 @@ public class EditPet extends AppCompatActivity {
     private Uri imageUri;
     private  String pet_id, pname, breed, sex, birthday, addedTime, updatedTime, PFID;
     private Integer age, weight;
-    private boolean isEditMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,42 +80,36 @@ public class EditPet extends AppCompatActivity {
         med = findViewById(R.id.medication);
         vetName = findViewById(R.id.vetName);
         vetNum = findViewById(R.id.vetContact);
+
         databaseHelper = new DatabaseHelper(this);
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-        Intent intent = getIntent();
-        isEditMode = intent.getBooleanExtra("isEditMode", false);
-        if (isEditMode){
-            PetModel petModel = PetFinder.getInstance().getCurrentPetModel();
-            pet_id = petModel.getMAC_ADDRESS();
-            pname = petModel.getName();
-            breed = petModel.getBreed();
-            sex = petModel.getSex();
-            birthday = petModel.getBirthdate();
-            age = Period.between(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("d/M/yyyy")),
-                    LocalDate.now()).getYears();
-            weight = petModel.getWeight();
-            imageUri = Uri.parse(petModel.getImage());
-            PFID = petModel.getPetFeederID();
-            petName.setText(pname);
-            petBreed.setText(breed);
-            // Set the selected radio button based on the sex
-            if (sex.equals("Male")) {
-                psex.check(R.id.maleRB);
-            } else if (sex.equals("Female")) {
-                psex.check(R.id.femaleRB);
-            }
-            bdate.setText(birthday);
-            petAge.setText(String.valueOf(age));
-            petWeight.setText(String.valueOf(weight));
+        PetModel petModel = PetFinder.getInstance().getCurrentPetModel();
+        pet_id = petModel.getMAC_ADDRESS();
+        pname = petModel.getName();
+        breed = petModel.getBreed();
+        sex = petModel.getSex();
+        birthday = petModel.getBirthdate();
+        age = Period.between(LocalDate.parse(birthday, DateTimeFormatter.ofPattern("d/M/yyyy")),
+                LocalDate.now()).getYears();
+        weight = petModel.getWeight();
+        imageUri = Uri.parse(petModel.getImage());
+        PFID = petModel.getPetFeederID();
+        petName.setText(pname);
+        petBreed.setText(breed);
+        psex.check(sex.equals("Male")?R.id.maleRB:R.id.femaleRB);
+        bdate.setText(birthday);
+        petAge.setText(String.valueOf(age));
+        petWeight.setText(String.valueOf(weight));
+        allergies.setText(petModel.getAllergies());
+        treats.setText(petModel.getTreats());
+        med.setText(petModel.getMedications());
+        vetName.setText(petModel.getVetName());
+        vetNum.setText(petModel.getVetContact());
 
-            if (imageUri.equals("null")) {
-                picture.setImageResource(R.drawable.profile);
-            } else {
-                picture.setImageURI(imageUri);
-            }
-        }
+        if (imageUri.equals("null")) picture.setImageResource(R.drawable.profile);
+        else picture.setImageURI(imageUri);
 
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -156,10 +152,19 @@ public class EditPet extends AppCompatActivity {
             storeData();
             startActivity(new Intent(EditPet.this, DisplayPetDetails.class));
             return true;
-        }
-        else if (id ==R.id.deletePet){
-            databaseHelper.deleteData(String.valueOf(id));
-            onResume();
+        } else if (id ==R.id.deletePet){
+            DeleteAlertDialogue.ShowDeleteAlertDialogue showDeleteAlertDialogue =
+                    new DeleteAlertDialogue().setDatabaseHelper(this).setToSingle(pet_id);
+            showDeleteAlertDialogue.onActionFinished(new DeleteAlertDialogue.ShowDeleteAlertDialogue.ActionFinished() {
+                @Override
+                public void onActionFinished(Boolean value) {
+                    Intent intent = new Intent(EditPet.this, Dashboard.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+            showDeleteAlertDialogue.DeleteShow();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -345,34 +350,30 @@ public class EditPet extends AppCompatActivity {
         birthday = bdate.getText().toString().trim();
         age = Integer.parseInt(petAge.getText().toString().trim().replaceAll("[^\\d]", ""));
         weight = Integer.valueOf(petWeight.getText().toString().trim());
+        String allergiesValue, treatsValue, medications, vetNameValue, vetContact;
+        allergiesValue = allergies.getText().toString().trim();
+        treatsValue = treats.getText().toString().trim();
+        medications = med.getText().toString().trim();
+        vetNameValue = vetName.getText().toString().trim();
+        vetContact = vetNum.getText().toString().trim();
 
-        if (isEditMode) {
-            String timestamp = ""+System.currentTimeMillis();
-            databaseHelper.updateData(
-                    ""+ pet_id,
-                    ""+pname,
-                    ""+breed,
-                    ""+sex,
-                    ""+birthday,
-                    age,
-                    weight,
-                    ""+imageUri,
-                    ""+addedTime,
-                    ""+timestamp,
-                    ""+PFID);
-        } else {
-            String timestamp = ""+System.currentTimeMillis();
-            databaseHelper.storeData(
-                    ""+pet_id,
-                    ""+petName,
-                    ""+breed,
-                    ""+sex,
-                    ""+birthday,
-                    age,
-                    weight,
-                    ""+imagePath,
-                    ""+timestamp,
-                    ""+timestamp);
-        }
+        String timestamp = ""+System.currentTimeMillis();
+        databaseHelper.updateData(
+                ""+ pet_id,
+                ""+pname,
+                ""+breed,
+                ""+sex,
+                ""+birthday,
+                age,
+                weight,
+                ""+imageUri,
+                ""+timestamp,
+                ""+PFID);
+            databaseHelper.updateHealthInfo(pet_id,
+                                            allergiesValue,
+                                            treatsValue,
+                                            medications,
+                                            vetNameValue,
+                                            vetContact);
     }
 }

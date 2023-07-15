@@ -32,7 +32,8 @@ public class DisplayPetDetails extends AppCompatActivity
                                 implements BluetoothGattCallbackHandler.DescriptorWriteCallback{
 
     private CircularImageView petProfile;
-    private TextView petName, petBreed, petSex, date, petWeight, MACAddress, age_textview;
+    private TextView petName, petBreed, petSex, date, petWeight, MACAddress, age_textview,
+            petAllergiesDisplay, petTreatsDisplay, petMedDisplay, petVetDisplay, petContactDisplay;
     private BottomNavigationView bottomNav;
     private String recordID, image;
     private DatabaseHelper dbhelper;
@@ -56,6 +57,11 @@ public class DisplayPetDetails extends AppCompatActivity
         petWeight = findViewById(R.id.petWeightDisplay);
         MACAddress = findViewById(R.id.deviceConnected);
         age_textview = findViewById(R.id.petAgeDisplay);
+        petAllergiesDisplay = findViewById(R.id.petAllergiesDisplay);
+        petTreatsDisplay = findViewById(R.id.petTreatsDisplay);
+        petMedDisplay = findViewById(R.id.petMedDisplay);
+        petVetDisplay = findViewById(R.id.petVetDisplay);
+        petContactDisplay = findViewById(R.id.vetContactDisplay);
 
         bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setOnItemSelectedListener(item -> {
@@ -141,10 +147,7 @@ public class DisplayPetDetails extends AppCompatActivity
         int id = item.getItemId();
         if (id == R.id.editPet) {
             petFinder.setCurrentPetModel(petModel);
-            Intent intent = new Intent(DisplayPetDetails.this, EditPet.class);
-            intent.putExtra("isEditMode", true);
-            intent.putExtra("isConnected", isConnected);
-            startActivity(intent);
+            startActivity(new Intent(DisplayPetDetails.this, EditPet.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -154,22 +157,22 @@ public class DisplayPetDetails extends AppCompatActivity
     private void showRecordDetails() {
         petModel = dbhelper.getRecordDetails(recordID);
 
+        image = petModel.getImage();
+        if (image.equals("null")) petProfile.setImageResource(R.drawable.profile);
+        else petProfile.setImageURI(Uri.parse(image));
+
         MACAddress.setText(petModel.getMAC_ADDRESS());
         petName.setText(petModel.getName());
         petBreed.setText(petModel.getBreed());
         petSex.setText(petModel.getSex());
-        if (petModel.getAge()>1) age_textview.setText(String.format("%d Years Old", petModel.getAge()));
-        else age_textview.setText(String.format("%d Year Old", petModel.getAge()));
+        age_textview.setText(String.format(petModel.getAge()>1?"%d Years Old":"%d Year Old", petModel.getAge()));
         date.setText(petModel.getBirthdate());
         petWeight.setText(String.format("%dkg", petModel.getWeight()));
-
-        image = petModel.getImage();
-
-        if (image.equals("null")){
-            petProfile.setImageResource(R.drawable.profile);
-        } else {
-            petProfile.setImageURI(Uri.parse(image));
-        }
+        if (!petModel.getAllergies().isEmpty()) petAllergiesDisplay.setText(petModel.getAllergies());
+        if (!petModel.getTreats().isEmpty()) petTreatsDisplay.setText(petModel.getTreats());
+        if (!petModel.getMedications().isEmpty()) petMedDisplay.setText(petModel.getMedications());
+        if (!petModel.getVetName().isEmpty()) petVetDisplay.setText(petModel.getVetName());
+        if (!petModel.getVetContact().isEmpty()) petContactDisplay.setText(petModel.getVetContact());
     }
 
     @Override

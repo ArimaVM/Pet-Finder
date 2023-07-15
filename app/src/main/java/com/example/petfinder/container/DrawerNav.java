@@ -13,8 +13,10 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.petfinder.R;
+import com.example.petfinder.application.PetFinder;
+import com.example.petfinder.components.About;
+import com.example.petfinder.components.Credits;
 import com.example.petfinder.components.Dashboard;
-import com.example.petfinder.components.Settings;
 import com.google.android.material.navigation.NavigationView;
 
 public class DrawerNav extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -46,11 +48,24 @@ public class DrawerNav extends AppCompatActivity implements NavigationView.OnNav
         switch (menuItem.getItemId()){
 
             case R.id.nav_dashboard:
-                startActivity(new Intent(DrawerNav.this, Dashboard.class));
+                if (PetFinder.getInstance().getDrawerNavID()!=0) {
+                    startActivity(new Intent(DrawerNav.this, Dashboard.class));
+                    PetFinder.getInstance().setDrawerNavID(0);
+                }
                 break;
 
-            case R.id.nav_settings:
-                startActivity(new Intent(DrawerNav.this, Settings.class));
+            case R.id.nav_about:
+                if (PetFinder.getInstance().getDrawerNavID()!=1) {
+                startActivity(new Intent(DrawerNav.this, About.class));
+                    PetFinder.getInstance().setDrawerNavID(1);
+                }
+                break;
+
+            case R.id.nav_credits:
+                if (PetFinder.getInstance().getDrawerNavID()!=2) {
+                    startActivity(new Intent(DrawerNav.this, Credits.class));
+                    PetFinder.getInstance().setDrawerNavID(2);
+                }
                 break;
 
             default:
