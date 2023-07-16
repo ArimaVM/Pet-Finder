@@ -4,8 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.widget.ProgressBar;
 
 import com.example.petfinder.components.Dashboard;
@@ -44,9 +46,16 @@ public class MainActivity extends AppCompatActivity {
                 if(counter == 100) {
                     t.cancel();
                     CheckForAppCompatibility();
-                    Intent intent = new Intent(MainActivity.this, Dashboard.class);
-                    startActivity(intent);
-                    finish();
+
+                    SharedPreferences sharedPreferences =
+                            PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                    if (!sharedPreferences.getBoolean(OnBoarding.COMPLETED_ONBOARDING_PREF_NAME, false)) {
+                        startActivity(new Intent(MainActivity.this, OnBoarding.class));
+                        finish();
+                    } else {
+                        startActivity(new Intent(MainActivity.this, Dashboard.class));
+                        finish();
+                    }
                 }
             }
         };

@@ -20,4 +20,13 @@
     <color name="pink">#D95F69</color>
     <color name="gray">#808080</color>
     <color name="lightGray">#cccccc</color>
+
+    <!--ON BOARDING COLORS-->
+    <color name="onBoarding1">#BB86FC</color>
+    <color name="onBoarding2">#ECB95B</color>
+    <color name="onBoarding3">#93C0A4</color>
+    <color name="onBoarding4">#EC5B5B</color>
+    <color name="onBoarding5">#5DA6EA</color>
+    <color name="onBoarding6">#FF825C</color>
+    <color name="onBoarding7">#80DBCD</color>
 </resources>

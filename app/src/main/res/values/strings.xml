@@ -108,4 +108,11 @@
     <string name="collar_location">Use Collar\'s \nLocation</string>
     <string name="geofence_radius">Radius</string>
     <string name="geofence">Geofence</string>
+    <string name="onBoarding1">We are excited to have you on board. With Pet Finder, you can easily track and manage your pets with advanced features and seamless integration. Let\'s explore what we can offer!</string>
+    <string name="onBoarding2">Keep an eye on your furry friends\' whereabouts using our GPS tracking feature. Never lose sight of them again!</string>
+    <string name="onBoarding3">Monitor your pets\' activity levels with the built-in pedometer. Stay informed about their daily exercise routines.</string>
+    <string name="onBoarding4">Generate comprehensive reports to track your pets\' health, activities, and more. Access valuable insights with just a few taps.</string>
+    <string name="onBoarding5">Pet Finder seamlessly integrates with our Pet Feeder app. Sync your data effortlessly for a holistic pet care experience.</string>
+    <string name="onBoarding6">Please note that the GPS Tracking feature uses NEO-6M GPS Module which requires an active GPS satellite signal in your vicinity to function. Be sure to use it in an area with good GPS coverage.</string>
+    <string name="onBoarding7">Now that you\'re up and ready to take care of your beloved pets, Pet Finder is here to support you every step of the way. Happy pet parenting!</string>
 </resources>
