@@ -17,18 +17,14 @@ public class PetFinderContentProvider extends ContentProvider {
 
     public static final String AUTHORITY = "com.example.petfinder";
     public static final Uri CONTENT_URI_PETS = Uri.parse("content://"+AUTHORITY+"/"+ Constants.TABLE_NAME);
-    public static final Uri CONTENT_URI_STEP = Uri.parse("content://"+AUTHORITY+"/"+ Constants.TABLE_NAME3);
 
     private static final int PETS = 1;
-    private static final int STEP = 2;
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
     static {
         URI_MATCHER.addURI(AUTHORITY, Constants.TABLE_NAME, PETS);
-        URI_MATCHER.addURI(AUTHORITY, Constants.TABLE_NAME3, STEP);
     }
 
     public static final String CONTENT_TYPE_PETS = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + Constants.TABLE_NAME;
-    public static final String CONTENT_TYPE_STEP = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + Constants.TABLE_NAME3;
 
     DatabaseHelper databaseHelper;
 
@@ -50,9 +46,6 @@ public class PetFinderContentProvider extends ContentProvider {
                     cursor = databaseHelper.query(uri, projection, selection, selectionArgs, sortOrder, URI_MATCHER, PETS, getContext());
                 }
                 break;
-            case STEP:
-                cursor = databaseHelper.getAllSteps();
-                break;
         }
         return cursor;
     }
@@ -62,7 +55,6 @@ public class PetFinderContentProvider extends ContentProvider {
     public String getType(@NonNull Uri uri) {
         switch (URI_MATCHER.match(uri)){
             case PETS: return CONTENT_TYPE_PETS;
-            case STEP: return CONTENT_TYPE_STEP;
         }
         return null;
     }

@@ -94,14 +94,11 @@ public class PetFinder extends Application implements Application.ActivityLifecy
 
     private void isContentUriExists() {
         Uri uri_pets = PetProviderConstants.CONTENT_URI_PETS;
-        Uri uri_step = PetProviderConstants.CONTENT_URI_STEP;
         Cursor cursorPets = null;
-        String cursorStep;
 
         try {
             cursorPets = contentResolver.query(uri_pets, null, null, null, null);
-            cursorStep = contentResolver.getType(uri_step);
-            contentProviderExists = cursorPets != null && cursorStep != null;
+            contentProviderExists = cursorPets != null;
         } catch (Exception e) {
             e.printStackTrace();
             contentProviderExists = false;
