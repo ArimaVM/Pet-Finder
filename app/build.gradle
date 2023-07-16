@@ -13,8 +13,8 @@ android {
         minSdk 24
         targetSdk 33
         versionCode 1
-        versionName "1.0"
-
+        versionName "1.0.2023"
+        setProperty("archivesBaseName", "Pet Finder")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -30,6 +30,14 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        applicationVariants.all{
+            variant ->
+                variant.outputs.each{
+                    output->
+                        def name = "Pet Finder v1.0.2023.apk"
+                        output.outputFileName = name
+                }
         }
     }
     compileOptions {
