@@ -474,7 +474,7 @@ public class PetFinder extends Application implements Application.ActivityLifecy
         private String convertDateTime(String date, String time){
             // Specify the UTC time and format
             String utcTime = date+"T"+time;
-            DateTimeFormatter utcFormatter = DateTimeFormatter.ofPattern("d/M/yyyy'T'HH:mm:ss");
+            DateTimeFormatter utcFormatter = DateTimeFormatter.ofPattern("M/d/yyyy'T'HH:mm:ss");
 
             // Parse the UTC time string to LocalDateTime
             LocalDateTime utcDateTime = LocalDateTime.parse(utcTime, utcFormatter);
