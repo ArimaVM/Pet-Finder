@@ -18,6 +18,6 @@ public class Credits extends DrawerNav {
         activityCreditsBinding = ActivityCreditsBinding.inflate(getLayoutInflater());
         setContentView(activityCreditsBinding.getRoot());
 
-        allocateActivityTitle("About");
+        allocateActivityTitle("Credits");
     }
 }
