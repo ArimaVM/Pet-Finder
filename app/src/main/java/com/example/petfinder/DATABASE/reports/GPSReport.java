@@ -196,7 +196,7 @@ public class GPSReport {
             Integer[] accumulatedCount = new Integer[]{0, 0};
             Integer[] count;
             Cursor cursor;
-
+            boolean hadData = false;
             switch (GPSMode){
                 case DAILY:
                     cursor = db.query(
@@ -215,6 +215,7 @@ public class GPSReport {
                         accumulatedCount[0] = 0;
                         accumulatedCount[1] = 0;
                     }
+                    state = State.HAS_DATA;
                     count = processCursor(cursor);
                     accumulatedCount[0] += count[0];
                     accumulatedCount[1] += count[1];
@@ -233,10 +234,12 @@ public class GPSReport {
                         );
 
                         if (cursor.getCount() == 0) {
-                            state = State.NO_DATA;
+                            if (!hadData) state = State.NO_DATA;
                             continue;
                         }
                         count = processCursor(cursor);
+                        hadData = true;
+                        state = State.HAS_DATA;
                         accumulatedCount[0] += count[0];
                         accumulatedCount[1] += count[1];
                     }
@@ -255,10 +258,12 @@ public class GPSReport {
                         );
 
                         if (cursor.getCount() == 0) {
-                            state = State.NO_DATA;
+                            if (!hadData) state = State.NO_DATA;
                             continue;
                         }
                         count = processCursor(cursor);
+                        hadData = true;
+                        state = State.HAS_DATA;
                         accumulatedCount[0] += count[0];
                         accumulatedCount[1] += count[1];
                     }

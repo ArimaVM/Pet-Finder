@@ -559,7 +559,7 @@ public class Reports extends AppCompatActivity {
             if (inside == 0 && outside == 0){
                 colors.add(getResources().getColor(R.color.grey));
                 gpsData.setText("N/A");
-                gpsDataLabel.setText("No data for today.");
+                gpsDataLabel.setText("No data for "+(gpsMode==GPSMode.DAILY?"today.":gpsMode==GPSMode.WEEKLY?"this week.":"this month."));
             } else if (typeAmountMap.get("Inside") < typeAmountMap.get("Outside")) {
                 colors.add(getResources().getColor(R.color.purple_700));
                 colors.add(getResources().getColor(R.color.orange));

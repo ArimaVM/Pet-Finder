@@ -35,7 +35,7 @@ android {
             variant ->
                 variant.outputs.each{
                     output->
-                        def name = "Pet Finder v1.0.2023.apk"
+                        def name = "Pet Finder v1.2.2023.apk"
                         output.outputFileName = name
                 }
         }
