@@ -72,7 +72,7 @@ public class GPSReport {
         return cursor.getCount()>0;
     }
 
-    private static List<String> getThisWeek(){
+    public static List<String> getThisWeek(){
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 

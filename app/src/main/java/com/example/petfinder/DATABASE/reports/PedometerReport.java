@@ -9,9 +9,14 @@ import com.example.petfinder.DATABASE.Constants;
 import com.example.petfinder.DATABASE.DatabaseHelper;
 import com.example.petfinder.application.PetFinder;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class PedometerReport {
 
@@ -22,54 +27,58 @@ public class PedometerReport {
         databaseHelper = new DatabaseHelper(context);
     }
 
+    @SuppressLint("SimpleDateFormat")
+    private Integer dayOfWeek(String date) throws ParseException {
+        Calendar c = Calendar.getInstance();
+        c.setTime(Objects.requireNonNull(new SimpleDateFormat("MM/dd/yyyy").parse(date)));
+        return c.get(Calendar.DAY_OF_WEEK);
+    }
+
     @SuppressLint("Range")
     public List<Integer> getDaily(){
         highestPedometer = 0;
+
         try {
             PetFinder.getInstance().getPedometer().saveData();
         }
         catch(Exception ignored) {}
 
-        int limit = getLimitDaily();
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        Cursor cursor = db.query(
-                Constants.TABLE_NAME3,
-                null,
-                Constants.COLUMN_ID+" = ? ",
-                new String[]{PetFinder.getInstance().getCurrentMacAddress()},
-                null,
-                null,
-                null,
-                "7"
-        );
-        List<Integer> returnValue = new ArrayList<>();
-        boolean sundayStarted = false;
-        if (cursor.getCount()<7){
-            sundayStarted = true;
-        }
-        int iteration = 0;
-        while (cursor.moveToNext()) {
-            if (!sundayStarted) {
-                if (StringToDay(cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DATE))) == Calendar.SUNDAY) {
-                    sundayStarted = true;
-                }
-            }
-            if (sundayStarted) {
-                iteration++;
-                if (iteration==1) {
-                    int dayOfFirstIteration = StringToDay(cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DATE)));
-                    if (dayOfFirstIteration != Calendar.SUNDAY) {
-                        for (int i = 0; i <= dayOfFirstIteration-1; i++) returnValue.add(0);
+        LinkedHashMap<Integer, Integer> returnHelper = new LinkedHashMap<>();
+        returnHelper.put(Calendar.SUNDAY, 0);
+        returnHelper.put(Calendar.MONDAY, 0);
+        returnHelper.put(Calendar.TUESDAY, 0);
+        returnHelper.put(Calendar.WEDNESDAY, 0);
+        returnHelper.put(Calendar.THURSDAY, 0);
+        returnHelper.put(Calendar.FRIDAY, 0);
+        returnHelper.put(Calendar.SATURDAY, 0);
+        for (String date : GPSReport.getThisWeek()) {
+            Cursor cursor = db.query(
+                    Constants.TABLE_NAME3,
+                    null,
+                    Constants.COLUMN_ID + " = ? AND " + Constants.COLUMN_DATE + " = ?",
+                    new String[]{PetFinder.getInstance().getCurrentMacAddress(), date},
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            if (cursor.moveToFirst()){
+                do {
+                    Integer day;
+                    try {
+                        day = dayOfWeek(date);
+                    } catch (ParseException ignored) {
+                        continue;
                     }
-                }
-                int steps = cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_NUMSTEPS));
-                returnValue.add(steps);
-                if (steps>highestPedometer) highestPedometer = steps;
+                    int amount = cursor.getInt(cursor.getColumnIndex(Constants.COLUMN_NUMSTEPS));
+                    returnHelper.put(day, amount);
+                    if (amount > highestPedometer) highestPedometer = amount;
+                } while (cursor.moveToNext());
             }
         }
-        for (int i = limit; i <= 7; i++) returnValue.add(0);
-        cursor.close();
         db.close();
+        ArrayList<Integer> returnValue = new ArrayList<>(returnHelper.values());
         return returnValue;
     }
 
@@ -153,25 +162,8 @@ public class PedometerReport {
         return returnValue;
     }
 
-    private int getLimitDaily(){
-        return Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-    }
-
     private int getYearToday(){
         return Calendar.getInstance().get(Calendar.YEAR);
-    }
-
-    private int StringToDay(String date){
-        Calendar calendar = Calendar.getInstance();
-
-        String[] dateParts = date.split("/");
-
-        int month = Integer.parseInt(dateParts[0])-1;
-        int day = Integer.parseInt(dateParts[1]);
-        int year = Integer.parseInt(dateParts[2]);
-
-        calendar.set(year, month, day);
-        return calendar.get(Calendar.DAY_OF_WEEK);
     }
 
     private int StringToMonth(String date){
