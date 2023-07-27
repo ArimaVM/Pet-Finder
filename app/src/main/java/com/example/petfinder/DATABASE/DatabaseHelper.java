@@ -58,17 +58,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-                        String sortOrder, UriMatcher URI_MATCHER, int PETS, Context context) {
+                        String sortOrder, Context context) {
         // Implement the query operation for the Content Provider
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor;
 
-        int match = URI_MATCHER.match(uri);
-        if (match == PETS) {// Query the pets table
-            cursor = db.query(Constants.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
-        } else {
-            throw new IllegalArgumentException("Unknown URI: " + uri);
-        }
+        cursor = db.query(Constants.TABLE_NAME + " LEFT JOIN " + Constants.TABLE_NAME5,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
+
 
         // Set the notification URI on the cursor
         if (context != null) {
@@ -129,13 +131,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public long updateHealthInfo(String btAddress, String Allergies, String treats, String Medications, String VetName, String VetContact) {
+    public long updateHealthInfo(String btAddress, String Allergies, String Medications, String VetName, String VetContact) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(Constants.COLUMN_ID, btAddress); // Use Bluetooth address as ID
         values.put(Constants.COLUMN_ALLERGIES, Allergies);
-        values.put(Constants.COLUMN_TREATS, treats);
         values.put(Constants.COLUMN_MEDICATIONS, Medications);
         values.put(Constants.COLUMN_VETNAME, VetName);
         values.put(Constants.COLUMN_VETCONTACT, VetContact);
@@ -210,7 +211,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int updateData(String id, String petName, String breed, String sex, String bdate, Integer age,
-                           Integer weight, String petPic, String updatedtime, String petFeederID) {
+                           Integer weight, String petPic, String updatedtime, String petFeederID, Boolean updateFeeder) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -230,20 +231,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //UPDATE TO PET FEEDER IF THE FOLLOWING CONDITIONS ARE MET:
         // - IF PET IS IMPORTED TO THE PET FEEDER.
         // - IF PET FEEDER IS INSTALLED IN THE SYSTEM.
-        PetFinder petFinder = PetFinder.getInstance();
-        if (petFinder.getContentProviderExists()) {
-            if (petFeederID != null) {
-                values.put(Constants.COLUMN_ID, petFeederID);
-                values.remove(Constants.COLUMN_PET_FEEDER_ID);
-                values.put(Constants.COLUMN_PET_FINDER_ID, id);
-                petFinder.getCResolver().update(PetFinderContentProvider.CONTENT_URI_PETS, values, null, null);
+        if (updateFeeder) {
+            PetFinder petFinder = PetFinder.getInstance();
+            if (petFinder.getContentProviderExists()) {
+                if (petFeederID != null) {
+                    values.put(Constants.COLUMN_ID, petFeederID);
+                    values.remove(Constants.COLUMN_PET_FEEDER_ID);
+                    values.put(Constants.COLUMN_PET_FINDER_ID, id);
+                    petFinder.getCResolver().update(PetFinderContentProvider.CONTENT_URI_PETS, values, null, null);
+                }
             }
         }
 
         db.close();
-
-        //TODO: ALSO UPDATE IN PET FEEDER IF NECESSARY.
-
         return returnValue;
     }
 

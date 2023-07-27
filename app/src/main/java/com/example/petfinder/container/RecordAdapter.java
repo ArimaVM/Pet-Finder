@@ -125,7 +125,6 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordHold
 
     class RecordHolder extends RecyclerView.ViewHolder {
 
-        private static final String TAG = "RecordHolder";
         ImageView imageButton;
         ImageView petPic;
         TextView petName, petBreed, petSex;

@@ -2,6 +2,7 @@ package com.example.petfinder.container;
 
 public class RecordModel {
     String id, name, breed, sex, age, birthdate, weight, image, addedtime, updatedtime, petFeederID;
+    String allergies, medications, vetname, vetContact;
 
     public RecordModel(String id, String name, String breed, String sex, String birthdate, String age, String weight, String image, String addedtime, String updatedtime) {
         this.id = id;
@@ -16,7 +17,51 @@ public class RecordModel {
         this.updatedtime = updatedtime;
         this.petFeederID = null;
     }
-    public RecordModel(String id, String name, String breed, String sex, String birthdate, String age, String weight, String image, String addedtime, String updatedtime, String petFeederId) {
+    public RecordModel(String id, String name, String breed, String sex, String birthdate,
+                       String age, String weight, String image, String addedtime,
+                       String updatedtime, String petFeederId,
+                       String allergies, String medications, String vetname,
+                       String vetContact) {
+        this.id = id;
+        this.name = name;
+        this.breed = breed;
+        this.sex = sex;
+        this.birthdate = birthdate;
+        this.age = age;
+        this.weight = weight;
+        this.image = image;
+        this.addedtime = addedtime;
+        this.updatedtime = updatedtime;
+        this.petFeederID = petFeederId;
+        this.allergies = allergies;
+        this.medications = medications;
+        this.vetname = vetname;
+        this.vetContact = vetContact;
+    }
+    public RecordModel(String id, String name, String breed, String sex, String birthdate,
+                       String age, String weight, String image, String addedtime,
+                       String updatedtime,
+                       String allergies, String medications, String vetname,
+                       String vetContact) {
+        this.id = id;
+        this.name = name;
+        this.breed = breed;
+        this.sex = sex;
+        this.birthdate = birthdate;
+        this.age = age;
+        this.weight = weight;
+        this.image = image;
+        this.addedtime = addedtime;
+        this.updatedtime = updatedtime;
+        this.petFeederID = null;
+        this.allergies = allergies;
+        this.medications = medications;
+        this.vetname = vetname;
+        this.vetContact = vetContact;
+    }
+    public RecordModel(String id, String name, String breed, String sex, String birthdate,
+                       String age, String weight, String image, String addedtime,
+                       String updatedtime, String petFeederId) {
         this.id = id;
         this.name = name;
         this.breed = breed;
@@ -105,5 +150,33 @@ public class RecordModel {
     }
     public void setPetFeederID(String petFeederID) {
         this.petFeederID = petFeederID;
+    }
+
+    public String getAllergies() {
+        return allergies;
+    }
+    public void setAllergies(String allergies) {
+        this.allergies = allergies;
+    }
+
+    public String getMedications() {
+        return medications;
+    }
+    public void setMedications(String medications) {
+        this.medications = medications;
+    }
+
+    public String getVetname() {
+        return vetname;
+    }
+    public void setVetname(String vetname) {
+        this.vetname = vetname;
+    }
+
+    public String getVetContact() {
+        return vetContact;
+    }
+    public void setVetContact(String vetContact) {
+        this.vetContact = vetContact;
     }
 }

@@ -43,7 +43,7 @@ public class PetFinderContentProvider extends ContentProvider {
                 if (selection==null) {
                     cursor = databaseHelper.getAllPets();
                 } else {
-                    cursor = databaseHelper.query(uri, projection, selection, selectionArgs, sortOrder, URI_MATCHER, PETS, getContext());
+                    cursor = databaseHelper.query(uri, projection, selection, selectionArgs, sortOrder, getContext());
                 }
                 break;
         }
@@ -103,7 +103,6 @@ public class PetFinderContentProvider extends ContentProvider {
         return returnValue;
     }
     private int updatePets(@NonNull Uri uri, @Nullable ContentValues values){
-        assert values != null;
         int returnValue = databaseHelper.updateData(values.getAsString(Constants.COLUMN_PET_FINDER_ID),
                 values.getAsString(Constants.COLUMN_PETNAME),
                 values.getAsString(Constants.COLUMN_BREED),
@@ -113,7 +112,8 @@ public class PetFinderContentProvider extends ContentProvider {
                 values.getAsInteger(Constants.COLUMN_WEIGHT),
                 values.getAsString(Constants.COLUMN_IMAGE),
                 values.getAsString(Constants.COLUMN_UPDATED_TIMESTAMP),
-                values.getAsString(Constants.COLUMN_ID));
+                values.getAsString(Constants.COLUMN_ID),
+                false);
         getContext().getContentResolver().notifyChange(uri, null);
         return returnValue;
     }

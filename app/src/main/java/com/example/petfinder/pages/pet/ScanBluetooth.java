@@ -421,9 +421,9 @@ public class ScanBluetooth extends AppCompatActivity
            is why it does not need the code snippet:
                if (petFinder.bluetoothObject.isNull()){...}
         */
-        petFinder.setBluetoothObject(bluetoothGatt, characteristic, bluetoothGattCallbackHandler);
         if (unlistedID.isEmpty()) {
             petFinder.setCurrentMacAddress(bluetoothAddress);
+            petFinder.setBluetoothObject(bluetoothGatt, characteristic, bluetoothGattCallbackHandler);
             startActivity(new Intent(ScanBluetooth.this, AddPet.class));
             finish();
         } else {
@@ -447,8 +447,15 @@ public class ScanBluetooth extends AppCompatActivity
                         ""+petModel.getUpdatedtime(),
                         ""+unlistedID
                         );
+                databaseHelper.updateHealthInfo(
+                            "" + bluetoothAddress,
+                            "" + petModel.getAllergies(),
+                        ""+petModel.getMedications(),
+                        ""+petModel.getVetname(),
+                            ""+petModel.getVetContact());
             }
 
+            petFinder.setBluetoothObject(bluetoothGatt, characteristic, bluetoothGattCallbackHandler);
             startActivity(new Intent(ScanBluetooth.this, DisplayPetDetails.class));
             finish();
         }

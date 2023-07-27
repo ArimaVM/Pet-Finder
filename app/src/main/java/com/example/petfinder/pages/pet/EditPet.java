@@ -76,7 +76,6 @@ public class EditPet extends AppCompatActivity {
         petAge = findViewById(R.id.EditAge);
         picture = findViewById(R.id.editPetPic);
         allergies = findViewById(R.id.allergies);
-        treats = findViewById(R.id.treats);
         med = findViewById(R.id.medication);
         vetName = findViewById(R.id.vetName);
         vetNum = findViewById(R.id.vetContact);
@@ -368,10 +367,10 @@ public class EditPet extends AppCompatActivity {
                 weight,
                 ""+imageUri,
                 ""+timestamp,
-                ""+PFID);
+                ""+PFID,
+                true);
             databaseHelper.updateHealthInfo(pet_id,
                                             allergiesValue,
-                                            treatsValue,
                                             medications,
                                             vetNameValue,
                                             vetContact);

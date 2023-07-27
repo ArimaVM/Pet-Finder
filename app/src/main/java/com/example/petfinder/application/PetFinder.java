@@ -266,7 +266,11 @@ public class PetFinder extends Application implements Application.ActivityLifecy
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_IMAGE)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ADDED_TIMESTAMP)),
                         ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_UPDATED_TIMESTAMP)),
-                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID)));
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ID)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ALLERGIES)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_MEDICATIONS)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_VETNAME)),
+                        ""+cursor.getString(cursor.getColumnIndex(Constants.COLUMN_VETCONTACT)));
                 unlistedPets.add(recordModel);
             }
             cursor.close();
