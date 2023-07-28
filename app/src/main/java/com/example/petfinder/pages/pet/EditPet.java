@@ -46,7 +46,7 @@ import java.util.Calendar;
 
 public class EditPet extends AppCompatActivity {
 
-    TextInputEditText petName, petBreed, petWeight, bdate, petAge, allergies, treats, med, vetName,vetNum;
+    TextInputEditText petName, petBreed, petWeight, bdate, petAge, allergies, med, vetName,vetNum;
 
     RadioGroup psex;
     RadioButton radioButton;
@@ -102,7 +102,6 @@ public class EditPet extends AppCompatActivity {
         petAge.setText(String.valueOf(age));
         petWeight.setText(String.valueOf(weight));
         allergies.setText(petModel.getAllergies());
-        treats.setText(petModel.getTreats());
         med.setText(petModel.getMedications());
         vetName.setText(petModel.getVetName());
         vetNum.setText(petModel.getVetContact());
@@ -349,9 +348,8 @@ public class EditPet extends AppCompatActivity {
         birthday = bdate.getText().toString().trim();
         age = Integer.parseInt(petAge.getText().toString().trim().replaceAll("[^\\d]", ""));
         weight = Integer.valueOf(petWeight.getText().toString().trim());
-        String allergiesValue, treatsValue, medications, vetNameValue, vetContact;
+        String allergiesValue, medications, vetNameValue, vetContact;
         allergiesValue = allergies.getText().toString().trim();
-        treatsValue = treats.getText().toString().trim();
         medications = med.getText().toString().trim();
         vetNameValue = vetName.getText().toString().trim();
         vetContact = vetNum.getText().toString().trim();
@@ -368,11 +366,10 @@ public class EditPet extends AppCompatActivity {
                 ""+imageUri,
                 ""+timestamp,
                 ""+PFID,
+                allergiesValue,
+                medications,
+                vetNameValue,
+                vetContact,
                 true);
-            databaseHelper.updateHealthInfo(pet_id,
-                                            allergiesValue,
-                                            medications,
-                                            vetNameValue,
-                                            vetContact);
     }
 }

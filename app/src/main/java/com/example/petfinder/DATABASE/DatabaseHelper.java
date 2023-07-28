@@ -132,6 +132,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public long updateHealthInfo(String btAddress, String Allergies, String Medications, String VetName, String VetContact) {
+        if (Allergies == null || Medications == null || VetName == null || VetContact == null) return 0;
+
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -211,7 +213,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int updateData(String id, String petName, String breed, String sex, String bdate, Integer age,
-                           Integer weight, String petPic, String updatedtime, String petFeederID, Boolean updateFeeder) {
+                          Integer weight, String petPic, String updatedtime, String petFeederID,
+                          String allergies, String medications, String vetName, String vetContact,
+                          Boolean updateFeeder) {
+        if (petName == null || breed == null || sex == null || bdate == null || age == null || weight == null || petPic == null || updatedtime == null || petFeederID == null ) return -1;
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -227,7 +232,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int returnValue =
                 db.update(Constants.TABLE_NAME, values, Constants.COLUMN_ID +" = ?", new String[] {id});
-
+        updateHealthInfo(id, allergies, medications, vetName, vetContact);
         //UPDATE TO PET FEEDER IF THE FOLLOWING CONDITIONS ARE MET:
         // - IF PET IS IMPORTED TO THE PET FEEDER.
         // - IF PET FEEDER IS INSTALLED IN THE SYSTEM.
@@ -238,6 +243,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     values.put(Constants.COLUMN_ID, petFeederID);
                     values.remove(Constants.COLUMN_PET_FEEDER_ID);
                     values.put(Constants.COLUMN_PET_FINDER_ID, id);
+                    values.put(Constants.COLUMN_ALLERGIES, allergies);
+                    values.put(Constants.COLUMN_MEDICATIONS, medications);
+                    values.put(Constants.COLUMN_VETNAME, vetName);
+                    values.put(Constants.COLUMN_VETCONTACT, vetContact);
                     petFinder.getCResolver().update(PetFinderContentProvider.CONTENT_URI_PETS, values, null, null);
                 }
             }
@@ -539,8 +548,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (cursor.moveToFirst()) {
                 petModel.setAllergies(
                         "" + cursor.getString(cursor.getColumnIndex(Constants.COLUMN_ALLERGIES)));
-                petModel.setTreats(
-                        "" + cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TREATS)));
                 petModel.setMedications(
                         "" + cursor.getString(cursor.getColumnIndex(Constants.COLUMN_MEDICATIONS)));
                 petModel.setVetName(

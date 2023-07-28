@@ -33,12 +33,11 @@ public class DisplayPetDetails extends AppCompatActivity
 
     private CircularImageView petProfile;
     private TextView petName, petBreed, petSex, date, petWeight, MACAddress, age_textview,
-            petAllergiesDisplay, petTreatsDisplay, petMedDisplay, petVetDisplay, petContactDisplay;
+            petAllergiesDisplay, petMedDisplay, petVetDisplay, petContactDisplay;
     private BottomNavigationView bottomNav;
     private String recordID, image;
     private DatabaseHelper dbhelper;
     private PetModel petModel;
-    private boolean isConnected = false;
     private BluetoothGatt bluetoothGatt;
     private PetFinder petFinder;
     private BluetoothGattCallbackHandler bluetoothGattCallbackHandler;
@@ -58,7 +57,6 @@ public class DisplayPetDetails extends AppCompatActivity
         MACAddress = findViewById(R.id.deviceConnected);
         age_textview = findViewById(R.id.petAgeDisplay);
         petAllergiesDisplay = findViewById(R.id.petAllergiesDisplay);
-        petTreatsDisplay = findViewById(R.id.petTreatsDisplay);
         petMedDisplay = findViewById(R.id.petMedDisplay);
         petVetDisplay = findViewById(R.id.petVetDisplay);
         petContactDisplay = findViewById(R.id.vetContactDisplay);
@@ -94,7 +92,6 @@ public class DisplayPetDetails extends AppCompatActivity
 
         if (bluetoothAdapter.isEnabled()) {
             @SuppressLint("MissingPermission") Runnable connectToBT = () -> {
-                isConnected = true;
                 BluetoothDevice device = bluetoothAdapter.getRemoteDevice(recordID);
                 bluetoothGatt = device.connectGatt(this, false, bluetoothGattCallbackHandler);
                 bluetoothGattCallbackHandler.setGatt(bluetoothGatt);
@@ -108,7 +105,6 @@ public class DisplayPetDetails extends AppCompatActivity
                 connectToBT.run();
             }
         } else {
-            isConnected = false;
             petFinder.deleteBluetoothObject();
         }
 
@@ -168,11 +164,10 @@ public class DisplayPetDetails extends AppCompatActivity
         age_textview.setText(String.format(petModel.getAge()>1?"%d Years Old":"%d Year Old", petModel.getAge()));
         date.setText(petModel.getBirthdate());
         petWeight.setText(String.format("%dkg", petModel.getWeight()));
-        if (!petModel.getAllergies().isEmpty()) petAllergiesDisplay.setText(petModel.getAllergies());
-        if (!petModel.getTreats().isEmpty()) petTreatsDisplay.setText(petModel.getTreats());
-        if (!petModel.getMedications().isEmpty()) petMedDisplay.setText(petModel.getMedications());
-        if (!petModel.getVetName().isEmpty()) petVetDisplay.setText(petModel.getVetName());
-        if (!petModel.getVetContact().isEmpty()) petContactDisplay.setText(petModel.getVetContact());
+        if (!petModel.getAllergies().isEmpty() || !Objects.equals(petModel.getAllergies(), "")) petAllergiesDisplay.setText(petModel.getAllergies());
+        if (!petModel.getMedications().isEmpty() || !Objects.equals(petModel.getMedications(), "")) petMedDisplay.setText(petModel.getMedications());
+        if (!petModel.getVetName().isEmpty() || !Objects.equals(petModel.getVetName(), "")) petVetDisplay.setText(petModel.getVetName());
+        if (!petModel.getVetContact().isEmpty() || !Objects.equals(petModel.getVetContact(), "")) petContactDisplay.setText(petModel.getVetContact());
     }
 
     @Override

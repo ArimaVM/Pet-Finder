@@ -246,8 +246,8 @@ public class PetFinder extends Application implements Application.ActivityLifecy
         //GET ALL PETS WITHOUT COLLAR MAC ADDRESS.
         Cursor cursor = contentResolver.query(PetProviderConstants.CONTENT_URI_PETS,
                 null,
-                Constants.COLUMN_PET_FINDER_ID + " IS NULL",
-                null,
+                Constants.COLUMN_PET_FINDER_ID + " IS NULL OR " + Constants.COLUMN_PET_FINDER_ID + " = ?",
+                new String[]{"null"},
                 null,
                 null);
         unlistedPets.clear();

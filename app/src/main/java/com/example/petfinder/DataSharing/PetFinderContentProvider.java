@@ -113,6 +113,10 @@ public class PetFinderContentProvider extends ContentProvider {
                 values.getAsString(Constants.COLUMN_IMAGE),
                 values.getAsString(Constants.COLUMN_UPDATED_TIMESTAMP),
                 values.getAsString(Constants.COLUMN_ID),
+                values.getAsString(Constants.COLUMN_ALLERGIES),
+                values.getAsString(Constants.COLUMN_MEDICATIONS),
+                values.getAsString(Constants.COLUMN_VETNAME),
+                values.getAsString(Constants.COLUMN_VETCONTACT),
                 false);
         getContext().getContentResolver().notifyChange(uri, null);
         return returnValue;

@@ -83,35 +83,32 @@ public class PetModel {
     }
 
     public String getAllergies() {
-        return Allergies;
+        return alterReturn(Allergies);
     }
     public void setAllergies(String allergies) {
         Allergies = allergies;
     }
 
-    public String getTreats() {
-        return Treats;
-    }
     public void setTreats(String treats) {
         Treats = treats;
     }
 
     public String getMedications() {
-        return Medications;
+        return alterReturn(Medications);
     }
     public void setMedications(String medications) {
         Medications = medications;
     }
 
     public String getVetName() {
-        return VetName;
+        return alterReturn(VetName);
     }
     public void setVetName(String vetName) {
         VetName = vetName;
     }
 
     public String getVetContact() {
-        return VetContact;
+        return alterReturn(VetContact);
     }
     public void setVetContact(String vetContact) {
         VetContact = vetContact;
@@ -136,5 +133,9 @@ public class PetModel {
     }
     public void setUpdated_timestamp(String updated_timestamp) {
         this.updated_timestamp = updated_timestamp;
+    }
+
+    private String alterReturn(String value){
+        return value==null?"":value.equals("null")?"":value;
     }
 }
